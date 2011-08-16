@@ -1,0 +1,39 @@
+<div
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd" 
+	xmlns:p="tapestry:parameter"
+	class="requireLogin"
+>
+<t:if t:test="loggedIn">
+	<p:else>
+		<div class="access-forbidden">
+			<t:delegate to="noLoginBlock" />
+		</div>
+	</p:else>
+	<t:if t:test="hasRole">
+		<p:else>
+			<t:delegate to="noAccessBlock" />
+		</p:else>
+		<t:body />
+	</t:if>
+</t:if>
+
+<t:block t:id="noLoginDft">
+	<h2 class="errorTitle">${message:you-have-no-access-label}</h2>
+	<div>${message:user-must-be-logged-in}</div>
+	<a href="#" class="showlogin" onclick="dspLoginForm();return false;">${message:here-you-can-login}</a>
+</t:block>
+
+<t:block t:id="noAccessDft">
+	<div class="access-forbidden">
+		<h2 class="errorTitle">${message:you-have-no-access-label}</h2>
+		<t:if t:test="moreRoles">
+			<p:else>
+				${message:user-must-have-role} <span class="roleCodes">'${roleCodes}'</span>
+			</p:else>
+			${message:user-must-have-an-of-roles}: <span class="roleCodes">${roleCodes}</span>
+		</t:if>
+	</div>
+	<a href="#" class="showlogin" onclick="dspLoginForm();return false;">${message:you-can-login-as-user-with-rights}</a>
+</t:block>
+
+</div>

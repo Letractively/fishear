@@ -1,0 +1,12 @@
+<div
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd" 
+	xmlns:p="tapestry:parameter" 
+	class="accountInfo"
+>
+<t:if t:test="llSvc.loggedIn">
+	<p:else>
+		<a class="loginLink" href="#" onclick="${onclickAction}">${message:login-label}</a>
+	</p:else>
+	<span class="userInfo">${userInfo}</span>&#160;<t:actionlink id="logout" t:id="logout" >${message:logout-label}</t:actionlink>
+</t:if>
+</div>

@@ -1,0 +1,24 @@
+<div
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_0_0.xsd" 
+	xmlns:p="tapestry:parameter"
+	id="loginFormDiv"
+>
+	<t:form id="loginForm">
+		<t:component t:id="messages" class="literal:error" />
+		<div t:type="if" t:test="LoggedIn" class="errors">
+			${message:you-have-not-access-to-required-data}<br />
+		</div>
+		<br />
+		<div>
+		${loginMessage}
+		</div>
+		<br />
+		<t:label id="usernameLabel" class="ui-form-label" t:for="username">${message:username-label}:</t:label>&#160;<t:textfield t:id="username" /><br />
+		<t:label id="usernameLabel" class="ui-form-label" t:for="password">${message:password-label}:</t:label>&#160;<t:passwordfield t:id="password" /><br />
+		<t:label id="remenberMeLabel1" class="ui-form-label" t:for="rememberMe">&#160;</t:label>&#160;<t:checkbox t:id="rememberMe" /><t:label id="remenberMeLabel2" t:for="rememberMe">${message:remember-me-label}</t:label><br />
+		<br />
+		<t:submit t:value="${message:do-login-label}" />
+		<div id="loginAddInfoFrame" style="text-align: right;">
+		</div>
+	</t:form>
+</div>

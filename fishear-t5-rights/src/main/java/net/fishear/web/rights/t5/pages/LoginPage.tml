@@ -1,0 +1,16 @@
+<html 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+	t:type="fe/EmptyLayout"
+	t:pageTitle="${pageTitle}"
+>
+<h1 class="login-page">${pageName}</h1>
+
+<t:if t:test="loginForm.LoggedIn">
+	You are logged in as ${loginForm.userInfo.FullUserName}.
+	You can <t:actionlink t:id="logout">log out </t:actionlink> or navigate to <t:pagelink t:page="index">home page.</t:pagelink>
+	<p:else>
+		<t:componen t:id="loginForm" />
+	</p:else>
+</t:if>
+</html>
