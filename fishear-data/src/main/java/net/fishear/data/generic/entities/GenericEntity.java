@@ -130,7 +130,7 @@ implements
 	}
 
     @Transient
-	public String recordDescription() {
+	public String entityDescription() {
     	String desc = "Entity '"+ Classes.getShortClassName(this) + "', id=" + getId();
     	final String[] knMets = {"getFullName", "getCode", "getName", "getTitle"};
     	for (int i = 0; i < knMets.length; i++) {

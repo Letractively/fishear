@@ -63,7 +63,7 @@ public class Table extends Grid
     }
 
     public String deleteConfirmMessage(EntityI<?> entity) {
-    	return Utils.getMessage(crsc, "really-delete-record-query", entity.recordDescription().replace('\'', '\"'));
+    	return Utils.getMessage(crsc, "really-delete-record-query", entity.entityDescription().replace('\'', '\"'));
 
     }
     

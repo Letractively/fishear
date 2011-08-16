@@ -31,10 +31,9 @@ extends
 
     /** returns the human-readable description of this entities values.
      * Returned value is mostly used in system messages (error, ... etc) to identify this entity row.
-     * <br /><strong>Note: Implementing class MUST annotate this method as "@Transient"</strong>, because of annotations are NOT inherited in Java.
      */
     @Transient
-    public String recordDescription();
+    public String entityDescription();
 
 	 /** returns true is entity instance is newly created (= it is not loaded from persistent storage).
 	  * Returns false = it may, or may not be loaded.
