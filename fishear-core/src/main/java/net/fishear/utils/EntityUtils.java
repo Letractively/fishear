@@ -456,11 +456,12 @@ public class
 	 * @param flags flags controlling copying
 	 * @return the destination object
 	 */
-	public static <T> T fillDestination(T srcE, T dstE, FillFlags... flags) {
+	@SuppressWarnings("unchecked")
+	public static <T> T fillDestination(Object srcE, Object dstE, FillFlags... flags) {
 		
 		Class<?> clazz = srcE.getClass();
-		if(srcE.getClass() != dstE.getClass()) {
-			throw new IllegalArgumentException("The source and target entities must be instance of the same class.");
+		if( !dstE.getClass().isAssignableFrom(srcE.getClass())) {
+			throw new IllegalArgumentException("The target entitiy must be assignable from the source.");
 		}
 		try {
 			boolean fillEmptyOnly = false; 
@@ -509,7 +510,7 @@ public class
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
-		return dstE;
+		return (T) dstE;
 	}
 
 	/** returns true if the entity is considererd as new (non-saved to persistent location).
