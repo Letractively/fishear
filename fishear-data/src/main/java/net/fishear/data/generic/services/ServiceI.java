@@ -95,6 +95,12 @@ public interface
      */
     void flushAll();
     
+    /** checks whether given property is lazy loaded.
+     * Useful only by joined properties.
+     * @param entity the entity
+     * @param propertyName tested property
+     * @return true if property is lazy loaded, false otherwise
+     */
     boolean isLazyLoaded(K entity, String propertyName);
 
     /** creates new, empty instance of entity.
@@ -109,6 +115,7 @@ public interface
 
 	/** Does persistent storage query to existence entity, which has given properties filled out by values from 'entity'.
 	 * If the 'entity' has non-zero not null ID, such entity is EXCLUDED from query (e.g. if only those entity exists, method returns false).
+	 * The method is suit for verifying codes and names that are treated to be unique on "application level", but not limited by constraints.
 	 * @param entity the source values entity 
 	 * @param propertyNames list of property names. 'entity' must contain each one, otherwise exception is thrown.
 	 * @return true if there exist such entity, false if does not.
@@ -147,4 +154,12 @@ public interface
      * @return DAO instance for this service.
      */
     GenericDaoI<K> getDao();
+
+	/** Synchronize entity in persistent storage with given entity.
+	 * If the 'entity' exists in the persistent storage, reads it and synchronize read one with 'entity'. 
+	 * Otherwise ('entity' is null, no ID, does not exist...), returns original entity or new instance. 
+	 * @param entity the "source" entity
+	 * @return entity instance
+	 */
+	K syncRead(K entity);
 }

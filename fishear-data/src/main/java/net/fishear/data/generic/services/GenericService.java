@@ -153,6 +153,22 @@ implements
     public K newEntityInstance() {
     	return getDao().newEntityInstance();
     }
+    
+    @Override
+    public K syncRead(K entity) {
+    	if(entity == null) {
+    		return newEntityInstance();
+    	}
+    	if(entity.isNew()) {
+    		return entity;
+    	}
+    	K nent = read(entity.getId());
+    	if(nent == null) {
+    		return entity;
+    	}
+    	EntityUtils.fillDestination(entity, nent);
+    	return nent;
+    }
 
 	@Override
     public K read(QueryConstraints qc) throws TooManyRecordsException {
@@ -167,7 +183,7 @@ implements
 		
 		return list.get(0);
     }
-	
+
 	@Override
 	public boolean existsEntity(K entity, String... propertyNames) {
 		try {
@@ -220,7 +236,7 @@ implements
 	public K fillNewEntity(K entity) {
 		if(!entity.isNew()) {
 			K e1 = read(entity.getId());
-			EntityUtils.fillNotEmpty(entity, e1);
+			EntityUtils.fillDestination(entity, e1);
 			return e1;
 		}
 		return entity;
