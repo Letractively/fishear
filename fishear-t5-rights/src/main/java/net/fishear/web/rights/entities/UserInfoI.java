@@ -10,5 +10,9 @@ public interface UserInfoI
 	String getLoginName();
 
 	String getFullUserName();
+	
+	String getFirstName();
+	
+	String getLastName();
 
 }

@@ -453,9 +453,10 @@ public class
 	 * If getter returns null, setter is not called. Also if values from both instances are the same, setter is not called.
 	 * @param srcE the source entity
 	 * @param dstE the destination
-	 * @param flags falgs controlling copying
+	 * @param flags flags controlling copying
+	 * @return the destination object
 	 */
-	public static void fillDestination(Object srcE, Object dstE, FillFlags... flags) {
+	public static <T> T fillDestination(T srcE, T dstE, FillFlags... flags) {
 		
 		Class<?> clazz = srcE.getClass();
 		if(srcE.getClass() != dstE.getClass()) {
@@ -508,6 +509,7 @@ public class
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+		return dstE;
 	}
 
 	/** returns true if the entity is considererd as new (non-saved to persistent location).
