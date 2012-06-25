@@ -4,13 +4,20 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fishear.Interfaces.IdI;
+import net.fishear.exceptions.AppException;
 
 
 
@@ -28,6 +35,25 @@ public class
 
 	public static final Object[] EOA = new Object[0];
 	public static final Class<?> TOP_LEVEL_CLASS = Object.class;
+
+	private static final Hashtable<Class<?>, Hashtable<String, FldDesc>> cache = new Hashtable<Class<?>, Hashtable<String, FldDesc>>();
+	
+	private static Logger log = LoggerFactory.getLogger(EntityUtils.class);
+	
+	public static enum FillFlags {
+
+		/**
+		 * for 'flags' in {@link #fillDestination(Object, Object, int)}. 
+		 * If set, only null values from target will be filled out. 
+		 */
+		FILL_EMPTY_ONLY,
+		
+		/**
+		 * for 'flags' in {@link #fillDestination(Object, Object, int)}. 
+		 * If set, all values in dest (except IDs) will be overwritten.
+		 */
+		FILL_ALL
+	}
 
 	/** return true if both 'e1' and 'e2' are null, or if both id's of 'e1' and 'e2' are null, or if id's of 'e1' and 'e2' are equals.
 	 * In other cases, returns false.
@@ -136,83 +162,79 @@ public class
 	 * as field), it is used to obtain fiels's value. Otherwise, value is taken
 	 * directly from field. If both fields (from e1 and e2) are null, it is OK.
 	 */
-//	public static boolean equals(IdI e1, Object e2) {
-//		return equals(e1, e2, new HashSet<Field>());
-//	}
-//
-//	public static boolean equals(IdI e1, Object e2,
-//			Set<Field> done) {
-//		if (e1 == e2) {
-//			return true;
-//		}
-//		Class<?> clazz = e1.getClass();
-//		if (clazz != e2.getClass()) {
-//			return false;
-//		}
-//		do {
-//			Field[] fields = clazz.getDeclaredFields();
-//			for (int i = 0; i < fields.length; i++) {
-//				Field fld = fields[i];
-//				String fldn = fld.getName();
-//				if (fld.getAnnotation(Transient.class) != null) {
-//					continue;
-//				}
-//				if (done.contains(fld)) {
-//					continue;
-//				}
-//				done.add(fld);
-//				String metn = "get" + fldn.substring(0, 1).toUpperCase()
-//						+ fldn.substring(1);
-//				Method m;
-//				try {
-//					Object v1, v2;
-//					try {
-//						m = clazz.getMethod(metn);
-//						if (m.getAnnotation(Transient.class) != null) {
-//							continue;
-//						}
-//						if (!m.isAccessible()) {
-//							m.setAccessible(true);
-//						}
-//						v1 = m.invoke(e1, EOA);
-//						v2 = m.invoke(e2, EOA);
-//					} catch (Exception e) { // exceptions is OK here if getter
-//											// does not exists
-//						if (!fld.isAccessible()) {
-//							fld.setAccessible(true);
-//						}
-//						v1 = fld.get(e1);
-//						v2 = fld.get(e2);
-//					}
-//					if (v1 == null) {
-//						if (v2 != null) {
-//							return false;
-//						}
-//					} else {
-//						if (v2 == null) {
-//							return false;
-//						}
-//						if (v1 instanceof IdI) {
-//							if (!equals((IdI) v1,
-//									(IdI) v2, done)) {
-//								return false;
-//							}
-//						} else {
-//							if (!v1.equals(v2)) {
-//								return false;
-//							}
-//						}
-//					}
-//				} catch (Exception e) {
-//					System.err.println("Cannot get value for field: " + fld
-//							+ "\nValue type: " + fld.getType());
-//					// e.printStackTrace();
-//					throw new AppException(e);
-//				}
-//			}
-//		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
-//		return true;
-//	}
+	public static boolean equals(Object e1, Object e2) {
+		return equals(e1, e2, new HashSet<Method>(), Integer.MAX_VALUE);
+	}
+
+	/** like {@link #equals(Object, Object)}, but maximum depth for inner fields is limited to "maxDepth". 
+	 * @param e1 first object
+	 * @param e2 second object
+	 * @param maxDepth max depth 
+	 * @return true if objects are equals, false otherwise 
+	 */
+	public static boolean equals(Object e1, Object e2, int maxDepth) {
+		return equals(e1, e2, new HashSet<Method>(), maxDepth);
+	}
+
+	public static boolean equals(Object e1, Object e2, Set<Method> done, int depth) {
+		if(depth < 0) {
+			return true;
+		}
+		if (e1 == e2) {
+			return true;
+		}
+		Class<?> clazz = e1.getClass();
+		if (clazz != e2.getClass()) {
+			return false;
+		}
+		String cln = clazz.getName();
+		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
+			return e1.equals(e2);
+		}
+		do {
+			Field[] fields = clazz.getDeclaredFields();
+			for (int i = 0; i < fields.length; i++) {
+				Field fld = fields[i];
+				String fldn = fld.getName();
+				if (fld.getAnnotation(Transient.class) != null) {
+					continue;
+				}
+				if (done.contains(fld)) {
+					continue;
+				}
+				String metn = "get" + fldn.substring(0, 1).toUpperCase() + fldn.substring(1);
+				Method m;
+				try {
+					Object v1, v2;
+					try {
+						m = clazz.getMethod(metn);
+						if(done.contains(m)) {
+							continue;
+						}
+						done.add(m);
+						if (m.getAnnotation(Transient.class) != null || !Modifier.isPublic(m.getModifiers())) {
+							continue;
+						}
+					} catch (NoSuchMethodException ex) { // exceptions can be OK here if getter does not exists
+						continue;
+					}
+					v1 = m.invoke(e1);
+					v2 = m.invoke(e2);
+					if(v1 == v2) {
+						continue;
+					} else if (v1 == null || v2 == null) {
+						return false;
+					} else if (!equals(v1, v2, done, depth - 1)) {
+						return false;
+					}
+				} catch (Exception e) {
+					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());
+					throw new AppException(e);
+				}
+			}
+		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
+		return true;
+	}
 
 	private static class FldDesc
 	{
@@ -351,8 +373,6 @@ public class
 		return "";
 	}
 
-	private static final Hashtable<Class<?>, Hashtable<String, FldDesc>> cache = new Hashtable<Class<?>, Hashtable<String, FldDesc>>();
-
 	private static final FldDesc getFldDesc(Class<?> clazz, String name) {
 		Hashtable<String, FldDesc> ht;
 		String s = normalize(name);
@@ -426,28 +446,41 @@ public class
 		}
 	}
 
-	/** takes all non-empty fields from srcE and fill it's values to dstE.
+	/** takes all non-empty fields from srcE and fill them's values to dstE.
+	 * Both entities must be instance of the same class. Both getter and setter must exist, otherwise exception is thrown. 
+	 * Methods annotated by {@link Transient} annotation and getId() methods are ignored.
+	 * Methods annotated by {@link Id} annotation are ignored too.
+	 * If getter returns null, setter is not called. Also if values from both instances are the same, setter is not called.
 	 * @param srcE the source entity
 	 * @param dstE the destination
-	 * @throws NoSuchMethodException 
-	 * @throws SecurityException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
+	 * @param flags falgs controlling copying
 	 */
-	public static void fillNotEmpty(Object srcE, Object dstE) {
+	public static void fillDestination(Object srcE, Object dstE, FillFlags... flags) {
 		
 		Class<?> clazz = srcE.getClass();
 		if(srcE.getClass() != dstE.getClass()) {
 			throw new IllegalArgumentException("The source and target entities must be instance of the same class.");
 		}
 		try {
-			while(clazz != Object.class) {
+			boolean fillEmptyOnly = false; 
+			boolean fillAll = false;
+			for(FillFlags fl : flags) {
+				if(fl == FillFlags.FILL_ALL) {
+					fillAll = true;
+				} else if(fl == FillFlags.FILL_EMPTY_ONLY) {
+					fillEmptyOnly = true;
+				}
+			}
+
+			while(clazz != TOP_LEVEL_CLASS) {
 				Method[] met = clazz.getMethods();
 				for (int i = 0; i < met.length; i++) {
 					Method m = met[i];
 					String metName = m.getName();
-					if(metName.startsWith("get") && !metName.equals("getId")) {
+					if(metName.startsWith("get")) {
+						if(m.getAnnotation(Id.class) != null || metName.equalsIgnoreCase("getId")) {
+							continue;
+						}
 						Class<?> vtyp = m.getReturnType();
 						try {
 							Method setter = clazz.getMethod("set"+metName.substring(3), vtyp);
@@ -456,10 +489,14 @@ public class
 									setter.getAnnotation(Transient.class) == null &&
 									Modifier.isPublic(m.getModifiers()) && Modifier.isPublic(setter.getModifiers())
 							) {
-								Object val = m.invoke(srcE);
-								if(val != null) {
-									setter.invoke(dstE, val);
+								Object valSrc = m.invoke(srcE);
+								if(valSrc != null) {
+									Object valDst = m.invoke(dstE);
+									if(fillAll || valDst == null || (!fillEmptyOnly && !valSrc.equals(valDst))) {
+										setter.invoke(dstE, valSrc);
+									}
 								}
+								
 							}
 						} catch(NoSuchMethodException ex) {
 							// that is OK
