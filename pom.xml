@@ -48,7 +48,7 @@
 		<dependency-lib-dir>dependency-lib</dependency-lib-dir>
 		<rts-system-core-version>0.0.1-SNAPSHOT</rts-system-core-version>
 		<source-encoding>utf-8</source-encoding>
-		<tapestry-version>5.2.6</tapestry-version>
+		<tapestry-version>5.3.2</tapestry-version>
 		<hibernate-version>3.6.0.Final</hibernate-version>
 		<javassist-version>3.12.1.GA</javassist-version>
 	</properties>
@@ -204,6 +204,13 @@
 
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>tapestry-testify</id>
+			<url>http://oss.sonatype.org/content/groups/public/</url>
+		</repository>
+	</repositories>
 
 
 	<pluginRepositories>

@@ -13,7 +13,7 @@
 
 	<dependencies>
 		<dependency>
-			<version>1.0-SNAPSHOT</version>
+			<version>${parent.version}</version>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-core</artifactId>
 			<scope>provided</scope>

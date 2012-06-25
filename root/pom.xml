@@ -21,28 +21,38 @@
 		</license>
 	</licenses>
 	<repositories>
-		<repository>
-			<id>tapestry</id>
-			<url>http://tapestry.formos.com/maven-repository/</url>
-		</repository>
-		<repository>
-			<id>tapestry-snapshots</id>
-			<url>http://tapestry.formos.com/maven-snapshot-repository/</url>
-		</repository>
+<!-- 		<repository> -->
+<!-- 			<id>tapestry</id> -->
+<!-- 			<url>http://tapestry.formos.com/maven-repository/</url> -->
+<!-- 		</repository> -->
+<!-- 		<repository> -->
+<!-- 			<id>tapestry-snapshots</id> -->
+<!-- 			<url>http://tapestry.formos.com/maven-snapshot-repository/</url> -->
+<!-- 		</repository> -->
 		<repository>
 			<id>sonatype-releases</id>
-			<url>https://oss.sonatype.org/content/groups/public</url>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases />
 		</repository>
 		<repository>
 			<id>sonatype-staging</id>
-			<url>https://oss.sonatype.org/content/groups/staging</url>
+			<url>http://oss.sonatype.org/content/groups/staging</url>
+			<releases />
+			<snapshots />
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>tapestry-snapshots</id>
-			<url>http://tapestry.formos.com/maven-snapshot-repository/</url>
+			<id>sonatype-releases-plugins</id>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases />
+		</pluginRepository>
+		<pluginRepository>
+			<id>sonatype-staging-plugins</id>
+			<url>http://oss.sonatype.org/content/groups/staging</url>
+			<releases />
+			<snapshots />
 		</pluginRepository>
 	</pluginRepositories>
 
