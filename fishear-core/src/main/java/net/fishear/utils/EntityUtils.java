@@ -1,5 +1,6 @@
 package net.fishear.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,6 +40,7 @@ public class
 	private static final Hashtable<Class<?>, Hashtable<String, FldDesc>> cache = new Hashtable<Class<?>, Hashtable<String, FldDesc>>();
 	
 	private static Logger log = LoggerFactory.getLogger(EntityUtils.class);
+	private static boolean jpaAvailable = true;
 	
 	public static enum FillFlags {
 
@@ -84,20 +86,26 @@ public class
 		if(entity instanceof IdI) {
 			return (T) ((IdI<?>)entity).getId();
 		}
-		List<Field> anof  = Annotations.getAnnotatedFields(entity.getClass(), Id.class);
-		List<Method> anom = Annotations.getAnnotatedMethods(entity.getClass(), Id.class);
-		if((anof.size() + anom.size()) > 1) {
-			throw new IllegalStateException(String.format("Too many objects annotated with '%s' annotation. Expected 1, found %s", Id.class.getName(), anof.size()));
-		}
-		try {
-			if (anof.size() > 0) {
-				return (T) getGetter(entity.getClass(), anof.get(0).getName()).invoke(entity);
+		if(jpaAvailable) {
+			try {
+				List<Field> anof  = Annotations.getAnnotatedFields(entity.getClass(), Id.class);
+				List<Method> anom = Annotations.getAnnotatedMethods(entity.getClass(), Id.class);
+				if((anof.size() + anom.size()) > 1) {
+					throw new IllegalStateException(String.format("Too many objects annotated with '%s' annotation. Expected 1, found %s", Id.class.getName(), anof.size()));
+				}
+				try {
+					if (anof.size() > 0) {
+						return (T) getGetter(entity.getClass(), anof.get(0).getName()).invoke(entity);
+					}
+					if (anom.size() > 0) {
+						return (T) anom.get(0).invoke(entity);
+					}
+				} catch (Exception ex) {
+					throw Exceptions.runtime(ex);
+				}
+			} catch (NoClassDefFoundError ex) {
+				jpaAvailable = false;
 			}
-			if (anom.size() > 0) {
-				return (T) anom.get(0).invoke(entity);
-			}
-		} catch (Exception ex) {
-			throw Exceptions.runtime(ex);
 		}
 		return null;
 	}
@@ -196,7 +204,7 @@ public class
 			for (int i = 0; i < fields.length; i++) {
 				Field fld = fields[i];
 				String fldn = fld.getName();
-				if (fld.getAnnotation(Transient.class) != null) {
+				if (isTransient(fld)) {
 					continue;
 				}
 				if (done.contains(fld)) {
@@ -212,7 +220,7 @@ public class
 							continue;
 						}
 						done.add(m);
-						if (m.getAnnotation(Transient.class) != null || !Modifier.isPublic(m.getModifiers())) {
+						if (isTransient(m) || !Modifier.isPublic(m.getModifiers())) {
 							continue;
 						}
 					} catch (NoSuchMethodException ex) { // exceptions can be OK here if getter does not exists
@@ -234,6 +242,50 @@ public class
 			}
 		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
 		return true;
+	}
+	
+	private static boolean isAnnotation(Object fldOrMethod, Class<? extends Annotation> annot) {
+		if(fldOrMethod instanceof Field) {
+			return ((Field)fldOrMethod).getAnnotation(annot) != null;
+		} else if(fldOrMethod instanceof Method) {
+			return ((Method)fldOrMethod).getAnnotation(annot) != null;
+		} else {
+			throw new IllegalArgumentException("'fldOrMethod' must be field or method");
+		}
+	}
+
+	/**
+	 * solves situation when JPA libraries are not available at runtime.
+	 * 
+	 * @param fldOrMethod required object
+	 * @return true if field or method is annotated by {@link Transient}, false otherwise.
+	 */
+	private static boolean isTransient(Object fldOrMethod) {
+		if(jpaAvailable) {
+			try {
+				return isAnnotation(fldOrMethod, Transient.class);
+			} catch(NoClassDefFoundError ex) {
+				jpaAvailable = false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * solves situation when JPA libraries are not available at runtime.
+	 * 
+	 * @param fldOrMethod required object
+	 * @return true if field or method is annotated by {@link Id}, false otherwise.
+	 */
+	private static boolean isId(Object fldOrMethod) {
+		if(jpaAvailable) {
+			try {
+				return isAnnotation(fldOrMethod, Id.class);
+			} catch(NoClassDefFoundError ex) {
+				jpaAvailable = false;
+			}
+		}
+		return false;
 	}
 
 	private static class FldDesc
@@ -363,8 +415,7 @@ public class
 		if (name != null && (name = name.trim()).length() > 0) {
 			if (name.length() > 3) {
 				// is it getter or setter name ?
-				if ((name.startsWith("get") || name.startsWith("set"))
-						&& Character.isUpperCase(name.charAt(3))) {
+				if ((name.startsWith("get") || name.startsWith("set")) && Character.isUpperCase(name.charAt(3))) {
 					name = name.substring(3);
 				}
 			}
@@ -460,11 +511,11 @@ public class
 	public static <T> T fillDestination(Object srcE, Object dstE, FillFlags... flags) {
 		
 		Class<?> clazz = srcE.getClass();
-		if( !dstE.getClass().isAssignableFrom(srcE.getClass())) {
+		if( !srcE.getClass().isAssignableFrom(dstE.getClass())) {
 			throw new IllegalArgumentException("The target entitiy must be assignable from the source.");
 		}
 		try {
-			boolean fillEmptyOnly = false; 
+			boolean fillEmptyOnly = false;
 			boolean fillAll = false;
 			for(FillFlags fl : flags) {
 				if(fl == FillFlags.FILL_ALL) {
@@ -480,15 +531,15 @@ public class
 					Method m = met[i];
 					String metName = m.getName();
 					if(metName.startsWith("get")) {
-						if(m.getAnnotation(Id.class) != null || metName.equalsIgnoreCase("getId")) {
+						if(isId(m) || metName.equalsIgnoreCase("getId")) {
 							continue;
 						}
 						Class<?> vtyp = m.getReturnType();
 						try {
 							Method setter = clazz.getMethod("set"+metName.substring(3), vtyp);
 							if(
-									m.getAnnotation(Transient.class) == null && 
-									setter.getAnnotation(Transient.class) == null &&
+									!isTransient(m) && 
+									!isTransient(setter) &&
 									Modifier.isPublic(m.getModifiers()) && Modifier.isPublic(setter.getModifiers())
 							) {
 								Object valSrc = m.invoke(srcE);
