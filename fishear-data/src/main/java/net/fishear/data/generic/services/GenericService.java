@@ -243,7 +243,17 @@ implements
 	}
 
 	@Override
-	public Map<Object, String> getIdValueMap(QueryConstraints qc, String... attrNames) {
+	public Map<?, String> getIdValueMap(QueryConstraints qc, String... attrNames) {
+		return getIdValueMapInternal(qc, false, attrNames);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, String> getIdStringValueMap(QueryConstraints qc, String... attrNames) {
+		return (Map<String, String>) getIdValueMapInternal(qc, true, attrNames);
+	}
+
+	private Map<?, String> getIdValueMapInternal(QueryConstraints qc, boolean cast, String... attrNames) {
 		Defender.notEmpty(attrNames, "attrNames");
 		Map<Object, String> map = new HashMap<Object, String>();
 		List<K> list = list(qc);
@@ -254,18 +264,26 @@ implements
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < attrNames.length; i++) {
 				String s = Texts.tos(attrNames[i]);
-				if((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("\"") && s.endsWith("\""))) {
+				if((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("\'") && s.endsWith("\'"))) {
 					sb.append(s.substring(1, s.length() - 1));
 				} else {
 					sb.append(((AbstractEntity)pt).getAttributeValue(s));
 				}
 			}
-			map.put(pt.getId(), sb.toString());
+			if(cast)  {
+				map.put(pt.getId().toString(), sb.toString());
+			} else {
+				map.put(pt.getId(), sb.toString());
+			}
 		}
 		return map;
 	}
 
 	public CurrentStateI getCurrentState() {
 		return null;
+	}
+	
+	public ListDataHolder<K> getListDataHolder() {
+		return new ListDataHolder<K>(this);
 	}
 }

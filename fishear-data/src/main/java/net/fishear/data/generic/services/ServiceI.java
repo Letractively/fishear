@@ -142,7 +142,7 @@ public interface
 	 * Dotted notation to referenced entities is allowed.
 	 * Texts or attr values are put to result in order they are passed. 
 	 */
-	Map<Object, String> getIdValueMap(QueryConstraints qc, String... attrNames);
+	Map<?, String> getIdValueMap(QueryConstraints qc, String... attrNames);
 	
 	/** provides basic informations about environment.
 	 * 
@@ -162,4 +162,11 @@ public interface
 	 * @return entity instance
 	 */
 	K syncRead(K entity);
+
+	/** returns map containing entityID as String  and as key and single string as value.
+	 * Behaves the same way as {@link #getIdValueMap(QueryConstraints, String...)}, but keys are as strings.
+	 */
+	Map<String, String> getIdStringValueMap(QueryConstraints qc, String... attrNames);
+
+	ListDataHolder<K> getListDataHolder();
 }
