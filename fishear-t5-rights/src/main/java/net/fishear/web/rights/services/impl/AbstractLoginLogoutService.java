@@ -89,6 +89,8 @@ implements
 		try {
 			UserInfoI uinf = doLoginImpl(username, password);
 			ses.setAttribute(gesAtrLoggedInKey(), uinf);
+		} catch (ValidationException ex) {
+			throw ex;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new ValidationException("error-while-login-user", ex.toString());
@@ -103,12 +105,19 @@ implements
 	@Override
 	public void doLogin(String username, String password, boolean rememberMe) {
 		doLogin(username, password);
-		rgl.getRequest().getSession(true).setAttribute("gweb!rememberme!disabled", null);
 		if(rememberMe) {
+			rgl.getRequest().getSession(true).setAttribute("gweb!rememberme!disabled", null);
 			String uncode = username + REMENBER_ME_SEPARATOR + password;
 			String uncEnc = gwEnv.encode(uncode, gwEnv.getClientId(cookies));
-			cookies.writeCookieValue(Constants.REMEMBER_ME_COOKIE_CODE, uncEnc, gwEnv.getUriBase());
+			cookies.writeCookieValue(Constants.REMEMBER_ME_COOKIE_CODE, uncEnc, getRememberMeUriBase());
 		}
+	}
+
+	/**
+	 * @return string 
+	 */
+	protected String getRememberMeUriBase() {
+		return gwEnv.getUriBase();
 	}
 
 	protected String readRmm() {
@@ -124,7 +133,6 @@ implements
 	}
 
 	public void clearCookies() {
-		cookies.writeCookieValue(Constants.REMEMBER_ME_COOKIE_CODE, "", gwEnv.getUriBase());
 		cookies.removeCookieValue(Constants.REMEMBER_ME_COOKIE_CODE);
 		rgl.getRequest().getSession(true).setAttribute("gweb!rememberme!disabled", null);
 	}
