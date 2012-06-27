@@ -167,6 +167,4 @@ public interface
 	 * Behaves the same way as {@link #getIdValueMap(QueryConstraints, String...)}, but keys are as strings.
 	 */
 	Map<String, String> getIdStringValueMap(QueryConstraints qc, String... attrNames);
-
-	ListDataHolder<K> getListDataHolder();
 }

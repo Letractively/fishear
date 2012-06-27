@@ -282,8 +282,4 @@ implements
 	public CurrentStateI getCurrentState() {
 		return null;
 	}
-	
-	public ListDataHolder<K> getListDataHolder() {
-		return new ListDataHolder<K>(this);
-	}
 }
