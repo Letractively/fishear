@@ -108,4 +108,28 @@ public class EntityUtilsTestFill {
 		te1.setId(te2.getId());
 		assertTrue(EntityUtils.equals(te1, te2));
 	}
+
+	@Test
+	public void fillByNullsTest() {
+		TestEntity te1 = new TestEntity();
+		TestEntity te2 = new TestEntity();
+
+		te1.setVal1("1V1V1V");
+		te1.setVal2("2V2V2V");
+		
+		te2.setId("AAAA");
+		te2.setNum1(111L);
+		te2.setNum2(222L);
+		te2.setVal1("V1V1V1");
+		te2.setVal2("V3V3V3");
+
+		assertNotEquals(te1.getVal3(), te2.getVal3());
+
+		EntityUtils.fillDestination(te1, te2, EntityUtils.FillFlags.OVERWRITE_BY_NULLS);
+
+		assertNotEquals(te1.getId(), te2.getId());
+		assertEquals(te1.getVal3(), te2.getVal3());
+		//assertFalse(EntityUtils.equals(te1, te2));
+	}
+
 }

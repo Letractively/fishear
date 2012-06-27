@@ -22,6 +22,7 @@ import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Defender;
 import net.fishear.utils.EntityUtils;
+import net.fishear.utils.EntityUtils.FillFlags;
 import net.fishear.utils.Texts;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -166,7 +167,7 @@ implements
     	if(nent == null) {
     		return entity;
     	}
-    	EntityUtils.fillDestination(entity, nent);
+    	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
     	return nent;
     }
 

@@ -54,7 +54,13 @@ public class
 		 * for 'flags' in {@link #fillDestination(Object, Object, int)}. 
 		 * If set, all values in dest (except IDs) will be overwritten.
 		 */
-		FILL_ALL
+		FILL_ALL, 
+		
+		/**
+		 * Overwrite fields that are null in source entity.
+		 * By default, not nulls in dst are preserved is src is null.
+		 */
+		OVERWRITE_BY_NULLS
 	}
 
 	/** return true if both 'e1' and 'e2' are null, or if both id's of 'e1' and 'e2' are null, or if id's of 'e1' and 'e2' are equals.
@@ -517,11 +523,14 @@ public class
 		try {
 			boolean fillEmptyOnly = false;
 			boolean fillAll = false;
+			boolean fillSourceNulls = false;
 			for(FillFlags fl : flags) {
 				if(fl == FillFlags.FILL_ALL) {
 					fillAll = true;
 				} else if(fl == FillFlags.FILL_EMPTY_ONLY) {
 					fillEmptyOnly = true;
+				} else if(fl == FillFlags.OVERWRITE_BY_NULLS) {
+					fillSourceNulls = true;
 				}
 			}
 
@@ -548,6 +557,8 @@ public class
 									if(fillAll || valDst == null || (!fillEmptyOnly && !valSrc.equals(valDst))) {
 										setter.invoke(dstE, valSrc);
 									}
+								} else if(fillSourceNulls && m.invoke(dstE) != null) {
+									setter.invoke(dstE, valSrc);
 								}
 								
 							}

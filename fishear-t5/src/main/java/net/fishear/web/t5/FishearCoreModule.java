@@ -22,6 +22,7 @@ public class FishearCoreModule
 
     public void contributeComponentClassResolver(Configuration<LibraryMapping> configuration) throws IOException {
         configuration.add(new LibraryMapping("fe", "net.fishear.web.t5"));
+        configuration.add(new LibraryMapping("fe", "net.fishear.web.t5commons"));
     }
 
     @Contribute(TypeCoercer.class)
