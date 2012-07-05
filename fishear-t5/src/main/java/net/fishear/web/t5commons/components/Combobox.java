@@ -34,9 +34,6 @@ public class Combobox<T> {
 	@Persist
 	private ServiceI<?> service;
 	
-	@InjectComponent
-	private Select select;
-
 	@SetupRender
 	void setupRenser() {
 		Object o = crsc.getInformalParameter("service", Object.class);

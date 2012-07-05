@@ -28,7 +28,11 @@ public class Confirm {
 	@AfterRender
 	public void afterRender() {
 		renderSupport.addScript(
-			String.format("new Confirm('%s', '%s');", element.getClientId(), confirmMessage)
+			String.format("new Confirm('%s', '%s');", element.getClientId(), confirmMessage())
 		);
     }
+
+	protected String confirmMessage() {
+		return confirmMessage;
+	}
 }
