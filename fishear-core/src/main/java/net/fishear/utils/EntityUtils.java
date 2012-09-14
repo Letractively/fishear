@@ -2,14 +2,14 @@ package net.fishear.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -595,4 +595,54 @@ public class
 	public static final <T, S> T convertType(S source, Class<T> target) {
 		return Coercions.convertType(source, target);
 	}
+
+	public static String toString(Object entity, String... attrNames) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < attrNames.length; i++) {
+			String attr = Texts.tos(attrNames[i]);
+			if((attr.startsWith("\"") && attr.endsWith("\"")) || (attr.startsWith("\'") && attr.endsWith("\'"))) {
+				sb.append(attr.substring(1, attr.length() - 1));
+			} else {
+				sb.append(getAttribute(attr, entity));
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * gets attribute from bean instance and returns it as proper type.
+	 * Throws runtime exception in case any other exception occurs.
+	 * 
+	 * @param attrName
+	 * @param entity
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getAttribute(String attrName, Object entity) {
+		try {
+			return (T) BeanUtils.getProperty(entity, attrName);
+		} catch (Exception ex) {
+			throw new AppException(ex);
+		}
+	}
+	
+	/**
+	 * gets attribute value from bean instance and returns it as proper type.
+	 * In case internal exception occurs, returns 'defaultValue'. Logs exception only if logLevel is set to DEBUG.
+	 * 
+	 * @param attrName
+	 * @param entity
+	 * @param defaultValue
+	 * @return property value, or default value in case exception occurs.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getValue(String attrName, Object entity, T defaultValue) {
+		try {
+			return (T) BeanUtils.getProperty(entity, attrName);
+		} catch (Exception ex) {
+			log.debug("exception during value getting", ex);
+			return defaultValue;
+		}
+	}
+	
 }
