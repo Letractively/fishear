@@ -46,7 +46,7 @@ public class Combobox<T> {
 		}
 		this.key = value == null ? null : value.getId();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Map<T, String> getDataMap() {
 		ListDataHolder<EntityI<T>, T> holder = null;
