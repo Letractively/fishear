@@ -137,7 +137,7 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 		
 	}
 
-	public static EncoderSelectModel<EntityI<?>> create(ServiceI<EntityI<?>> service, String... attrNames) {
+	public static EncoderSelectModel<EntityI<?>> create(ServiceI service, String... attrNames) {
 		try {
 			EncoderSelectModel<EntityI<?>> em = new EncoderSelectModel<EntityI<?>>();
 			em.setService(service);
