@@ -51,6 +51,9 @@ class ResultsParser extends AbstractQueryParser<Results, Criteria> {
                 case MIN:
                     projectionList.add(Projections.min(propertyName));
                     break;
+                case SUM:
+                    projectionList.add(Projections.sum(propertyName));
+                    break;
                 default:
                     if (LOG.isErrorEnabled()) {
                         LOG.error("Query result function " + func.name() +

@@ -18,6 +18,8 @@ implements
     public static final int DEFAULT_RESULTS_PER_PAGE = 20;
     public static final int ALL_RESULTS = -1;
 
+    private ResultType resultType;
+    
     /**
      * Maximum of returned entities.
      */
@@ -177,4 +179,18 @@ implements
 		}
 		return sb.toString();
     }
+
+	/**
+	 * @return the resultType
+	 */
+	public ResultType getResultType() {
+		return resultType;
+	}
+
+	/**
+	 * @param resultType the resultType to set
+	 */
+	public void setResultType(ResultType resultType) {
+		this.resultType = resultType;
+	}
 }

@@ -4,5 +4,6 @@ public enum Functions {
     COUNT,
     MAX,
     AVG,
-    MIN
+    MIN,
+    SUM
 }

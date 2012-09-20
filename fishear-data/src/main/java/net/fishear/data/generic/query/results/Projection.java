@@ -3,6 +3,16 @@ package net.fishear.data.generic.query.results;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fishear.data.generic.query.results.ProjectionItem.Type;
+
+/**
+ * projection of SQL result to Java object(s).
+ * 
+ * Similar to Hibernate's projections.
+ * 
+ * @author ffyxrr
+ *
+ */
 public class 
 	Projection
 implements
@@ -19,12 +29,58 @@ implements
 		return projections;
 	}
 
+	/**
+	 * adds the property projection type to the result.
+	 * @param propertyName
+	 * @return
+	 */
+	public Projection property(String propertyName) {
+		return add(propertyName, Type.PROPERTY);
+	}
+
 	public Projection distinct(String propertyName) {
+		return add(propertyName, Type.DISTINCT);
+	}
+
+	/**
+	 * adds the property projection type to the result.
+	 * @param propertyName
+	 * @return
+	 */
+	public Projection group(String propertyName) {
+		return add(propertyName, Type.GROUP);
+	}
+
+	public Projection add(String propertyName, Type type) {
+		check(type);
 		if(projections == null) {
 			projections = new ArrayList<ProjectionItem>();
 		}
-		projections.add(ProjectionItem.distinct(propertyName));
+		projections.add(ProjectionItem.create(propertyName, type));
 		return this;
+	}
+	
+	protected void check(Type forType) {
+		if(projections != null) {
+			boolean isGrp = forType == Type.GROUP;
+			boolean isProperty = forType == Type.PROPERTY;
+			for(ProjectionItem pi : projections) {
+				switch(pi.getType()) {
+				case GROUP:
+					if(isProperty) {
+						throw new IllegalArgumentException(String.format("Cannot add projection %s when the %s has been added already", forType, pi.getType()));
+					}
+					isGrp = true;
+					break;
+				case PROPERTY:
+					if(isGrp) {
+						throw new IllegalArgumentException(String.format("Cannot add projection %s when the %s has been added already", forType, pi.getType()));
+					}
+					isProperty = true;
+					break;
+				}
+			}
+		}
 	}
 	
 	public int size() {

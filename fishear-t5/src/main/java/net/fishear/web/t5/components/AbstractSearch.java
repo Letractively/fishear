@@ -8,9 +8,13 @@ import net.fishear.web.t5.base.AbstractFragment;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
-import org.apache.tapestry5.annotations.PageAttached;
+import org.apache.tapestry5.annotations.InjectComponent;
 import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.annotations.SetupRender;
+import org.apache.tapestry5.corelib.components.Form;
 import org.apache.tapestry5.runtime.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class 
@@ -21,16 +25,16 @@ implements
 	SearchFormI<T>
 {
 	
+	private static Logger log = LoggerFactory.getLogger(AbstractSearch.class);
+	
 	private ServiceI<T> thisService;
 
 	@Persist
 	private T entity;
-	
-//	public abstract ServiceI<T> getService();
-	
+
 	private SearchableI<T> searchable;
 	
-	@PageAttached
+	@SetupRender
 	public void pageLoaded() {
 		thisService = getService();
 		searchForGrid();
@@ -47,7 +51,8 @@ implements
 			}
 			ct = ct.getComponentResources().getContainer();
 		}
-		throw new IllegalStateException(String.format("The implementation of AbstractSearch component has to be placed into implementation of %s", SearchableI.class.getName()));
+		log.debug("No parent component {} found in parents tree. SSearch Automation is disabled.", SearchableI.class.getName());
+//		throw new IllegalStateException(String.format("The implementation of AbstractSearch component has to be placed into implementation of %s", SearchableI.class.getName()));
 	}
 
 	public T getEntity() {
@@ -57,12 +62,12 @@ implements
 		return entity;
 	}
 
-	public void onSuccessFromSearch() {
+	public void onSuccess() {
 
 		// TODO: return the grid for ajax refresh
 	}
 	
-	public void onActionFromSrchclr() {
+	public void onClearSearch() {
 		clearSearchForm();
 	}
 

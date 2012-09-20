@@ -5,8 +5,10 @@ import java.util.List;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
+import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.order.OrderBy;
 import net.fishear.data.generic.query.order.SortDirection;
+import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.Globals;
 
@@ -43,12 +45,31 @@ implements
 		setQueryConstraint(null);
 	}
 
-	public void setQueryConstraint(QueryConstraints queryConstraints) {
+	/** sets constraints used for subsequent queries.
+	 * @param queryConstraints
+	 * @return this isnstance (to allow chaining)
+	 */
+	public PagingDataSource setQueryConstraint(QueryConstraints queryConstraints) {
 		this.queryConstraints = 
 			queryConstraints == null ? 
 				QueryFactory.createDefault() : 
 				queryConstraints
 			;
+		return this;
+	}
+
+	public PagingDataSource setRestrictions(Restrictions restrictions) {
+		if(restrictions != null) {
+			queryConstraints = QueryFactory.create(restrictions);
+		}
+		return this;
+	}
+
+	public PagingDataSource setConditions(Conditions conditions) {
+		if(conditions != null) {
+			queryConstraints = QueryFactory.create(conditions);
+		}
+		return this;
 	}
 
 	public QueryConstraints getQueryConstraint() {

@@ -123,11 +123,9 @@ implements
 
 	@Override
     public long queryCount(QueryConstraints constraints) {
-    	QueryConstraints query = QueryFactory.copyOrCreate(constraints);
-        query.results().addRowCount();
-        List<?> list = query(query);
-        int result = ((Number)list.get(0)).intValue();
-        return result;
+    	QueryConstraints qc = QueryFactory.copyOrCreate(constraints);
+        qc.results().addRowCount();
+        return ((Number)query(qc).get(0)).intValue();
     }
 
     public GenericDaoI<K> getDao() {
