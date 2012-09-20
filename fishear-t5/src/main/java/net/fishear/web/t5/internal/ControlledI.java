@@ -1,4 +1,6 @@
-package net.fishear.web.t5.base;
+package net.fishear.web.t5.internal;
+
+import net.fishear.web.t5.base.AbstractController;
 
 
 /** interface should implements all components whose are designed to be controlled by {@link AbstractController}.

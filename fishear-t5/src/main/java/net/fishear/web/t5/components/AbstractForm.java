@@ -5,7 +5,7 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.ValidationException;
 import net.fishear.web.t5.base.AbstractComponent;
-import net.fishear.web.t5.base.ServiceSourceI;
+import net.fishear.web.t5.internal.ServiceSourceI;
 
 import org.apache.tapestry5.annotations.PageAttached;
 import org.apache.tapestry5.runtime.Component;

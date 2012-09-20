@@ -5,10 +5,10 @@ import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.Coercions;
 import net.fishear.web.t5.base.AbstractComponent;
-import net.fishear.web.t5.base.SearchFormI;
-import net.fishear.web.t5.base.SearchableI;
-import net.fishear.web.t5.base.ServiceSourceI;
 import net.fishear.web.t5.data.PagingDataSource;
+import net.fishear.web.t5.internal.SearchFormI;
+import net.fishear.web.t5.internal.SearchableI;
+import net.fishear.web.t5.internal.ServiceSourceI;
 
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.OnEvent;

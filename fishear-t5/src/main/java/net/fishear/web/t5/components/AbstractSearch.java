@@ -5,8 +5,8 @@ import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.web.t5.base.AbstractFragment;
-import net.fishear.web.t5.base.SearchFormI;
-import net.fishear.web.t5.base.SearchableI;
+import net.fishear.web.t5.internal.SearchFormI;
+import net.fishear.web.t5.internal.SearchableI;
 
 import org.apache.tapestry5.annotations.PageAttached;
 import org.apache.tapestry5.annotations.Persist;

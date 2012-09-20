@@ -1,5 +1,8 @@
 package net.fishear.web.t5.base;
 
+import net.fishear.web.t5.internal.ControlledI;
+import net.fishear.web.t5.internal.IndependentPageElementI;
+
 import org.apache.tapestry5.annotations.Persist;
 
 import java.util.Enumeration;

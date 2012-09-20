@@ -1,4 +1,4 @@
-package net.fishear.web.t5.base;
+package net.fishear.web.t5.internal;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.conditions.Conditions;

@@ -1,4 +1,4 @@
-package net.fishear.web.t5.base;
+package net.fishear.web.t5.internal;
 
 /** provides method to interact control page (usually menu or tab page) with this component.
  * @author terber
