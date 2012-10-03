@@ -10,11 +10,12 @@
 		<relativePath>root</relativePath>
 	</parent>
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.fishear</groupId>
 	<artifactId>fishear-all</artifactId>
-	<packaging>pom</packaging>
+
+	<groupId>net.fishear</groupId>
 	<version>1.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
 
 	<url>http://code.google.com/p/fishear/</url>
 
@@ -27,7 +28,6 @@
 	</licenses>
 	<scm>
 		<url>https://code.google.com/p/fishear</url>
-<!-- 		<connection>http://svn.apache.org/viewcvs.cgi/maven</connection> -->
 	</scm>
 	<modules>
 		<module>fishear-core</module>
@@ -256,5 +256,5 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-
+	<modelVersion>4.0.0</modelVersion>
 </project>
