@@ -36,20 +36,21 @@ public class Select {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SetupRender
 	void setupRenser() {
-		model = crsc.getInformalParameter("model", SelectModel.class);
-		encoder = crsc.getInformalParameter("encoder", ValueEncoder.class);
-		if(model == null && encoder != null && encoder instanceof EncoderSelectModel) {
-			model = ((EncoderSelectModel)encoder).getModel();
-		}
 		if(model == null) {
-			throw new IllegalArgumentException("Parameter 'model' must be specified or parameter 'encoder' must be specified and it must be 'EncoderSelectModel'.");
+			model = crsc.getInformalParameter("model", SelectModel.class);
+			encoder = crsc.getInformalParameter("encoder", ValueEncoder.class);
+			if(model == null && encoder != null && encoder instanceof EncoderSelectModel) {
+				model = ((EncoderSelectModel)encoder).getModel();
+			}
+			if(model == null) {
+				throw new IllegalArgumentException("Parameter 'model' must be specified or parameter 'encoder' must be specified and it must be 'EncoderSelectModel'.");
+			}
+			String cols = crsc.getInformalParameter("columns", String.class);
+			if(cols != null && cols.trim().length() > 0) {
+				this.columns = cols.split(","); 
+			}
+			this.key = value == null ? null : value.getId().toString();
 		}
-		String cols = crsc.getInformalParameter("columns", String.class);
-		if(cols != null && cols.trim().length() > 0) {
-			this.columns = cols.split(","); 
-		}
-		this.key = value == null ? null : value.getId().toString();
-		
 	}
 
 	public EntityI<?> getValue() {
@@ -91,6 +92,7 @@ public class Select {
 	
 	@SuppressWarnings("rawtypes")
 	private EntityI<?> findEntity(String key) {
+		setupRenser();
 		for(OptionModel om : model.getOptions()) {
 			if(key.equals(om.getValue())) {
 				if(om instanceof Option) {
