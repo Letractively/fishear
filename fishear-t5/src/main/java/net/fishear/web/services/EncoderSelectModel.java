@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.EntityUtils;
 
@@ -20,6 +21,8 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 	private ServiceI<T> service;
 
 	private String[] attrNames;
+	
+	private QueryConstraints constraints;
 
 	public EncoderSelectModel(ServiceI<T> service, String... attrNames) {
 		this.service = service;
@@ -61,22 +64,18 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 		return model;
 	}
 
-	public class DataModel extends AbstractSelectModel implements SelectModel {
+	/**
+	 * @return the constraints
+	 */
+	public QueryConstraints getConstraints() {
+		return constraints;
+	}
 
-		@Override
-		public List<OptionGroupModel> getOptionGroups() {
-			return null;
-		}
-
-		@Override
-		public List<OptionModel> getOptions() {
-			List<OptionModel> list = new ArrayList<OptionModel>();
-			for (T t : service.list(null)) {
-				Option opt = new Option(t);
-				list.add(opt);
-			}
-			return list;
-		}
+	/**
+	 * @param constraints the constraints to set
+	 */
+	public void setConstraints(QueryConstraints constraints) {
+		this.constraints = constraints;
 	}
 
 	/**
@@ -93,6 +92,24 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 		this.attrNames = attrNames;
 	}
 	
+	public class DataModel extends AbstractSelectModel implements SelectModel {
+
+		@Override
+		public List<OptionGroupModel> getOptionGroups() {
+			return null;
+		}
+
+		@Override
+		public List<OptionModel> getOptions() {
+			List<OptionModel> list = new ArrayList<OptionModel>();
+			for (T t : service.list(constraints)) {
+				Option opt = new Option(t);
+				list.add(opt);
+			}
+			return list;
+		}
+	}
+
 	public class Option implements OptionModel {
 
 		private EntityI<?> entity;
@@ -135,6 +152,12 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 			this.entity = entity;
 		}
 		
+	}
+
+	public static EncoderSelectModel<EntityI<?>> create(ServiceI service, QueryConstraints qc, String... attrNames) {
+		EncoderSelectModel<EntityI<?>> em = create(service, attrNames);
+		em.constraints = qc;
+		return em;
 	}
 
 	public static EncoderSelectModel<EntityI<?>> create(ServiceI service, String... attrNames) {
