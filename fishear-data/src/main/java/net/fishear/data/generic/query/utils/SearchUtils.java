@@ -9,7 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import net.fishear.Interfaces.IdI;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
+
+import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.restrictions.Restrictions;
@@ -19,6 +22,8 @@ import net.fishear.utils.Globals;
 public class SearchUtils
 {
 
+	private static Logger log = LoggerFactory.getLogger(SearchUtils.class);
+	
 	/**
 	 * Creates search conditions in accordancy to values filled in 'idao'
 	 * instance. It applies JavaBean mechanism in conjunction with
@@ -113,22 +118,31 @@ public class SearchUtils
 							} else if (retvalType == Class.class) {
 								Class<?> cl = (Class<?>) m.invoke(entity, EntityUtils.EOA);
 								anyOk |= cond.addLikeNotEmpty(fldName, cl.getName());
-							} else if (IdI.class.isAssignableFrom(retvalType)) {
-								IdI<?> e1 = (IdI<?>) m.invoke(entity, EntityUtils.EOA);
+							} else if (EntityI.class.isAssignableFrom(retvalType)) {
+								EntityI<?> e1 = (EntityI<?>) m.invoke(entity, EntityUtils.EOA);
 								if (e1 != null) {
-									Conditions c1 = createSearchConditions(e1, fldName.concat("."), vec, true);
-									if (c1 != null) {
-										cond.add(c1.getRootRestriction());
+									log.trace("Field {} is type of EntityI, analysing entity", fldName, EntityI.class);
+									if(e1.isNew()) {
+										log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
+										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
+										if (cond1 != null) {
+											cond.join(retvalType, fldName, cond1.getRootRestriction());
+											anyOk = true;
+										}
+									} else {
+										log.trace("Field {} is existing persistent instance, assuming equals entity", fldName);
+										cond.addEquals(fldName, e1);
 										anyOk = true;
 									}
 								}
 							} else {
 								// TODO:
+								log.debug("Class {} of field {} is unknown type; ignored", EntityI.class.getName(), fldName);
 							}
 						}
 					} catch (Exception ex) {
 						if(ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException) {
-							// do nothing
+							// do nothing so far ?
 						} else {
 							ex.printStackTrace(); // TODO: better way how to inform ?
 						}
