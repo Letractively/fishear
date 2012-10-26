@@ -93,6 +93,7 @@ implements
 
 	@Override
 	public Conditions getSearchConstraints() {
+		T entity = getEntity();
 		beforeSearch(entity);
 		Conditions cond = SearchUtils.createSearchConditions(entity);
 		Conditions conditions = getConditions();
