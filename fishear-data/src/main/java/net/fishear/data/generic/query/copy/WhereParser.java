@@ -44,7 +44,7 @@ class WhereParser extends AbstractQueryParser<Where, QueryConstraints> {
 
     private void copyJoins(Conditions sourceObject, Conditions output) {
 
-        for (Join j : sourceObject.getOuterJoins()) {
+        for (Join j : sourceObject.getJoins()) {
             Restrictions restrictions =
                     restrictionsParser.parse(j.getRestrictions());
             output.join(j.getPropertyName(), restrictions);

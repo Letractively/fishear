@@ -126,7 +126,7 @@ public class SearchUtils
 										log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
 										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
 										if (cond1 != null) {
-											cond.join(retvalType, fldName, cond1.getRootRestriction());
+											cond.join(fldName, cond1.getRootRestriction());
 											anyOk = true;
 										}
 									} else {

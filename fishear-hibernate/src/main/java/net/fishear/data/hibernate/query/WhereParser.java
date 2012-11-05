@@ -58,7 +58,7 @@ class WhereParser extends AbstractQueryParser<Where, Criteria> {
     }
 
     private void parseJoinConditions(Conditions conditions, Criteria output) {
-        List<Join> joinsList = conditions.getOuterJoins();
+        List<Join> joinsList = conditions.getJoins();
         if (joinsList != null) {
             for (Join j : joinsList) {
             	

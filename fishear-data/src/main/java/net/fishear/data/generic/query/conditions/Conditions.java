@@ -28,7 +28,7 @@ implements
 	/**
 	 * List of joined selections and contraints.
 	 */
-	private List<Join> outerJoins;
+	private List<Join> joins;
 
     private List<NestedRestriction> nestedRestrictions;
 
@@ -44,7 +44,7 @@ implements
 			return false;
 
 		Conditions that = (Conditions) o;
-		if (!ObjectUtils.equals(outerJoins, that.outerJoins)) {
+		if (!ObjectUtils.equals(joins, that.joins)) {
 			return false;
 		}
 		if (rootRestriction != null ? !rootRestriction.equals(that.rootRestriction) : that.rootRestriction != null)
@@ -57,7 +57,7 @@ implements
 	public int hashCode() {
 		int result;
 		result = (rootRestriction != null ? rootRestriction.hashCode() : 0);
-		result = 31 * result + ObjectUtils.hashCode(outerJoins);
+		result = 31 * result + ObjectUtils.hashCode(joins);
 		return result;
 	}
 
@@ -117,38 +117,6 @@ implements
 	}
 
 	/**
-	 * Add joined restrictions for given entity type.
-	 * 
-	 * @param entityType
-	 *            class represents joined property.
-	 * @param restriction
-	 * @return Return this for method chaining.
-	 */
-	public Conditions join(Class<?> entityType, Restrictions restriction) {
-
-		Join join = new Join(JoinType.OUTER, entityType.getName(), restriction);
-		getJoins().add(join);
-		return this;
-	}
-
-	/**
-	 * Add joined restrictions for given entity type.
-	 * 
-	 * @param entityType
-	 *            class represents joined property.
-	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param restriction
-	 * @return Return this for method chaining.
-	 */
-	public Conditions join(Class<?> entityType, String alias, Restrictions restriction) {
-
-		Join join = new Join(JoinType.OUTER, entityType.getName(), restriction);
-		join.setAlias(alias);
-		getJoins().add(join);
-		return this;
-	}
-
-	/**
 	 * Return root restriction.
 	 * 
 	 * @return Return root restriction. If is not set, return null!
@@ -158,20 +126,20 @@ implements
 	}
 
 	public List<Join> getJoins() {
-		if (outerJoins == null) {
-			outerJoins = new ArrayList<Join>();
+		if (joins == null) {
+			joins = new ArrayList<Join>();
 		}
-		return outerJoins;
+		return joins;
 	}
-
-	/**
-	 * Return all joined restrictions.
-	 * 
-	 * @return
-	 */
-	public List<Join> getOuterJoins() {
-		return getJoins();
-	}
+//
+//	/**
+//	 * Return all joined restrictions.
+//	 * 
+//	 * @return
+//	 */
+//	public List<Join> getOuterJoins() {
+//		return getJoins();
+//	}
 
 	/**
 	 * adds AND condition to previously added conditions, but only if 'value' is
@@ -253,8 +221,8 @@ implements
 		StringBuilder sb = new StringBuilder();
 		String cln = getClass().getName();
 
-		if(outerJoins != null && outerJoins.size() > 0) {
-			for (Join j : outerJoins) {
+		if(joins != null && joins.size() > 0) {
+			for (Join j : joins) {
 				sb.append(j.toString());
 			}
 		}
