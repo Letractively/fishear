@@ -27,6 +27,7 @@
 	<scm>
 		<url>https://code.google.com/p/fishear</url>
 	</scm>
+
 	<modules>
 		<module>fishear-core</module>
 		<module>fishear-data</module>
