@@ -4,7 +4,7 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
-import net.fishear.web.t5.base.AbstractFragment;
+import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public abstract class 
 	AbstractSearch<T extends EntityI<?>>
 extends
-	AbstractFragment
+	ComponentBase
 implements
 	SearchFormI<T>
 {
@@ -57,7 +57,7 @@ implements
 
 	@SuppressWarnings("unchecked")
 	private void searchForGrid() {
-		Component ct = getResources().getContainer();
+		Component ct = super.crsc.getContainer();
 		while(ct != null) {
 			if(ct instanceof SearchableI) {
 				this.searchable = ((SearchableI<T>)ct);

@@ -5,11 +5,11 @@ import net.fishear.utils.Exceptions;
 import net.fishear.web.rights.entities.UserInfoI;
 import net.fishear.web.rights.services.LoginLogoutService;
 import net.fishear.web.services.EnvironmentService;
-import net.fishear.web.t5.base.AbstractComponent;
+import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.base.Constants;
-import net.fishear.web.t5.components.Messages;
 
 import org.apache.tapestry5.MarkupWriter;
+import org.apache.tapestry5.alerts.AlertManager;
 import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Import;
@@ -31,7 +31,7 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 public class 
 	LoginForm 
 extends 
-	AbstractComponent
+	ComponentBase
 {
 
 	@Inject
@@ -47,6 +47,9 @@ extends
 	@Inject
 	private EnvironmentService s2env;
 	
+	@Component
+	AlertManager alerts;
+	
 	@Inject
 	private Cookies cookies;
 
@@ -59,9 +62,6 @@ extends
 	@Property
 	private boolean rememberMe;
 
-	@Component
-	private Messages messages;
-	
 	@SuppressWarnings("unused")
 	private String clientId;
 	
@@ -79,14 +79,14 @@ extends
 		Throwable ex = Exceptions.getRootCause(xex);
 		if(ex instanceof ValidationException) {
 			if(username == null || username.trim().length() == 0) {
-				messages.setText(getMessage("missing-loginname"));
+				alerts.error(translate("missing-loginname"));
 			} else {
-				messages.setText(getMessage(ex.getMessage()));
+				alerts.info(translate(ex.getMessage()));
 			}
 			request.setAttribute(Constants.REQUIRED_LOGIN_RQATR, Constants.LoginRequest.LOGIN_FORCED);
 		} else {
 			ex.printStackTrace();
-			messages.setText(getMessage("error-while-login", ex.toString()));
+			alerts.info(translate("error-while-login", ex.toString()));
 			request.setAttribute(Constants.REQUIRED_LOGIN_RQATR, Constants.LoginRequest.LOGIN_FORCED);
 		}
 		String lastPars = cookies.readCookieValue(Constants.LAST_PAGE_COOKIE_CODE);
@@ -102,9 +102,9 @@ extends
 
 	public String getLoginMessage() {
 		if(isLoggedIn()) {
-			return getMessage("log-in-as-user-with-access-rights");
+			return translate("log-in-as-user-with-access-rights");
 		} else {
-			return getMessage("please-log-in");
+			return translate("please-log-in");
 		}
 	}
 	

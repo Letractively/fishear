@@ -2,7 +2,7 @@ package net.fishear.web.rights.t5.components;
 
 import net.fishear.web.rights.services.LoginLogoutService;
 import net.fishear.web.services.EnvironmentService;
-import net.fishear.web.t5.base.AbstractComponent;
+import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.base.Constants;
 
 import org.apache.tapestry5.BindingConstants;
@@ -28,7 +28,7 @@ import org.apache.tapestry5.services.Request;
 public class 
 	RequireLogin
 extends
-	AbstractComponent
+	ComponentBase
 {
 
 	@SuppressWarnings("unused")
@@ -65,11 +65,11 @@ extends
 	private Block noAccess;
 
 	public Block getNoLoginBlock() {
-		return noLogin == null ? getResources().findBlock("nologinDft") : noLogin;
+		return noLogin == null ? crsc.findBlock("nologinDft") : noLogin;
 	}
 	
 	public Block getNoAccessBlock() {
-		return noAccess == null ? getResources().findBlock("noAccessDft") : noAccess;
+		return noAccess == null ? crsc.findBlock("noAccessDft") : noAccess;
 	}
 	
 	public void setupRender() {

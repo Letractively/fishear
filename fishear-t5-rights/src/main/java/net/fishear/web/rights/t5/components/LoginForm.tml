@@ -4,7 +4,7 @@
 	id="loginFormDiv"
 >
 	<t:form id="loginForm">
-		<t:component t:id="messages" class="literal:error" />
+		<t:alerts"/>
 		<div t:type="if" t:test="LoggedIn" class="errors">
 			${message:you-have-not-access-to-required-data}<br />
 		</div>
