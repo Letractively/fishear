@@ -3,7 +3,7 @@ package net.fishear.web.rights.t5.components;
 import net.fishear.web.rights.services.LoginLogoutService;
 import net.fishear.web.services.EnvironmentService;
 import net.fishear.web.t5.base.ComponentBase;
-import net.fishear.web.t5.base.Constants;
+import net.fishear.web.t5.internal.Constants;
 
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.Block;

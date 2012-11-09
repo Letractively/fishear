@@ -1,4 +1,4 @@
-package net.fishear.web.t5.base;
+package net.fishear.web.t5.internal;
 
 public class Constants
 {

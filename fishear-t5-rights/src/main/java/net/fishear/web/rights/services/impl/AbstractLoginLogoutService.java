@@ -8,7 +8,7 @@ import net.fishear.utils.Texts;
 import net.fishear.web.rights.entities.UserInfoI;
 import net.fishear.web.rights.services.LoginLogoutService;
 import net.fishear.web.services.EnvironmentService;
-import net.fishear.web.t5.base.Constants;
+import net.fishear.web.t5.internal.Constants;
 
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.services.Cookies;

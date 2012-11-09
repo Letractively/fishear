@@ -88,17 +88,17 @@ implements
 
 	@Override
 	public String getClientId(Cookies cookies) {
-		String cid = cookies.readCookieValue(net.fishear.web.t5.base.Constants.CLNID_COOKIE_CODE);
+		String cid = cookies.readCookieValue(net.fishear.web.t5.internal.Constants.CLNID_COOKIE_CODE);
 		if(StringUtils.isEmpty(cid)) {
 			cid = generateUniqueClientId();
-			cookies.writeCookieValue(net.fishear.web.t5.base.Constants.CLNID_COOKIE_CODE, cid, getUriBase());
+			cookies.writeCookieValue(net.fishear.web.t5.internal.Constants.CLNID_COOKIE_CODE, cid, getUriBase());
 		}
 		return cid;
 	}
 
 	@Override
 	public boolean hasClientId(Cookies cookies) {
-		String cid = cookies.readCookieValue(net.fishear.web.t5.base.Constants.CLNID_COOKIE_CODE);
+		String cid = cookies.readCookieValue(net.fishear.web.t5.internal.Constants.CLNID_COOKIE_CODE);
 		return !StringUtils.isEmpty(cid);
 	}
 

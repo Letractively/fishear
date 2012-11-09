@@ -6,7 +6,7 @@ import net.fishear.web.rights.entities.UserInfoI;
 import net.fishear.web.rights.services.LoginLogoutService;
 import net.fishear.web.services.EnvironmentService;
 import net.fishear.web.t5.base.ComponentBase;
-import net.fishear.web.t5.base.Constants;
+import net.fishear.web.t5.internal.Constants;
 
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.alerts.AlertManager;
