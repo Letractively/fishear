@@ -1,8 +1,10 @@
 package net.fishear.data.generic.query;
 
 import net.fishear.data.generic.query.conditions.Conditions;
+import net.fishear.data.generic.query.conditions.Join;
 import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.data.generic.query.order.OrderBy;
+import net.fishear.data.generic.query.order.SortDirection;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.query.results.Projection;
 import net.fishear.data.generic.query.results.Results;
@@ -225,5 +227,48 @@ implements
 	public Results getResults() {
 		return results;
 	}
+
+	/** adds ascending sorting by given property.
+	 * @param property the property
+	 * @return this
+	 */
+	public QueryConstraints orderBy(String property) {
+		setOrderBy(new OrderBy().add(property, SortDirection.ASCENDING));
+		return this;
+	}
+
+	/** adds by given property with the given sorting direction.
+	 * @param property the property
+	 * @param direction the direction
+	 * @return this
+	 */
+	public QueryConstraints orderBy(String property, SortDirection direction) {
+		setOrderBy(new OrderBy().add(property, direction));
+		return this;
+	}
+	
+	/** joins new entity to current query.
+	 * @param joinProperty source's entity property name
+	 * @param restrictions restriction that restricts joined data
+	 * @return this
+	 * @see Join
+	 */
+	public QueryConstraints join(String joinProperty, Restrictions restrictions) {
+		where().getConditions().join(joinProperty, restrictions);
+		return this;
+	}
+	
+	/** joins new entity to current query.
+	 * @param joinProperty source's entity property name
+	 * @param restrictions restriction that restricts joined data
+	 * @param alias alias that joined entity will appear under
+	 * @return this
+	 * @see Join
+	 */
+	public QueryConstraints join(String joinProperty, String alias, Restrictions restrictions) {
+		getWhere().getConditions().join(joinProperty, restrictions);
+		return this;
+	}
+	
 
 }
