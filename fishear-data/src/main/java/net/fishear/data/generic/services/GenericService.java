@@ -26,6 +26,8 @@ import net.fishear.utils.EntityUtils.FillFlags;
 import net.fishear.utils.Texts;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The abstract implementation of service interface.
  * For each real service, it is sufficient to extend this service to provide basic CRUD opearations.
@@ -42,37 +44,53 @@ implements
 
     private final GenericDaoI<K> thisDao;
 
+    protected final Logger log = LoggerFactory.getLogger(getClass());
+
     public GenericService(GenericDaoI<K> genericDao) {
         this.thisDao = genericDao;
+        log.debug("Service instance created with DAO '{}'", this.thisDao);
     }
 
     public GenericService() {
         this.thisDao = DaoSourceManager.createDao(findType(), getClass());
+        log.debug("Service instance created with DAO '{}'", this.thisDao);
     }
 
     @SuppressWarnings("unchecked")
 	public GenericService(Class<? extends EntityI<?>> entityType) {
         this.thisDao = (GenericDaoI<K>) DaoSourceManager.createDao(entityType, getClass());
+        log.debug("Service instance created for entity type '{}', DAO '{}'", entityType, this.thisDao);
     }
 
 	@Override
     public K read(Object id) {
+		log.trace("Reading entity for ID='{}'", id);
         K result = (K)getDao().read(id);
+		log.debug("Reading operation for ID='{}' returns {}", id, result);
         return result;
     }
 
 	@Override
     public void delete(K entity) {
+		if(entity == null) {
+			log.warn("Deleting entity {}: Entity is null");
+		} else {
+			log.trace("Deleting entity {}", entity);
+		}
         getDao().delete(entity);
+		log.debug("Entity {} with ID={} has been deleted", entity, entity.getId());
     }
 
 	@Override
     public boolean delete(Object id) {
+		log.trace("Deleting entity by ID={}", id);
 		GenericDaoI<K> dao = getDao();
 		K k = dao.read(id);
 		if(k != null) {
-	        dao.delete(k);
+			delete(k);
 	        return true;
+		} else {
+			log.debug("Deleting entity by ID: object with ID='{}' not found", id);
 		}
 		return false;
     }
@@ -89,22 +107,25 @@ implements
      * If id id null or zero value, creates new record.
      * This method call it's methods "create" or "update" (it DOES NOT call DAO operations directly), 
      * if subclass extends those methods, subclasses methods are called.
-     * @param dataObject
+     * @param entity the entity to be saved
      */
 	@Override
-    public Object save(K dataObject) {
-		fillStandardEntity(dataObject);
-		return getDao().save(dataObject);
+    public Object save(K entity) {
+		log.debug("Saving entity {} not found", entity);
+		fillStandardEntity(entity);
+		return getDao().save(entity);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	private void fillStandardEntity(K dataObject) {
-		if(dataObject instanceof StandardEntityI) {
+	private void fillStandardEntity(K entity) {
+		if(entity instanceof StandardEntityI) {
 			Date date = new Date();
 			CurrentStateI state = getCurrentState();
 			Object user = state == null ? null : state.getCurrentUser();
-			StandardEntityI stde = (StandardEntityI)dataObject;
-			if(dataObject.isNew()) {
+			StandardEntityI stde = (StandardEntityI)entity;
+			log.trace("Entity {} is instance of 'StandardEntityI', filling update date=current / user='{}'", entity, user);
+			if(entity.isNew()) {
+				log.trace("Entity is new object, '{}', filling create date=current / user='{}'", entity, user);
 				if(stde.getCreateDate() == null) { stde.setCreateDate(date); }
 				if(stde.getCreateUser() == null) { stde.setCreateUser(user); }
 			}
@@ -116,6 +137,7 @@ implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public <Q> List<Q> query(QueryConstraints constraints) {
+		log.debug("Querying data for QueryConstraints={}", constraints);
     	GenericDaoI<K> dao = getDao();
     	List<Q> result = (List<Q>) dao.query(constraints == null ? QueryFactory.createDefault() : constraints);
         return result;
@@ -123,6 +145,7 @@ implements
 
 	@Override
     public long queryCount(QueryConstraints constraints) {
+		log.debug("Querying data count for QueryConstraints={}", constraints);
     	QueryConstraints qc = QueryFactory.copyOrCreate(constraints);
         qc.results().addRowCount();
         return ((Number)query(qc).get(0)).intValue();
@@ -171,6 +194,7 @@ implements
 
 	@Override
     public K read(QueryConstraints qc) throws TooManyRecordsException {
+		log.trace("Getting single data row with given QueryConstraints");
 		List<K> list = list(qc);
 
 		if(list.size() == 0) {
@@ -185,6 +209,7 @@ implements
 
 	@Override
 	public boolean existsEntity(K entity, String... propertyNames) {
+		log.trace("Checking whether any data exist for entity {}, properties {}", entity, propertyNames);
 		try {
 			QueryConstraints qc = QueryFactory.createDefault();
 			if(!entity.isNew()) {
