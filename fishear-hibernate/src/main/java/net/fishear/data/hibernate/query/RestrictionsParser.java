@@ -48,20 +48,17 @@ extends
      */
     private Criterion parseRestriction(Restrictions currentRes) {
 
-        if (currentRes instanceof Conjunction) {
-            //if is composite inner node like AND, OR etc.
+    	log.trace("parsing restriction {}", currentRes);
+        if (currentRes instanceof Conjunction) { // inner node (AND, OR, ...)
             Conjunction conjunction = (Conjunction) currentRes;
             return parseConjuction(conjunction);
-        }
-        else if (currentRes instanceof Expression) {
-            //if is composite leaf node
+        } else if (currentRes instanceof Expression) { // leaf node
             Expression expression = (Expression) currentRes;
             return parseExpression(expression);
+        } else {
+       		log.error("Cannot parse leaf query class {}", currentRes);
+            throw new IllegalStateException(String.format("Restrictions must be instance of 'Expression' or 'Conjunction', but %s is not", currentRes.getClass().getName()));
         }
-        else if (LOG.isErrorEnabled()) {
-            LOG.error("Cannot parse leaf query class " + currentRes);
-        }
-        return null;
     }
 
     private Criterion parseConjuction(Conjunction conjunction) {
@@ -105,6 +102,10 @@ extends
         Object value = expression.getValue();
         Class<?> clazz;
 
+        if(log.isTraceEnabled()) {
+        	log.trace(String.format("Parsing expression of type '%s' for propety '%s', value=%s", type.name(), propertyName, value));
+        }
+
         switch (type) {
             case EQUAL:
                 return org.hibernate.criterion.Restrictions.eq(propertyName, value);
@@ -118,7 +119,7 @@ extends
                 return org.hibernate.criterion.Restrictions.le(propertyName, value);
             case LIKE:
             	String sval = (String)value;
-            	if(sval.contains("%")) {
+            	if(sval.contains("%") || sval.contains("_")) {
                     return org.hibernate.criterion.Restrictions.ilike(propertyName, sval);
             	} else {
                     return org.hibernate.criterion.Restrictions.ilike(propertyName, sval, MatchMode.ANYWHERE);
@@ -177,9 +178,13 @@ extends
     }
 
     private DetachedCriteria subquery(SubqueryExpression sqex) {
+
     	String entityName = sqex.getTargetPropertyName();
     	String alias = Texts.tos(sqex.getAlias(), null);
     	Restrictions restr = (Restrictions) sqex.getValue();
+    	if(log.isTraceEnabled()) {
+    		log.trace(String.format("Creating detached criteria for entity %s of type %s as %s", entityName, sqex.getType(), restr));
+    	}
     	DetachedCriteria dtc;
     	if(alias != null) {
     		dtc = DetachedCriteria.forEntityName(entityName, alias);

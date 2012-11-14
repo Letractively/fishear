@@ -5,7 +5,7 @@ import net.fishear.utils.Texts;
 public class SubqueryExpression extends Expression
 {
 	private String alias;
-	
+
 	private static ExpressionTypes[] types = {
 			ExpressionTypes.EXISTS,
 			ExpressionTypes.NOT_EXISTS,

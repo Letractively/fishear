@@ -16,6 +16,8 @@ import net.fishear.exceptions.AppException;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -25,6 +27,8 @@ implements
 	GenericDaoI<K>
 {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private QueryParser<QueryConstraints, Criteria> queryParser = new HibernateQueryParser();
 
 	private Class<K> type;
@@ -97,13 +101,18 @@ implements
 		return type;
 	}
 
-	private Criteria createCriteria() {
-		Criteria result = getSession().createCriteria(type);
+	private Criteria createCriteria(QueryConstraints qc) {
+		String alias = qc.getAlias();
+		if(alias == null || alias.trim().length() == 0) {
+			alias = "this";
+		}
+		log.trace("");
+		Criteria result = getSession().createCriteria(type, alias);
 		return result;
 	}
 
 	private Criteria parseQueryConstraints(QueryConstraints qc) {
-		Criteria criteria = createCriteria();
+		Criteria criteria = createCriteria(qc);
 		queryParser.parse(qc, criteria);
 		return criteria;
 	}
