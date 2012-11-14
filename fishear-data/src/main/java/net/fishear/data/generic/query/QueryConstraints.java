@@ -20,6 +20,8 @@ implements
 	Cloneable
 {
 
+	private String alias;
+
 	private OrderBy orderBy;
 	private Where where;
 	private Projection projection;
@@ -267,6 +269,21 @@ implements
 	 */
 	public QueryConstraints join(String joinProperty, String alias, Restrictions restrictions) {
 		getWhere().getConditions().join(joinProperty, restrictions);
+		return this;
+	}
+
+	/**
+	 * @return the alias that will be used in SQL query for main entity.
+	 */
+	public String getAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias the alias to set
+	 */
+	public QueryConstraints setAlias(String alias) {
+		this.alias = alias;
 		return this;
 	}
 	
