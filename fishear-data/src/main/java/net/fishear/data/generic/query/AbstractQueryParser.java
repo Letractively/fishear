@@ -1,5 +1,8 @@
 package net.fishear.data.generic.query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 public abstract class 
@@ -8,6 +11,8 @@ implements
 	QueryParser<T, E>
 {
 
+	protected final Logger log = LoggerFactory.getLogger(getClass());
+	
     /**
      * Parse query constraints with all constaints, filters etc.
      *
