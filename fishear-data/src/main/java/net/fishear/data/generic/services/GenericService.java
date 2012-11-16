@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.AbstractEntity;
@@ -304,6 +305,12 @@ implements
 	}
 
 	public CurrentStateI getCurrentState() {
-		return null;
+		DaoSourceI ds;
+		CurrentStateSourceI css;
+		if((ds = getDao().getDaoSource()) != null && (css = ds.getCurrentStateSource()) != null) {
+			return css.getCurrentState();
+		} else {
+			return null;
+		}
 	}
 }

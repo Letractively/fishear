@@ -1,6 +1,7 @@
 package net.fishear.data.hibernate.dao;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 
 import org.hibernate.Transaction;
 

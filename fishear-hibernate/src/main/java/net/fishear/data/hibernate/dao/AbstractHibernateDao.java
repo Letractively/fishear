@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.exceptions.DataException;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryParser;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 import net.fishear.data.hibernate.HibernateContext;
 import net.fishear.data.hibernate.query.HibernateQueryParser;
 import net.fishear.exceptions.AppException;
@@ -32,6 +34,8 @@ implements
 	private QueryParser<QueryConstraints, Criteria> queryParser = new HibernateQueryParser();
 
 	private Class<K> type;
+
+	private DaoSourceI daoSource; 
 
 	public AbstractHibernateDao() {
 		this.type = findType();
@@ -134,4 +138,15 @@ implements
 		throw new AppException("Subclass does not parametrize generic superclass.");
 	}
 
+	@Override
+	public DaoSourceI getDaoSource() {
+		return this.daoSource;
+	}
+
+	/**
+	 * @param daoSource the daoSource to set
+	 */
+	public void setDaoSource(DaoSourceI daoSource) {
+		this.daoSource = daoSource;
+	}
 }

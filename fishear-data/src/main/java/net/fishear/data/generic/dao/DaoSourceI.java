@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 
 public interface DaoSourceI
 {
@@ -28,4 +29,17 @@ public interface DaoSourceI
 	 */
 	void registerPackage(String packageName, int subclassLevel);
 
+	/**
+	 * returns current state source, that provide current system state.
+	 * 
+	 * @return state source
+	 */
+	CurrentStateSourceI getCurrentStateSource();
+
+	/**
+	 * allows to set state source that provides current system state (user logged in, ...)
+	 * @param currentStateSource
+	 */
+	void setCurrentStateSource(CurrentStateSourceI currentStateSource);
+	
 }

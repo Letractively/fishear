@@ -2,8 +2,12 @@ package net.fishear.data.generic.dao;
 
 import java.lang.reflect.Constructor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 import net.fishear.exceptions.AppException;
 
 
@@ -19,19 +23,30 @@ import net.fishear.exceptions.AppException;
 public class ClassBasedDaoSource implements DaoSourceI
 {
 
-	private Class<?> daoClass;
+	Logger log = LoggerFactory.getLogger(getClass());
 	
+	private Class<?> daoClass;
+
+	private CurrentStateSourceI currentStateSource;
+
 	public ClassBasedDaoSource(Class<?> daoClass) {
 		this.daoClass = daoClass;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends EntityI<?>> GenericDaoI<T> createDao(Class<T> entityType) {
 		Class<?> clazz = daoClass;
 		try {
 			Constructor<?> constru = clazz.getConstructor(Class.class);
-			return (GenericDaoI<T>) constru.newInstance(entityType);
+			GenericDaoI<T> dao = (GenericDaoI<T>) constru.newInstance(entityType);
+			try {
+				// try to set DAO source 
+				clazz.getMethod("setDaoSource", DaoSourceI.class).invoke(dao, this);
+			} catch(Exception ex) {
+				log.warn("Cannot set daoSource to the DAO: {}", ex.toString());
+			}
+			return dao;
 		} catch (Exception ex) {
 			throw new AppException(ex);
 		}
@@ -55,6 +70,16 @@ public class ClassBasedDaoSource implements DaoSourceI
 	@Override
 	public boolean supportsAutoregistrationPackages() {
 		return false;
+	}
+
+	@Override
+	public CurrentStateSourceI getCurrentStateSource() {
+		return currentStateSource;
+	}
+
+	@Override
+	public void setCurrentStateSource(CurrentStateSourceI currentStateSource) {
+		this.currentStateSource = currentStateSource;
 	}
 
 }

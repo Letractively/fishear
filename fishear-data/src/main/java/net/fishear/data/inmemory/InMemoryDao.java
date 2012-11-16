@@ -5,10 +5,12 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryParser;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 import net.fishear.data.inmemory.query.InMemoryQueryParser;
 import net.fishear.exceptions.AppException;
 
@@ -25,6 +27,8 @@ implements
 	private QueryParser<QueryConstraints, InMemoryCriteria> queryParser = new InMemoryQueryParser();
 
 	private Class<K> type;
+
+	private DaoSourceI daoSource;
 
 	public InMemoryDao() {
 		this.type = findType();
@@ -146,5 +150,17 @@ implements
 	@Override
 	public void transaction() {
 
+	}
+
+	@Override
+	public DaoSourceI getDaoSource() {
+		return this.daoSource;
+	}
+
+	/**
+	 * @param daoSource the daoSource to set
+	 */
+	public void setDaoSource(DaoSourceI daoSource) {
+		this.daoSource = daoSource;
 	}
 }

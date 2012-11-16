@@ -4,47 +4,47 @@ import java.util.List;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 
+public interface GenericDaoI<K extends EntityI<?>> {
 
+	K read(Object id);
 
-public interface 
-	GenericDaoI<K extends EntityI<?>> 
-{
+	Object save(K entity);
 
-   K read(Object id);
+	void delete(K entity);
 
-   Object save(K entity);
+	boolean isLazyLoaded(Object entity, String propertyName);
 
-   void delete(K entity);
+	K newEntityInstance();
 
-   boolean isLazyLoaded(Object entity, String propertyName);
+	Class<K> type();
 
-   K newEntityInstance();
+	List<?> query(QueryConstraints queryConstraints);
 
-   Class<K> type();
+	/**
+	 * synchronize internal state with cache, but bo not commit transaction.
+	 */
+	void flush();
 
-   List<?> query(QueryConstraints queryConstraints);
+	/**
+	 * If transaction has been started, commits it. Otherwise do nothing.
+	 */
+	void commit();
 
-   /**
-    * synchronize internal state with cache, but bo not commit transaction.
-    */
-   void flush();
+	/**
+	 * If transaction has been started, rollbacks it. Otherwise do nothing.
+	 */
+	void rollback();
 
-   /**
-    * If transaction has been started, commits it.
-    * Otherwise do nothing.
-    */
-   void commit();
+	/**
+	 * If dao supports transactions and transaction not started yet, begins int.
+	 * Otherwise do nothing.
+	 */
+	void transaction();
 
-   /**
-    * If transaction has been started, rollbacks it.
-    * Otherwise do nothing.
-    */
-   void rollback();
-
-   /**
-    * If dao supports transactions and transaction not started yet, begins int. 
-    * Otherwise do nothing.
-    */
-   void transaction();
+	/**
+	 * @return current state source if set, or null if not.
+	 */
+	DaoSourceI getDaoSource();
 }
