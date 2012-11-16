@@ -2,6 +2,10 @@ package net.fishear.web.rights.services.impl;
 
 import java.util.List;
 
+import net.fishear.data.generic.dao.DaoSourceI;
+import net.fishear.data.generic.dao.DaoSourceManager;
+import net.fishear.data.generic.services.CurrentStateI;
+import net.fishear.data.generic.services.CurrentStateSourceI;
 import net.fishear.exceptions.ValidationException;
 import net.fishear.utils.Defender;
 import net.fishear.utils.Texts;
@@ -30,7 +34,8 @@ import org.apache.tapestry5.services.Session;
 public abstract class 
 	AbstractLoginLogoutService
 implements
-	LoginLogoutService
+	LoginLogoutService,
+	CurrentStateSourceI
 {
 
 	private static final String REMENBER_ME_SEPARATOR = "\u0000";
@@ -45,9 +50,14 @@ implements
 	protected EnvironmentService gwEnv;
 
 	public abstract UserInfoI doLoginImpl(String username, String password) throws Exception;
+	
+	private CurrentState currentState;
 
 	public AbstractLoginLogoutService() {
-
+		currentState = new CurrentState(this);
+		if(DaoSourceManager.getDefaultDaoSource() != null && DaoSourceManager.getDefaultDaoSource().getCurrentStateSource() == null) {
+			DaoSourceManager.getDefaultDaoSource().setCurrentStateSource(this);
+		}
 	}
 
 	@Override
@@ -190,5 +200,24 @@ implements
 	 */
 	protected String gesAtrLoggedInKey() {
 		return "net!fishear!t5!account!key";
+	}
+	
+	public static class CurrentState implements CurrentStateI {
+
+		private final AbstractLoginLogoutService abstractLoginLogoutService;
+		
+		public CurrentState(AbstractLoginLogoutService abstractLoginLogoutService) {
+			this.abstractLoginLogoutService = abstractLoginLogoutService;
+		}
+
+		@Override
+		public Object getCurrentUser() {
+			return abstractLoginLogoutService.getUserInfo().getLoginName();
+		}
+		
+	}
+
+	public CurrentStateI getCurrentState() {
+		return this.currentState;
 	}
 }
