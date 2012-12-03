@@ -50,11 +50,11 @@ implements
 	 * @return this isnstance (to allow chaining)
 	 */
 	public PagingDataSource setQueryConstraint(QueryConstraints queryConstraints) {
-		this.queryConstraints = 
-			queryConstraints == null ? 
-				QueryFactory.createDefault() : 
-				queryConstraints
-			;
+		if(queryConstraints == null) {
+			this.queryConstraints = QueryFactory.createDefault();
+		} else {
+			this.queryConstraints = queryConstraints;
+		}
 		return this;
 	}
 
