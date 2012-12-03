@@ -6,12 +6,14 @@ import java.util.List;
 import net.fishear.data.generic.query.AbstractQueryParser;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.conditions.Join;
+import net.fishear.data.generic.query.conditions.Join.JoinType;
 import net.fishear.data.generic.query.conditions.NestedRestriction;
 import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.utils.Texts;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.CriteriaSpecification;
 
 class WhereParser extends AbstractQueryParser<Where, Criteria> {
 
@@ -65,9 +67,9 @@ class WhereParser extends AbstractQueryParser<Where, Criteria> {
             	Criteria c;
             	String alias = Texts.tos(j.getAlias(), null);
             	if(alias == null) {
-            		c = output.createCriteria(j.getPropertyName());
+            		c = output.createCriteria(j.getPropertyName(), joinType(j.getJoinType()));
             	} else {
-            		c = output.createCriteria(j.getPropertyName(), alias);
+            		c = output.createCriteria(j.getPropertyName(), alias, joinType(j.getJoinType()));
             	}
 
                 Restrictions joinRestrictions = j.getRestrictions();
@@ -75,4 +77,19 @@ class WhereParser extends AbstractQueryParser<Where, Criteria> {
             }
         }
     }
+
+	private int joinType(JoinType joinType) {
+		if(joinType == null) {
+			return CriteriaSpecification.INNER_JOIN;
+		}
+		switch(joinType) {
+		case INNER:
+			return CriteriaSpecification.INNER_JOIN;
+		case OUTER:
+			return CriteriaSpecification.LEFT_JOIN;
+		case FULL:
+			return CriteriaSpecification.FULL_JOIN;
+		}
+		throw new IllegalStateException(String.format("Unknown join type: %s", joinType));
+	}
 }
