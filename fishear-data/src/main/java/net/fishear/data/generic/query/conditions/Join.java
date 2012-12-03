@@ -18,9 +18,12 @@ implements
 	private String alias;
 
     public Join(JoinType joinType, String propertyName, Restrictions restrictions) {
-        this.restrictions = restrictions;
+        this.restrictions = restrictions == null ? Restrictions.TRUE : restrictions;
         this.joinType = joinType;
-        this.propertyName = propertyName;
+        this.propertyName = propertyName.trim();
+        if(this.propertyName.length() == 0) {
+        	throw new IllegalStateException("'propertyName' argument is mandatory");
+        }
     }
 
     @Override
@@ -76,7 +79,7 @@ implements
     }
 
     public String toString() {
-    	return propertyName + " " + joinType + restrictions.toString(); 
+    	return joinType + " JOIN " + propertyName + (alias == null ? "" : " ".concat(alias)) + " ON " + restrictions.toString(); 
     }
 
 	public String getAlias() {
@@ -88,7 +91,9 @@ implements
 	}
 	
 	public enum JoinType {
-		OUTER
+		OUTER,
+		INNER,
+		FULL
 	}
 	
 }

@@ -89,7 +89,7 @@ implements
 	 * 
 	 * @param joinProperty
 	 *            Name of join property.
-	 * @param restriction
+	 * @param restriction restrictions. May be null = no restriction is expected.
 	 * @return Return this for method chaining.
 	 */
 	public Conditions join(String joinProperty, Restrictions restriction) {
@@ -104,13 +104,47 @@ implements
 	 * 
 	 * @param joinProperty
 	 *            Name of join property.
+	 * @param restriction restrictions. May be null = no restriction is expected.
+	 * @param joinType the type of join
+	 * @return Return this for method chaining.
+	 */
+	public Conditions join(String joinProperty, JoinType joinType, Restrictions restriction) {
+
+		Join join = new Join(joinType, joinProperty, restriction);
+		getJoins().add(join);
+		return this;
+	}
+
+	/**
+	 * Add joined restrictions for given property.
+	 * 
+	 * @param joinProperty
+	 *            Name of join property.
 	 * @param alias The alias to assign to the joined association (for later reference).
-	 * @param restriction
+	 * @param restriction restrictions. May be null = no restriction is expected.
 	 * @return Return this for method chaining.
 	 */
 	public Conditions join(String joinProperty, String alias, Restrictions restriction) {
 
 		Join join = new Join(JoinType.OUTER, joinProperty, restriction);
+		join.setAlias(alias);
+		getJoins().add(join);
+		return this;
+	}
+
+	/**
+	 * Add joined restrictions for given property.
+	 * 
+	 * @param joinProperty
+	 *            Name of join property.
+	 * @param alias The alias to assign to the joined association (for later reference).
+	 * @param restriction restrictions. May be null = no restriction is expected.
+	 * @param joinType type of the join
+	 * @return Return this for method chaining.
+	 */
+	public Conditions join(String joinProperty, JoinType joinType, String alias, Restrictions restriction) {
+
+		Join join = new Join(joinType, joinProperty, restriction);
 		join.setAlias(alias);
 		getJoins().add(join);
 		return this;

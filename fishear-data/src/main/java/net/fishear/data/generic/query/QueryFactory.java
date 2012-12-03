@@ -50,7 +50,7 @@ public class QueryFactory
 	}
 
 	/**
-	 * Make new instance with default values. This instance has number of
+	 * Creates new instance with default values. This instance has number of
 	 * returned rows set to {@link Integer#MAX_VALUE}, all others parameters are
 	 * set as in method {@link #createDefault()}.
 	 * 
@@ -59,6 +59,21 @@ public class QueryFactory
 	public static QueryConstraints fullResult() {
 		QueryConstraints qc = new QueryConstraints();
 		qc.results().setResultsPerPage(Integer.MAX_VALUE);
+		return qc;
+	}
+
+	/**
+	 * Creates new instance with default values and condition set to given value.
+	 * This instance has number of returned rows set to {@link Integer#MAX_VALUE}, all others parameters have default values.
+	 * @param cond the conditions
+	 * @return new instance created
+	 */
+	public static QueryConstraints fullResult(Conditions cond) {
+		QueryConstraints qc = createDefault();
+		qc.results().setResultsPerPage(Integer.MAX_VALUE);
+		if(cond != null) {
+			qc.where().setConditions(cond);
+		}
 		return qc;
 	}
 

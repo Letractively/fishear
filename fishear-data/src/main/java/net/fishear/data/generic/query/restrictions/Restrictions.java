@@ -15,6 +15,11 @@ extends
 implements
 	Cloneable
 {
+	
+	/**
+	 * the "virtual" restriction (translated to SQLM part 1=1) suit sor situations where restriction is required, but not really need.
+	 */
+	public static final Restrictions TRUE = Restrictions.sql("1=1");
 
 	public Restrictions() {
 
