@@ -168,7 +168,7 @@ implements
 
 	@Override
 	public List<K> list(QueryConstraints constraints) {
-    	List<K> list = query(constraints == null ? QueryFactory.fullResult() : constraints);
+    	List<K> list = query(constraints == null ? QueryFactory.create() : constraints);
     	return list == null ? new ArrayList<K>() : list;
     }
 

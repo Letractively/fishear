@@ -67,7 +67,7 @@ public class BasicServiceTest
 		
 		assertEquals(ee, e1);
 		
-		QueryConstraints qc = QueryFactory.fullResult();
+		QueryConstraints qc = QueryFactory.create();
 		qc.results().setFirstResultIndex(2);
 		qc.results().setResultsPerPage(2);
 		List<SampleEntity> list5 = svc.list(qc);

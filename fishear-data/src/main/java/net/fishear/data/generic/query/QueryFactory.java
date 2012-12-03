@@ -3,6 +3,7 @@ package net.fishear.data.generic.query;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.copy.CopyQueryParser;
 import net.fishear.data.generic.query.restrictions.Restrictions;
+import net.fishear.data.generic.query.results.Results;
 import net.fishear.utils.Defender;
 
 
@@ -24,20 +25,15 @@ public class QueryFactory
 	 * @return Simply call default constructor.
 	 */
 	public static QueryConstraints createDefault() {
-		return new QueryConstraints();
-	}
-
-	public static QueryConstraints fullResult(Restrictions restriction) {
-		QueryConstraints qc = fullResult();
-		qc.where().conditions().add(restriction);
+		QueryConstraints qc = new QueryConstraints();
+		qc.results().setResultsPerPage(Results.DEFAULT_RESULTS_PER_PAGE);
 		return qc;
 	}
 
-	/**
-	 * synonym for {@link #createDefault()} (it is too long for typping)
-	 */
-	public static QueryConstraints create() {
-		return new QueryConstraints();
+	public static QueryConstraints create(Restrictions restriction) {
+		QueryConstraints qc = create();
+		qc.where().conditions().add(restriction);
+		return qc;
 	}
 
 	/**
@@ -46,7 +42,7 @@ public class QueryFactory
 	 * @return
 	 */
 	public static QueryConstraints defaults() {
-		return new QueryConstraints();
+		return createDefault();
 	}
 
 	/**
@@ -56,7 +52,7 @@ public class QueryFactory
 	 * 
 	 * @return Simply call default constructor.
 	 */
-	public static QueryConstraints fullResult() {
+	public static QueryConstraints create() {
 		QueryConstraints qc = new QueryConstraints();
 		qc.results().setResultsPerPage(Integer.MAX_VALUE);
 		return qc;
@@ -68,9 +64,8 @@ public class QueryFactory
 	 * @param cond the conditions
 	 * @return new instance created
 	 */
-	public static QueryConstraints fullResult(Conditions cond) {
-		QueryConstraints qc = createDefault();
-		qc.results().setResultsPerPage(Integer.MAX_VALUE);
+	public static QueryConstraints create(Conditions cond) {
+		QueryConstraints qc = create();
 		if(cond != null) {
 			qc.where().setConditions(cond);
 		}
@@ -78,14 +73,14 @@ public class QueryFactory
 	}
 
 	/**
-	 * create copy of existing constraints or new constraints.
+	 * create copy of existing constraints or new constraints by {@link #create()} method.
 	 * 
 	 * @param constraints
 	 *            if null, crates and returns new (empty) instance of
 	 *            constraints, otherwise make copy of this parameter.
 	 */
 	public static QueryConstraints copyOrCreate(QueryConstraints constraints) {
-		return constraints == null ? createDefault() : createCopy(constraints);
+		return constraints == null ? create() : createCopy(constraints);
 	}
 
 	/**
@@ -102,8 +97,7 @@ public class QueryFactory
 	 */
 	public static QueryConstraints createCopy(QueryConstraints constraints) {
 		Defender.notNull(constraints, "query constaints");
-
-        QueryConstraints result = createDefault();
+        QueryConstraints result = create();
         copyParser.parse(constraints, result);
         return result;
 	}
@@ -112,7 +106,7 @@ public class QueryFactory
 	 * creates constraint with one where "equals" condition.
 	 */
 	public static QueryConstraints equals(String propertyName, Object value) {
-		QueryConstraints qc = createDefault();
+		QueryConstraints qc = create();
 		qc.where().conditions().add(Restrictions.equal(propertyName, value));
 		return qc;
 	}
@@ -121,9 +115,8 @@ public class QueryFactory
 	 * creates constraint with two "equals" condition connected by "and"
 	 * operator.
 	 */
-	public static QueryConstraints andEquals(String prop1Name, Object value1,
-			String prop2Name, Object value2) {
-		QueryConstraints qc = createDefault();
+	public static QueryConstraints andEquals(String prop1Name, Object value1, String prop2Name, Object value2) {
+		QueryConstraints qc = create();
 		qc.where().conditions().add(
 				Restrictions.and(Restrictions.equal(prop1Name, value1),
 						Restrictions.equal(prop2Name, value2)));
@@ -145,7 +138,7 @@ public class QueryFactory
 	 * creates and returns constraints depends on given restrictions.
 	 * Restriction can be null = no restriction is set.
 	 */
-	public static QueryConstraints create(Restrictions restriction) {
+	public static QueryConstraints createDefault(Restrictions restriction) {
 		QueryConstraints cstr = createDefault();
 		if(restriction != null) {
 			cstr.where().conditions().add(restriction);
@@ -154,7 +147,7 @@ public class QueryFactory
 	}
 
 	public static QueryConstraints like(String propertyName, String expression) {
-		QueryConstraints qc = createDefault();
+		QueryConstraints qc = create();
 		qc.where().conditions().add(Restrictions.like(propertyName, expression));
 		return qc;
 	}
@@ -162,7 +155,7 @@ public class QueryFactory
 	 /** creates new query constraint instance with given condition.
 	 * @param cond if it is null, no condition will be set. Otherwise, the condition is set.
 	 */
-	public static QueryConstraints create(Conditions cond) {
+	public static QueryConstraints createDefault(Conditions cond) {
 		QueryConstraints cstr = createDefault();
 		if(cond != null) {
 			cstr.where().setConditions(cond);

@@ -35,7 +35,7 @@ implements
     private List<AggregateProperty> functionsList;
 
     public Results() {
-        this.resultsPerPage = DEFAULT_RESULTS_PER_PAGE;
+        this.resultsPerPage = Integer.MAX_VALUE;
         this.firstResultIndex = 0;
         functionsList = new ArrayList<AggregateProperty>();
     }
