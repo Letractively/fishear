@@ -75,8 +75,16 @@ implements
 	public T getEntity() {
 		if(entity == null) {
 			entity = thisService.newEntityInstance();
+			newEntityInstance(entity);
 		}
 		return entity;
+	}
+
+	/** called after new entity is created to allow successor to set needed values.
+	 * @param entity
+	 */
+	protected void newEntityInstance(T entity) {
+
 	}
 
 	public Object onSuccess() {
