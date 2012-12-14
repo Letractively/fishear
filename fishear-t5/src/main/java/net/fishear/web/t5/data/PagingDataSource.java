@@ -88,20 +88,20 @@ implements
 	}
 
 	public int getAvailableRows() {
-		int result = 0;
-		result = (int) sourceWrapperI.getItemsCount(this.queryConstraints);
-		String where = this.queryConstraints.getFilter().conditions().toString();
-		if (where != null && where.length() > 0) {
-			log.debug(" " + where);
-		}
+		log.debug("Getting record count using query constraints: {}", this.queryConstraints.where());
+		int result = (int) sourceWrapperI.getItemsCount(this.queryConstraints);
+		log.debug("Record count is {}", result);
 		return result;
 	}
 
 	public void prepare(int startIndex, int endIndex, List<SortConstraint> sortConstraints) {
 		// save start index for iterating during rendering
 		this.lastStartIndex = startIndex;
-		
-		this.list = sourceWrapperI.getItems(setupConstraints(startIndex, endIndex, sortConstraints));
+		QueryConstraints qc = setupConstraints(startIndex, endIndex, sortConstraints);
+		if(log.isDebugEnabled()) {
+			log.debug(String.format("Preparing data: startIndex=%s, endIndex=%s, QueryConstraints: %s",  startIndex, endIndex, qc));
+		}
+		this.list = sourceWrapperI.getItems(qc);
 	}
 
 	public Object getRowValue(int rowIndex) {
