@@ -87,16 +87,46 @@ implements
 	/**
 	 * Add joined restrictions for given property.
 	 * 
-	 * @param joinProperty
+	 * @param joinPropertyName
 	 *            Name of join property.
 	 * @param restriction restrictions. May be null = no restriction is expected.
 	 * @return Return this for method chaining.
 	 */
-	public Conditions join(String joinProperty, Restrictions restriction) {
+	public Conditions join(String joinPropertyName, Restrictions restriction) {
 
-		Join join = new Join(JoinType.OUTER, joinProperty, restriction);
+		if(joinExists(joinPropertyName)) {
+			return this;
+		}
+
+		Join join = new Join(JoinType.OUTER, joinPropertyName, restriction);
 		getJoins().add(join);
 		return this;
+	}
+	
+	
+	public boolean joinExists(String joinPropertyName) {
+		if(joinPropertyName == null || joinPropertyName.trim().length() == 0 || joins == null || joins.size() == 0) {
+			return false;
+		}
+		for(Join j : joins) {
+			if(joinPropertyName.equals(j.getPropertyName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<Join> getJoins(String joinPropertyName) {
+		ArrayList<Join> list = new ArrayList<Join>();
+		if(joinPropertyName == null || joinPropertyName.trim().length() == 0 || joins == null || joins.size() == 0) {
+			return list;
+		}
+		for(Join j : joins) {
+			if(joinPropertyName.equals(j.getPropertyName())) {
+				list.add(j);
+			}
+		}
+		return list;
 	}
 
 	/**
@@ -292,5 +322,19 @@ implements
 		} else {
 			return add(Restrictions.equal(fldName, value));
 		}
+	}
+
+	/** adds new join if such does not exist, or adds restriction to existing join if already exists.
+	 * @param propertyName the property that is joined to
+	 * @param rootRestriction the restrixction
+	 */
+	public Conditions addJoin(String propertyName, Restrictions joiningRestriction) {
+		List<Join> list = getJoins(propertyName);
+		if(list.size() > 0) {
+			list.get(0).setRestrictions(Restrictions.and(list.get(0).getRestrictions(), joiningRestriction));
+		} else {
+			join(propertyName, joiningRestriction);
+		}
+		return this;
 	}
 }

@@ -259,6 +259,17 @@ implements
 		where().getConditions().join(joinProperty, restrictions);
 		return this;
 	}
+
+	/** adds new join if such does not exist, or adds restriction to existing join if already exists.
+	 * @param joinProperty property name to join
+	 * @param restrictions the restriction
+	 * @return this instance
+	 * @see Conditions#addJoin(String, Restrictions)
+	 */
+	public QueryConstraints addJoin(String joinProperty, Restrictions restrictions) {
+		where().getConditions().addJoin(joinProperty, restrictions);
+		return this;
+	}
 	
 	/** joins new entity to current query.
 	 * @param joinProperty source's entity property name

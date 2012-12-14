@@ -78,6 +78,13 @@ implements
         return restrictions;
     }
 
+    public void setRestrictions(Restrictions restrictions) {
+    	if(restrictions == null) {
+    		throw new NullPointerException("'restrictions' must not be null");
+    	}
+        this.restrictions = restrictions;
+    }
+
     public String toString() {
     	return joinType + " JOIN " + propertyName + (alias == null ? "" : " ".concat(alias)) + " ON " + restrictions.toString(); 
     }

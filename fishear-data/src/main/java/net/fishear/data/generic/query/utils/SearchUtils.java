@@ -59,10 +59,10 @@ public class SearchUtils
 		boolean anyOk = false;
 		Class<?> clazz = entity.getClass();
 		Method[] met = clazz.getMethods();
-		if (isInnerEntity) {
+		if (isInnerEntity && !EntityUtils.isNew(entity)) {
 			Object id = EntityUtils.getId(entity);
-			if (EntityUtils.isNew(entity)) {
-				return QueryFactory.equals(innerName.concat("id"), id).where().conditions();
+			if(id != null) {
+				return QueryFactory.equals("id", id).where().conditions();
 			}
 		}
 		for (int i = 0; i < met.length; i++) {
@@ -108,12 +108,14 @@ public class SearchUtils
 								}
 							} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
 								Number n = (Number) m.invoke(entity, EntityUtils.EOA);
-								if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
-									anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
-								} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
-									anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
-								} else {
-									anyOk |= cond.addNotZero(fldName, n == null ? 0 : n.longValue());
+								if(n != null) {
+									if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
+										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
+									} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
+										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
+									} else {
+										anyOk |= cond.addNotZero(fldName, n == null ? 0 : n.longValue());
+									}
 								}
 							} else if (retvalType == Class.class) {
 								Class<?> cl = (Class<?>) m.invoke(entity, EntityUtils.EOA);
@@ -124,9 +126,10 @@ public class SearchUtils
 									log.trace("Field {} is type of EntityI, analysing entity", fldName, EntityI.class);
 									if(e1.isNew()) {
 										log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
-										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
+//										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
+										Conditions cond1 = createSearchConditions(e1, "", vec, true);
 										if (cond1 != null) {
-											cond.join(fldName, cond1.getRootRestriction());
+											cond.addJoin(fldName, cond1.getRootRestriction());
 											anyOk = true;
 										}
 									} else {
