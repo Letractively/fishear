@@ -1,6 +1,8 @@
 package net.fishear.web.t5.components;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
@@ -125,5 +127,9 @@ implements
 	 */
 	public void setConditions(Conditions conditions) {
 		this.conditions = conditions;
+	}
+
+	public QueryConstraints getQueryConstraints() {
+		return QueryFactory.create(getSearchConstraints());
 	}
 }

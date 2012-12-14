@@ -1,6 +1,8 @@
 package net.fishear.web.t5.internal;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
 
 public interface 
@@ -9,7 +11,7 @@ extends
 	ServiceSourceI<T>
 {
 
-	/** returns query constraints to satisfy data filled out to search form, or null if no search is required.
+	/** returns condition to satisfy data filled out to search form, or null if no search is required.
 	 */
 	Conditions getSearchConstraints();
 	
@@ -22,4 +24,8 @@ extends
 	 */
 	boolean isSearchConstraintsSet();
 	
+	/**
+	 * @return whole {@link QueryConstraints} instance created using {@link QueryFactory#create()}
+	 */
+	QueryConstraints getQueryConstraints();
 }
