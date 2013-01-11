@@ -1,7 +1,5 @@
 package net.fishear.data.hibernate.query;
 
-
-
 import net.fishear.data.generic.query.AbstractQueryParser;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.results.ProjectionItem;
@@ -15,7 +13,6 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
-
 
 public class 
 	HibernateQueryParser

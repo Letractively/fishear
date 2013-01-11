@@ -212,6 +212,9 @@ implements
 
 		@Override
 		public Object getCurrentUser() {
+			if(abstractLoginLogoutService.getUserInfo() == null) {
+				return null;
+			}
 			return abstractLoginLogoutService.getUserInfo().getLoginName();
 		}
 		

@@ -2,7 +2,9 @@ package net.fishear.data.hibernate.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.GenericDaoI;
@@ -17,6 +19,7 @@ import net.fishear.exceptions.AppException;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,5 +151,44 @@ implements
 	 */
 	public void setDaoSource(DaoSourceI daoSource) {
 		this.daoSource = daoSource;
+	}
+
+	@Override
+	public Integer executeUpdate(String query, Object... parameters) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		if(parameters != null) {
+
+			if(parameters.length %2 == 1) {
+				throw new IllegalArgumentException("Parameter count must be even number");
+			}
+			
+			for(int i = 0; i < parameters.length; i += 2) {
+				if(parameters[i] == null || !(parameters[i] instanceof String)) {
+					throw new IllegalArgumentException(String.format("Each even parameter must be not null string value, but parameter at index %s ('%s)' is not.", i, parameters[i]));
+				}
+				String key = parameters[i].toString();
+				Object val = parameters[i + 1];
+				map.put(key, val);
+			}
+		}
+		return executeUpdate(query, map);
+	}
+
+	@Override
+	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
+		Query q = getSession().createQuery(query);
+		if(paramsMap != null && paramsMap.size() > 0) {
+			for(String key : paramsMap.keySet()) {
+				Object val = paramsMap.get(key);
+				log.trace("Setting parameter '{}' to value '{}'", key, val);
+				q.setParameter(key, val);
+			}
+		}
+		Integer ret = q.executeUpdate();
+		log.debug("Bulk query {} affected %s records", ret);
+		return ret;
 	}
 }

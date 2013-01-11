@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 /** The main class to hold global application informations.
  * @author terber
  */
-public class 
+public class
 	HibernateContext
 {
 	private static final Logger log = Globals.getLogger();

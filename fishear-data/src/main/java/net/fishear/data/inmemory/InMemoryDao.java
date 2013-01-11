@@ -4,6 +4,7 @@ package net.fishear.data.inmemory;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.GenericDaoI;
@@ -162,5 +163,15 @@ implements
 	 */
 	public void setDaoSource(DaoSourceI daoSource) {
 		this.daoSource = daoSource;
+	}
+
+	@Override
+	public Integer executeUpdate(String query, Object... parameters) {
+		throw new IllegalStateException("Method is not implemented");
+	}
+
+	@Override
+	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
 	}
 }
