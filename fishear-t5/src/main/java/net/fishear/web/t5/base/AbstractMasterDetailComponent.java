@@ -3,6 +3,7 @@ package net.fishear.web.t5.base;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.exceptions.BreakException;
 import net.fishear.web.t5.annotations.ForZone;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
@@ -42,6 +43,7 @@ implements
 	/**
 	 * called in case form is submitted.
 	 * Prepares entity to be saved to database.
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
 	 * 
 	 * @param entity the entity. Either new instance (call {@link EntityI#isNew()} or existing one read from DB.
 	 */
@@ -49,6 +51,7 @@ implements
 
 	/**
 	 * called after entity is successfully saved. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
 	 * 
 	 * @param entity the entity that had been saved. Suppoed it is always persistent, but session is not commited yet.
 	 */
@@ -65,6 +68,7 @@ implements
 	}
 
 	/** called before record is deleted. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
 	 * 
 	 * @param id
 	 */
@@ -92,6 +96,10 @@ implements
 		return entity;
 	}
 
+	public void setEntity(T entity) {
+		this.entity = entity;
+	}
+
 	/**
 	 * @return data source
 	 */
@@ -112,6 +120,13 @@ implements
 			afterSave(entity);
 			getService().getDao().commit();
 			alerts.info(translate("record-has-been-saved-message"));
+		} catch(BreakException ex) {
+			if(log.isDebugEnabled()) {
+				log.debug("Saving is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
+			}
+			if(ex.isRollback()) {
+				getService().getDao().rollback();
+			}
 		} catch(Exception ex) {
 			log.error(String.format("Error while saving entity %s", entity), ex);
 			alerts.error(translate("error-while-saving-entity-message", ex.toString()));
@@ -138,6 +153,13 @@ implements
 				alerts.info(translate("record-has-been-deleted-message"));
 			} else {
 				alerts.error(translate("cannot-delete-record-message"));
+			}
+		} catch(BreakException ex) {
+			if(log.isDebugEnabled()) {
+				log.debug("Deleting is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
+			}
+			if(ex.isRollback()) {
+				getService().getDao().rollback();
 			}
 		} catch(Exception ex) {
 			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
