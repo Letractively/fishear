@@ -4,7 +4,6 @@ package net.fishear.web.t5.base;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.BreakException;
-import net.fishear.web.t5.annotations.ForZone;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
@@ -14,9 +13,7 @@ import org.apache.tapestry5.annotations.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-@ForZone("TransportTimeZone")
-public abstract class 
+public abstract class
 	AbstractMasterDetailComponent<T extends EntityI<?>> 
 extends 
 	ComponentBase
