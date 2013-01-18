@@ -14,7 +14,7 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public abstract class 
-	AbstractStdandardEntity 
+	AbstractStandardEntity 
 extends
 	AbstractEntity 
 implements 
@@ -25,9 +25,9 @@ implements
 
 	private Date updateDate;
 	
-	private String createUser = "";
+	private String createUser;
 
-	private String updateUser = "";
+	private String updateUser;
 
 	@Override
 	public void setCreateDate(Date createDate) {
@@ -57,7 +57,7 @@ implements
 	}
 
 	@Override
-	@Column(name = EntityConstants.STDCOL_CREATE_USER)
+	@Column(name = EntityConstants.STDCOL_CREATE_USER, length=EntityConstants.USERID_LENGTH)
 	public String getCreateUser() {
 		return createUser;
 	}
@@ -68,7 +68,7 @@ implements
 	}
 
 	@Override
-	@Column(name = EntityConstants.STDCOL_UPDATE_USER)
+	@Column(name = EntityConstants.STDCOL_UPDATE_USER, length=EntityConstants.USERID_LENGTH)
 	public String getUpdateUser() {
 		return updateUser;
 	}
