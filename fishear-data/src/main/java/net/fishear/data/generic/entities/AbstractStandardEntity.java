@@ -18,7 +18,7 @@ public abstract class
 extends
 	AbstractEntity 
 implements 
-	StandardEntityI<String>
+	StandardEntityI
 {
 
 	private Date createDate;

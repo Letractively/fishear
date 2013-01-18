@@ -12,10 +12,9 @@ import net.fishear.data.generic.services.GenericService;
  * 
  * @author terber
  *
- * @param <K> type of user ID (or name ...)
  */
 public interface 
-	StandardEntityI<K>
+	StandardEntityI
 {
 	/**
 	 * The date when the record was created
@@ -39,15 +38,15 @@ public interface
 	 */
 	Date getUpdateDate();
 
-	void setCreateUser(K createUserId);
+	void setCreateUser(String createUserId);
 
 	/**
 	 * @return
 	 */
-	K getCreateUser();
+	String getCreateUser();
 
-	void setUpdateUser(K updateUserId);
+	void setUpdateUser(String updateUserId);
 
-	K getUpdateUser();
+	String getUpdateUser();
 
 }

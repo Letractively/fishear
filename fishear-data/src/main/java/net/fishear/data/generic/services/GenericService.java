@@ -117,7 +117,6 @@ implements
 		return getDao().save(entity);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
 	private void fillStandardEntity(K entity) {
 		if(entity instanceof StandardEntityI) {
 			Date date = new Date();
@@ -128,22 +127,14 @@ implements
 			if(entity.isNew()) {
 				log.trace("Entity is new object, '{}', filling create date=current / user='{}'", entity, user);
 				if(stde.getCreateDate() == null) { stde.setCreateDate(date); }
-				if(stde.getCreateUser() == null) { 
-					stde.setCreateUser(user); 
-				} else {
-					if(stde.getCreateUser() instanceof CharSequence) {
-						if(stde.getCreateUser().toString().trim().length() == 0) {
-							stde.setCreateUser(user); 
-						}
-					} else if (stde.getCreateUser() instanceof Number) {
-						if(((Number)stde.getCreateUser()).longValue() == 0L) {
-							stde.setCreateUser(user); 
-						}
-					}
+				if(stde.getCreateUser() == null && user != null) {
+					stde.setCreateUser(user.toString()); 
 				}
 			}
 			stde.setUpdateDate(date);
-			stde.setUpdateUser(user);
+			if(user != null) {
+				stde.setUpdateUser(user.toString());
+			}
 		} 
 	}
 
