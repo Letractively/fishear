@@ -174,4 +174,9 @@ implements
 	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
 		throw new IllegalStateException("Method is not implemented");
 	}
+
+	@Override
+	public K refresh(K entity) {
+		return entity;
+	}
 }

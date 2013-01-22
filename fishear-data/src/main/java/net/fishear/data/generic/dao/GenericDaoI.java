@@ -69,4 +69,8 @@ public interface GenericDaoI<K extends EntityI<?>> {
 	 */
 	Integer executeUpdate(String query, Map<String, Object> paramsMap);
 
+	/** refreshes the entity state, so entity is reloaded from database.
+	 * @param entity
+	 */
+	K refresh(K entity);
 }
