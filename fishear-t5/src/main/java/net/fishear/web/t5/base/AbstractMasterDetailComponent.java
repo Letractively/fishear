@@ -163,6 +163,11 @@ implements
 		}
 		return getReturn();
 	}
+	
+	
+	public void reloadEntity() {
+		entity = getService().read(getEntity().getId());
+	}
 
 	@Override
 	public void setSearchComponent(SearchFormI<T> searchComponent) {
