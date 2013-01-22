@@ -191,4 +191,15 @@ implements
 		log.debug("Bulk query {} affected %s records", ret);
 		return ret;
 	}
+
+	@Override
+	public K refresh(K entity) {
+		if(entity.isNew()) {
+			log.warn("Attempt to refresh new (insaved) entity: {}", entity);
+		} else {
+			log.debug("Refreshing entity: {}", entity);
+			getSession().refresh(entity);
+		}
+		return entity;
+	}
 }

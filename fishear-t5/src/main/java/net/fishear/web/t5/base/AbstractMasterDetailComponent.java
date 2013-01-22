@@ -165,8 +165,11 @@ implements
 	}
 	
 	
-	public void reloadEntity() {
-		entity = getService().read(getEntity().getId());
+	public void refreshEntity() {
+		T e = getEntity();
+		if(!e.isNew()) {
+			entity = getService().getDao().refresh(getEntity());
+		}
 	}
 
 	@Override
