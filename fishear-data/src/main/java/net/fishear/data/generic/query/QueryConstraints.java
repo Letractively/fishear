@@ -235,7 +235,7 @@ implements
 	 * @return this
 	 */
 	public QueryConstraints orderBy(String property) {
-		setOrderBy(new OrderBy().add(property, SortDirection.ASCENDING));
+		orderBy().add(property, SortDirection.ASCENDING);
 		return this;
 	}
 
@@ -245,7 +245,7 @@ implements
 	 * @return this
 	 */
 	public QueryConstraints orderBy(String property, SortDirection direction) {
-		setOrderBy(new OrderBy().add(property, direction));
+		orderBy().add(property, direction);
 		return this;
 	}
 	
