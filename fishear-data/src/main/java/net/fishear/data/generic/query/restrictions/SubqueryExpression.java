@@ -1,5 +1,6 @@
 package net.fishear.data.generic.query.restrictions;
 
+import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.utils.Texts;
 
 public class SubqueryExpression extends Expression
@@ -19,7 +20,11 @@ public class SubqueryExpression extends Expression
 		}
 		throw new IllegalArgumentException("Only "+Texts.tos(types, " ")+" is allowed as type for subquery");
 	}
-	
+
+	public SubqueryExpression(ExpressionTypes type, String forEntity, Where where) {
+		super(checkType(type), forEntity, where);
+	}
+
 	public SubqueryExpression(ExpressionTypes type, String forEntity, Restrictions subquery) {
 		super(checkType(type), forEntity, subquery);
 	}

@@ -2,6 +2,7 @@ package net.fishear.data.hibernate.query;
 
 
 import net.fishear.data.generic.query.AbstractQueryParser;
+import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.data.generic.query.restrictions.Conjunction;
 import net.fishear.data.generic.query.restrictions.ConjunctionTypes;
 import net.fishear.data.generic.query.restrictions.Expression;
@@ -181,18 +182,29 @@ extends
 
     	String entityName = sqex.getTargetPropertyName();
     	String alias = Texts.tos(sqex.getAlias(), null);
-    	Restrictions restr = (Restrictions) sqex.getValue();
-    	if(log.isTraceEnabled()) {
-    		log.trace(String.format("Creating detached criteria for entity %s of type %s as %s", entityName, sqex.getType(), restr));
-    	}
+    	
     	DetachedCriteria dtc;
     	if(alias != null) {
     		dtc = DetachedCriteria.forEntityName(entityName, alias);
     	} else {
     		dtc = DetachedCriteria.forEntityName(entityName);
     	}
-    	dtc.setProjection(Projections.id());
-    	dtc.add(parseRestriction(restr));
+    	if(log.isTraceEnabled()) {
+    		log.trace(String.format("Creating detached criteria for entity %s of type %s as %s", entityName, sqex.getType(), sqex.getValue()));
+    	}
+
+    	if(sqex.getValue() instanceof Restrictions) {
+        	Restrictions restr = (Restrictions) sqex.getValue();
+        	dtc.setProjection(Projections.id());
+        	dtc.add(parseRestriction(restr));
+    	} else if (sqex.getValue() instanceof Where) {
+        	dtc.setProjection(Projections.id());
+        	DetachedWhereParser whp = new DetachedWhereParser();
+        	whp.parse((Where) sqex.getValue(), dtc);
+    	} else {
+    		throw new IllegalStateException(String.format("Subquery must be instance of restrictions or Where, but is %s", sqex.getValue().getClass().getName()));
+    	}
+
     	return dtc;
     }
 }

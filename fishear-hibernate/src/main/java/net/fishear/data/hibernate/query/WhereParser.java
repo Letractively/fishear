@@ -14,6 +14,7 @@ import net.fishear.utils.Texts;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.DetachedCriteria;
 
 class WhereParser extends AbstractQueryParser<Where, Criteria> {
 
@@ -42,9 +43,7 @@ class WhereParser extends AbstractQueryParser<Where, Criteria> {
             if (nestedRestriction.getPropertyName().indexOf(".") != -1) {
                 String[] splittedName = nestedRestriction.getPropertyName().split("\\.");
                 for (int i=0;i<splittedName.length;i++) {
-
                     c = c.createCriteria(splittedName[i]);
-                    
                 }
 
             } else {

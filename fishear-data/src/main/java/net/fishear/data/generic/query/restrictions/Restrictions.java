@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.fishear.data.generic.query.AbstractQueryPart;
+import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.utils.Texts;
 
 public abstract class 
@@ -135,12 +136,12 @@ implements
 		return new Expression(ExpressionTypes.IS_NOT_NULL, propertyName, null);
 	}
 
-	public static Restrictions exists(String entityName, Restrictions subquery) {
+	public static SubqueryExpression exists(String entityName, Restrictions subquery) {
 		SubqueryExpression sqex = new SubqueryExpression(ExpressionTypes.EXISTS, entityName, subquery);
 		return sqex;
 	}
 
-	public static Restrictions exists(Class<?> entityClass, Restrictions subquery) {
+	public static SubqueryExpression exists(Class<?> entityClass, Restrictions subquery) {
 		return exists(entityClass.getName(), subquery);
 	}
 
@@ -152,6 +153,25 @@ implements
 
 	public static Restrictions exists(Class<?> entityClass, String alias, Restrictions subquery) {
 		return exists(entityClass.getName(), alias, subquery);
+	}
+
+	public static SubqueryExpression exists(String entityName, Where where) {
+		SubqueryExpression sqex = new SubqueryExpression(ExpressionTypes.EXISTS, entityName, where);
+		return sqex;
+	}
+
+	public static SubqueryExpression exists(Class<?> entity, Where where) {
+		return exists(entity.getName(), where);
+	}
+
+	public static Restrictions exists(Class<?> entityClass, String alias, Where where) {
+		return exists(entityClass.getName(), alias, where);
+	}
+
+	public static Restrictions exists(String entityName, String alias, Where where) {
+		SubqueryExpression sqex = new SubqueryExpression(ExpressionTypes.EXISTS, entityName, where);
+		sqex.setAlias(alias);
+		return sqex;
 	}
 
 	public static Restrictions notExists(String entityName, Restrictions subquery) {
@@ -171,6 +191,25 @@ implements
 
 	public static Restrictions notExists(Class<?> entityClass, Restrictions subquery) {
 		return notExists(entityClass.getName(), subquery);
+	}
+
+	public static Restrictions notExists(String entityName, Where where) {
+		SubqueryExpression sqex = new SubqueryExpression(ExpressionTypes.NOT_EXISTS, entityName, where);
+		return sqex;
+	}
+
+	public static Restrictions notExists(String entityName, String alias, Where where) {
+		SubqueryExpression sqex = new SubqueryExpression(ExpressionTypes.NOT_EXISTS, entityName, where);
+		sqex.setAlias(alias);
+		return sqex;
+	}
+
+	public static Restrictions notExists(Class<?> entityClass, String alias, Where where) {
+		return notExists(entityClass.getName(), alias, where);
+	}
+
+	public static Restrictions notExists(Class<?> entityClass, Where where) {
+		return notExists(entityClass.getName(), where);
 	}
 
 	/**********************************/
