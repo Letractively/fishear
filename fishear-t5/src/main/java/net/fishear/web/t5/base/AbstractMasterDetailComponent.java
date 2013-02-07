@@ -80,9 +80,12 @@ implements
 	 */
 	public T getEntity() {
 		if(entity == null) {
+			log.trace("getEntity(): Entity variable is null => creating new entity instance");
 			entity = getService().newEntityInstance();
+			log.trace("Calling 'newEntityInstance' for entity {}", entity);
 			newEntityInstance(entity);
 		} else if(entity.getId() != null) {
+			log.trace("getEntity(): Reading entity for ID '{}'", entity.getIdString());
 			entity = getService().syncRead(entity);
 			if(entity == null) {
 				log.warn("Entity with id {} not found", entity.getId());
@@ -110,10 +113,13 @@ implements
 
 //	@CommitAfter
 	public Object onSuccess() {
+		log.debug("onSuccess() called");
 		try {
 			T entity = getEntity();
+			log.trace("beforeSave(entity) called fofr entity {}", entity);
 			beforeSave(entity);
 			getService().save(entity);
+			log.trace("afterSave(entity) called fofr entity {}", entity);
 			afterSave(entity);
 			getService().getDao().commit();
 			alerts.info(translate("record-has-been-saved-message"));
@@ -132,17 +138,20 @@ implements
 	}
 
 	public Object onAddNew() {
+		log.debug("onAddNew() called");
 		entity = null;
 		return getReturn();
 	}
 
 	protected Object onDetail(Long id) {
+		log.debug("onDetail({}) called", id);
 		entity = id == null ? null : getService().read(id);
 		return getReturn();
 	}
 
 //	@CommitAfter
 	protected Object onDelete(Long id) {
+		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
 			if(getService().delete(id)) {
@@ -163,9 +172,9 @@ implements
 		}
 		return getReturn();
 	}
-	
-	
+
 	public void refreshEntity() {
+		log.debug("refreshEntity() called");
 		T e = getEntity();
 		if(!e.isNew()) {
 			entity = getService().getDao().refresh(getEntity());
