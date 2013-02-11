@@ -70,11 +70,19 @@ public class ComponentBase {
 		return zz == null ? null : zz.getClientId();
 	}
 	
+	
+	/**
+	 * @return the page that will be rendered after event is proccessed.
+	 */
+	public Object getPageToRender() {
+		return crsc.getPage();
+	}
+	
 	/**
 	 * @return depending on request type returns this instance or zone defined by {@link ForZone} annotation at class level.
 	 */
 	public Object getReturn() {
-		return request.isXHR() ? getForZone() : this;
+		return request.isXHR() ? getForZone() : getPageToRender();
 	}
 	
 	public String translate(String key, Object... args) {
