@@ -13,7 +13,7 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public class 
-	AbstractStrinIdEntity
+	AbstractStringIdEntity
 extends
 	GenericEntity<String>
 {

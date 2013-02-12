@@ -11,9 +11,7 @@ import java.util.Date;
  * @param <K> type of ID of master entity
  */
 public interface 
-	ValidityEntityI<K>
-extends
-	EntityI<K>
+	ValidityEntityI
 {
 	void setValidFrom(Date ValidFrom);
 
