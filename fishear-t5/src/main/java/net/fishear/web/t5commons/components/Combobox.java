@@ -8,10 +8,12 @@ import net.fishear.data.generic.services.ListDataHolder;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.Coercions;
 
+import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.InjectComponent;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.corelib.components.Select;
@@ -34,6 +36,10 @@ public class Combobox<T> {
 	@Persist
 	private ServiceI<?> service;
 	
+	@Parameter(defaultPrefix=BindingConstants.LITERAL) 
+	@Property
+	String onchange;
+
 	@SetupRender
 	void setupRenser() {
 		Object o = crsc.getInformalParameter("service", Object.class);

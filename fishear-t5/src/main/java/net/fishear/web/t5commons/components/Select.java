@@ -4,12 +4,14 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.web.services.EncoderSelectModel;
 import net.fishear.web.services.EncoderSelectModel.Option;
 
+import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.OptionModel;
 import org.apache.tapestry5.SelectModel;
 import org.apache.tapestry5.ValueEncoder;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -33,6 +35,10 @@ public class Select {
 
 	private ValueEncoder<EntityI<?>> encoder;
 
+	@Parameter(defaultPrefix=BindingConstants.LITERAL) 
+	@Property
+	String onchange;
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SetupRender
 	void setupRenser() {

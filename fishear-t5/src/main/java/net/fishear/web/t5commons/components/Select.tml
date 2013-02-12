@@ -2,5 +2,5 @@
 	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
 	xmlns:p="tapestry:parameter"
 >
-<t:select t:model="dataMap" t:value="key" />
+<t:select t:model="dataMap" t:value="key" t:mixins="renderInformals" onchange="${onchange}" />
 </html>
