@@ -5,12 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import net.fishear.data.generic.entities.AbstractStrinIdEntity;
+import net.fishear.data.generic.entities.AbstractStringIdEntity;
 
 
 @Entity
 @Table(name = "TESTSTRTABLE")
-public class StringIdEntity extends AbstractStrinIdEntity
+public class StringIdEntity extends AbstractStringIdEntity
 {
 
 	private String value;
