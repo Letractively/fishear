@@ -337,4 +337,13 @@ implements
 		}
 		return this;
 	}
+	
+	/**
+	 * @return true in case no join, no restriction ... etc is set = SQL equivalent is WHERE (1=1).
+	 * If returns false, any of element is set.
+	 */
+	public boolean isEmpty() {
+		return rootRestriction == null && (nestedRestrictions == null || nestedRestrictions.size() == 0) && (joins == null || joins.size() == 0);
+	}
+	
 }

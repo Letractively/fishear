@@ -34,8 +34,9 @@ implements
 
 	private SearchableI<T> searchable;
 	
+	@Persist
 	private Conditions extraConditions;
-	
+
 	@SetupRender
 	public void pageLoaded() {
 		thisService = getService();
@@ -115,8 +116,9 @@ implements
 				cond.add(conditions.getRootRestriction());
 			}
 		}
-		modifyConditions(cond);
-		return cond;
+		Conditions cond2 = cond == null ? new Conditions() : cond;
+		modifyConditions(cond2);
+		return cond2.isEmpty() ? cond : cond2;
 	}
 
 	@Override
