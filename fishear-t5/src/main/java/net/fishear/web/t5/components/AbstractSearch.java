@@ -34,7 +34,7 @@ implements
 
 	private SearchableI<T> searchable;
 	
-	private Conditions conditions;
+	private Conditions extraConditions;
 	
 	@SetupRender
 	public void pageLoaded() {
@@ -51,9 +51,10 @@ implements
 	}
 
 	/** called before constraints are returned.
+	 * Descendant can modify constraints created by this component.
 	 * @param cond
 	 */
-	private void modifyConstraints(Conditions cond) {
+	protected void modifyConditions(Conditions cond) {
 
 	}
 
@@ -106,7 +107,7 @@ implements
 		T entity = getEntity();
 		beforeSearch(entity);
 		Conditions cond = SearchUtils.createSearchConditions(entity);
-		Conditions conditions = getConditions();
+		Conditions conditions = getExtraConditions();
 		if(conditions != null) {
 			if(cond == null) {
 				cond = conditions;
@@ -114,7 +115,7 @@ implements
 				cond.add(conditions.getRootRestriction());
 			}
 		}
-		modifyConstraints(cond);
+		modifyConditions(cond);
 		return cond;
 	}
 
@@ -126,15 +127,15 @@ implements
 	/**
 	 * @return the conditions
 	 */
-	public Conditions getConditions() {
-		return conditions;
+	public Conditions getExtraConditions() {
+		return extraConditions;
 	}
 
 	/**
 	 * @param conditions the conditions to set
 	 */
-	public void setConditions(Conditions conditions) {
-		this.conditions = conditions;
+	public void setExtraConditions(Conditions conditions) {
+		this.extraConditions = conditions;
 	}
 
 	public QueryConstraints getQueryConstraints() {
