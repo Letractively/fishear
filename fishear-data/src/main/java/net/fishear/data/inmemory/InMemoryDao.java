@@ -3,10 +3,12 @@ package net.fishear.data.inmemory;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.fishear.data.generic.dao.DaoSourceI;
+import net.fishear.data.generic.dao.DatabaseDaoI;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
@@ -20,7 +22,8 @@ import net.fishear.exceptions.AppException;
 public class 
 	InMemoryDao<K extends EntityI<?>>
 implements 
-	GenericDaoI<K>
+	GenericDaoI<K>,
+	DatabaseDaoI
 {
 
 	final List<K> dataList = new ArrayList<K>();
@@ -166,11 +169,6 @@ implements
 	}
 
 	@Override
-	public Integer executeUpdate(String query, Object... parameters) {
-		throw new IllegalStateException("Method is not implemented");
-	}
-
-	@Override
 	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
 		throw new IllegalStateException("Method is not implemented");
 	}
@@ -178,5 +176,30 @@ implements
 	@Override
 	public K refresh(K entity) {
 		return entity;
+	}
+
+	@Override
+	public List<?> executeQuery(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
+	}
+
+	@Override
+	public List<?> executeSqlQuery(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
+	}
+
+	@Override
+	public Iterator<?> iterateQuery(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
+	}
+
+	@Override
+	public Iterator<?> iterateSqlQuery(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
+	}
+
+	@Override
+	public Integer executeSqlUpdate(String query, Map<String, Object> paramsMap) {
+		throw new IllegalStateException("Method is not implemented");
 	}
 }

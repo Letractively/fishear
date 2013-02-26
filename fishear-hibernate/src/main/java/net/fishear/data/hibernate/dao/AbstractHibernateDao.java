@@ -2,20 +2,21 @@ package net.fishear.data.hibernate.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.fishear.data.generic.dao.DaoSourceI;
+import net.fishear.data.generic.dao.DatabaseDaoI;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.exceptions.DataException;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryParser;
-import net.fishear.data.generic.services.CurrentStateSourceI;
 import net.fishear.data.hibernate.HibernateContext;
 import net.fishear.data.hibernate.query.HibernateQueryParser;
 import net.fishear.exceptions.AppException;
+import net.fishear.utils.Maps;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -28,8 +29,11 @@ import org.slf4j.LoggerFactory;
 
 public abstract class 
 	AbstractHibernateDao<K extends EntityI<?>>
+extends 
+	Maps
 implements 
-	GenericDaoI<K>
+	GenericDaoI<K>,
+	DatabaseDaoI
 {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -55,6 +59,10 @@ implements
 
 	@SuppressWarnings("unchecked")
 	public K read(Object id) {
+		if(id == null) {
+			log.warn("'read': entity ID is null");
+			return null;
+		}
 		if(!(id instanceof Serializable)) {
 			throw new DataException(String.format("Entity ID must implement Serializable interface. Entity: %s", type.getName()));
 		}
@@ -153,42 +161,65 @@ implements
 		this.daoSource = daoSource;
 	}
 
-	@Override
-	public Integer executeUpdate(String query, Object... parameters) {
-
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		if(parameters != null) {
-
-			if(parameters.length %2 == 1) {
-				throw new IllegalArgumentException("Parameter count must be even number");
-			}
-			
-			for(int i = 0; i < parameters.length; i += 2) {
-				if(parameters[i] == null || !(parameters[i] instanceof String)) {
-					throw new IllegalArgumentException(String.format("Each even parameter must be not null string value, but parameter at index %s ('%s)' is not.", i, parameters[i]));
-				}
-				String key = parameters[i].toString();
-				Object val = parameters[i + 1];
-				map.put(key, val);
-			}
-		}
-		return executeUpdate(query, map);
-	}
-
-	@Override
-	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
-		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
-		Query q = getSession().createQuery(query);
+	private Query setParams(Query q, Map<String, Object> paramsMap) {
 		if(paramsMap != null && paramsMap.size() > 0) {
 			for(String key : paramsMap.keySet()) {
 				Object val = paramsMap.get(key);
-				log.trace("Setting parameter '{}' to value '{}'", key, val);
+				log.trace("Query parameter ':{}' is set to '{}'", key, val);
 				q.setParameter(key, val);
 			}
 		}
-		Integer ret = q.executeUpdate();
-		log.debug("Bulk query {} affected %s records", ret);
+		return q;
+	}
+	
+	@Override
+	public Integer executeUpdate(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk update: {}, params: {}", query, paramsMap);
+		Integer ret = setParams(getSession().createQuery(query), paramsMap).executeUpdate();
+		log.debug("JPA update {} affected {} records", query, ret);
+		return ret;
+	}
+
+	@Override
+	public Integer executeSqlUpdate(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk update: {}, params: {}", query, paramsMap);
+		Integer ret = setParams(getSession().createSQLQuery(query), paramsMap).executeUpdate();
+		log.debug("Native SQL update {} affected {} records", query, ret);
+		return ret;
+	}
+
+	@Override
+	public List<?> executeQuery(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
+		List<?> ret = setParams(getSession().createQuery(query), paramsMap).list();
+		log.debug("JPA query {} returned {} records", query, ret.size());
+		return ret;
+	}
+
+
+	@Override
+	public List<?> executeSqlQuery(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
+		List<?> ret = setParams(getSession().createSQLQuery(query), paramsMap).list();
+		log.debug("Native SQL query {} returned {} records", query, ret.size());
+		return ret;
+	}
+
+
+	@Override
+	public Iterator<?> iterateQuery(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
+		Iterator<?> ret = setParams(getSession().createQuery(query), paramsMap).iterate();
+		log.debug("JPA query {} returned iterator", query);
+		return ret;
+	}
+
+
+	@Override
+	public Iterator<?> iterateSqlQuery(String query, Map<String, Object> paramsMap) {
+		log.debug("Execute bulk query: {}, params: {}", query, paramsMap);
+		Iterator<?> ret = setParams(getSession().createSQLQuery(query), paramsMap).iterate();
+		log.debug("Native SQL query {} returned iterator", query);
 		return ret;
 	}
 

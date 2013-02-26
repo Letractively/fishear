@@ -1,30 +1,60 @@
 package net.fishear.data.generic.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
-import net.fishear.data.generic.services.CurrentStateSourceI;
 
 public interface GenericDaoI<K extends EntityI<?>> {
 
+	/**
+	 * reads single entity by ID.
+	 * @param id entity ID. never should be nul, but in case it is nukll no exception is throws - null entity is returned instead (null ID should be logged).
+	 * @return
+	 */
 	K read(Object id);
 
+	/**
+	 * saves entity to persistent storage. Generates ID if needed. Tries to merge with persistent entity instance, if such exists.
+	 * @param entity the entity
+	 * @return entity ID (either new or existing).
+	 */
 	Object save(K entity);
 
+	/** 
+	 * deletes entity from persistent storage.
+	 * 
+	 * @param entity
+	 */
 	void delete(K entity);
 
+	/**
+	 * should decide whether propertz is layz loaded
+	 * @param entity affected entitz
+	 * @param propertyName the name
+	 * @return true or false
+	 */
 	boolean isLazyLoaded(Object entity, String propertyName);
 
+	/**
+	 * creates new entity instance, but MUST NOT connect persistent layer.
+	 * @return new entity instance
+	 */
 	K newEntityInstance();
 
+	/**
+	 * @return entitz class that the service is created for
+	 */
 	Class<K> type();
 
+	/** generic query, that can return any return type (not exactly the entity list or entity)
+	 * @param queryConstraints
+	 * @return query return
+	 */
 	List<?> query(QueryConstraints queryConstraints);
 
 	/**
-	 * synchronize internal state with cache, but bo not commit transaction.
+	 * synchronize internal state with cache, but but does not commit transaction.
 	 */
 	void flush();
 
@@ -48,26 +78,6 @@ public interface GenericDaoI<K extends EntityI<?>> {
 	 * @return current state source if set, or null if not.
 	 */
 	DaoSourceI getDaoSource();
-
-	/**
-	 * executes SQL update query in JPA-implementation specific manner.
-	 * Its implementation is NOT MANDATORRY, IT SHOULD BE USED WITH CARE.
-	 * @param query query string 
-	 * @param parameters pairs of key-value for named parameters. Each even value must be string (= key), each odd value is key's value (any object)
-	 * @return number of affected records, or null = number of records is unknown
-	 * @throws RuntimeException in case any error occurs, or method is not implemented.
-	 */
-	Integer executeUpdate(String query, Object... parameters);
-
-	/**
-	 * executes SQL update query in JPA-implementation specific manner.
-	 * Its implementation is NOT MANDATORRY, IT SHOULD BE USED WITH CARE.
-	 * @param query query string 
-	 * @param paramsMap key-value pairs for nammed parameters
-	 * @return number of affected records, or null = number of records is unknown
-	 * @throws RuntimeException in case any error occurs, or method is not implemented.
-	 */
-	Integer executeUpdate(String query, Map<String, Object> paramsMap);
 
 	/** refreshes the entity state, so entity is reloaded from database.
 	 * @param entity

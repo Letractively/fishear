@@ -1,9 +1,9 @@
 package net.fishear.data.hibernate.dao;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import net.fishear.data.generic.entities.EntityI;
-import net.fishear.data.generic.services.CurrentStateSourceI;
 
 import org.hibernate.Transaction;
 
