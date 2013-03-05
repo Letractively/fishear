@@ -87,27 +87,38 @@ public class SearchUtils
 							fldName = innerName.concat(metName.substring(3, 4).toLowerCase().concat(metName.substring(4)));
 							if (CharSequence.class.isAssignableFrom(retvalType)) {
 								CharSequence chs = (CharSequence) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'CharSequence' and value {}", fldName, chs);
 								anyOk |= cond.addLikeNotEmpty(fldName, chs == null ? null : chs.toString());
 							} else if (retvalType == char[].class) {
 								char[] chs = (char[]) m.invoke(entity, EntityUtils.EOA);
-								anyOk |= cond.addLikeNotEmpty(fldName, chs == null ? null : new StringBuilder(chs.length).append(chs).toString());
+								if(chs != null) {
+									String str = new StringBuilder(chs.length).append(chs).toString();
+									log.trace("Adding propety {} of type 'char[]' and value {}", fldName, str);
+									anyOk |= cond.addLikeNotEmpty(fldName, str);
+								} else {
+									log.trace("Adding propety {} of type 'char[]' and value {}", fldName, chs);
+								}
 							} else if (retvalType == Character.class || retvalType == Character.TYPE) {
 								Character ch = (Character) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Character' and value {}", fldName, ch);
 								anyOk |= cond.addLikeNotEmpty(fldName, ch == null ? null : ch.toString());
 							} else if (retvalType == Boolean.class || retvalType == Boolean.TYPE) {
 								Boolean fl = (Boolean) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Boolean' and value {}", fldName, fl);
 								if (fl != null) {
 									cond.add(Restrictions.equal(fldName, fl));
 									anyOk |= true;
 								}
 							} else if (Date.class.isAssignableFrom(retvalType)) {
 								Date date = (Date) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Date' and value {}", fldName, date);
 								if (date != null) {
 									cond.add(Restrictions.equal(fldName, date));
 									anyOk |= true;
 								}
 							} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
 								Number n = (Number) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Number' and value {}", fldName, n);
 								if(n != null) {
 									if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
 										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
@@ -119,7 +130,15 @@ public class SearchUtils
 								}
 							} else if (retvalType == Class.class) {
 								Class<?> cl = (Class<?>) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Class' and value {}", fldName, cl);
 								anyOk |= cond.addLikeNotEmpty(fldName, cl.getName());
+							} else if (Enum.class.isAssignableFrom(retvalType)) {
+								Enum<?> en = (Enum<?>) m.invoke(entity, EntityUtils.EOA);
+								log.trace("Adding propety {} of type 'Enum' and value {}", fldName, en);
+								if(en != null) {
+									cond.addEquals(fldName, en);
+									anyOk = true;
+								}
 							} else if (EntityI.class.isAssignableFrom(retvalType)) {
 								EntityI<?> e1 = (EntityI<?>) m.invoke(entity, EntityUtils.EOA);
 								if (e1 != null) {
@@ -139,15 +158,19 @@ public class SearchUtils
 									}
 								}
 							} else {
-								// TODO:
-								log.debug("Class {} of field {} is unknown type; ignored", EntityI.class.getName(), fldName);
+								Object o = m.invoke(entity, EntityUtils.EOA);
+								if(o != null) {
+									log.warn("Field {} is unsupported type {}; ignored", fldName, retvalType.getName());
+								} else {
+									log.debug("Field {} is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
+								}
 							}
 						}
 					} catch (Exception ex) {
 						if(ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException) {
 							// do nothing so far ?
 						} else {
-							ex.printStackTrace(); // TODO: better way how to inform ?
+							log.error("Error while getting property value", ex);
 						}
 					}
 				}
