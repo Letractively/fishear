@@ -18,7 +18,7 @@ public class Globals {
 	
 	public static final Class<Double> doubleClass = Double.TYPE;
 	public static final Class<Float> floatClass = Float.TYPE;
-
+	
     private static final Hashtable<String, String> RESOLVED_CFGS = new Hashtable<String, String>();
 
     private static final Hashtable<Class<?>, Logger> LOGGER_CACHE = new Hashtable<Class<?>, Logger>();
