@@ -124,6 +124,10 @@ public class SearchUtils
 										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
 									} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
 										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
+									} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
+										if(n.intValue() != 0) {
+											cond.addEquals(fldName, n.intValue());
+										}
 									} else {
 										anyOk |= cond.addNotZero(fldName, n == null ? 0 : n.longValue());
 									}
