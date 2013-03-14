@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
-			</dependency>
+		</dependency>
 	</dependencies>
 
 	<modelVersion>4.0.0</modelVersion>

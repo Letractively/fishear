@@ -24,6 +24,11 @@ extends
 implements
 	SearchFormI<T>
 {
+
+	public enum EntityType {
+		ENTITY,
+		ENTITY2
+	}
 	
 	private static Logger log = LoggerFactory.getLogger(AbstractSearch.class);
 	
@@ -31,6 +36,9 @@ implements
 
 	@Persist
 	private T entity;
+
+	@Persist
+	private T entity2;
 
 	private SearchableI<T> searchable;
 	
@@ -48,6 +56,10 @@ implements
 	 * @param entity
 	 */
 	protected void beforeSearch(T entity) {
+		beforeSearch(entity, null);
+	}
+
+	protected void beforeSearch(T entity, T entity2) {
 
 	}
 
@@ -82,11 +94,23 @@ implements
 		return entity;
 	}
 
+	public T getEntity2() {
+		if(entity2 == null) {
+			entity2 = thisService.newEntityInstance();
+			newEntityInstance(entity2);
+		}
+		return entity2;
+	}
+
 	/** called after new entity is created to allow successor to set needed values.
 	 * @param entity
 	 */
 	protected void newEntityInstance(T entity) {
+		newEntityInstance(entity, EntityType.ENTITY);
+	}
 
+	protected void newEntityInstance(T entity, EntityType type) {
+		
 	}
 
 	public Object onSuccess() {
@@ -106,9 +130,15 @@ implements
 	@Override
 	public Conditions getSearchConstraints() {
 		T entity = getEntity();
-		beforeSearch(entity);
+		T entity2 = this.entity2 == null ? null : getEntity2();
+
+		log.debug("Creating search condition for entity {} and entity2 {}", entity, entity2);
+
+		beforeSearch(entity, entity2);
+
 		Conditions cond = SearchUtils.createSearchConditions(entity);
 		Conditions conditions = getExtraConditions();
+
 		if(conditions != null) {
 			if(cond == null) {
 				cond = conditions;

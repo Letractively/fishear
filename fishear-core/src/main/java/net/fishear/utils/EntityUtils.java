@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -62,6 +63,22 @@ public class
 		 */
 		OVERWRITE_BY_NULLS
 	}
+	
+	/**
+	 * @author ffyxrr
+	 * flags that modify #listDifferencies method behaviour 
+	 */
+	public static enum DiffFlags {
+
+		/**
+		 * If set, transient fields/getters are involved into to comparison. 
+		 * Ztansient values are ommitted by default.
+		 */
+		COMPARE_TRANSIENT
+		
+	}
+	
+	
 
 	/** return true if both 'e1' and 'e2' are null, or if both id's of 'e1' and 'e2' are null, or if id's of 'e1' and 'e2' are equals.
 	 * In other cases, returns false.
@@ -175,46 +192,197 @@ public class
 	 * same values. If getter method for field exists (with the same return value
 	 * as field), it is used to obtain fiels's value. Otherwise, value is taken
 	 * directly from field. If both fields (from e1 and e2) are null, it is OK.
+	 * @param e1 first object
+	 * @param e2 second object
+	 * @param flags flags that correct behavior
 	 */
-	public static boolean equals(Object e1, Object e2) {
-		return equals(e1, e2, new HashSet<Method>(), Integer.MAX_VALUE);
+	public static boolean equals(Object e1, Object e2, DiffFlags... flags) {
+		return equals(e1, e2, Integer.MAX_VALUE, flags);
 	}
 
-	/** like {@link #equals(Object, Object)}, but maximum depth for inner fields is limited to "maxDepth". 
+	/** like {@link #equals(Object, Object, DiffFlags...)}, but maximum depth for inner fields is limited to "maxDepth". 
 	 * @param e1 first object
 	 * @param e2 second object
 	 * @param maxDepth max depth 
+	 * @param flags flags that correct behavior
 	 * @return true if objects are equals, false otherwise 
 	 */
-	public static boolean equals(Object e1, Object e2, int maxDepth) {
-		return equals(e1, e2, new HashSet<Method>(), maxDepth);
+	public static boolean equals(Object e1, Object e2, int maxDepth, DiffFlags... flags) {
+		
+		boolean compareTransient = false;
+
+		for(DiffFlags fl : flags) {
+			switch(fl) {
+			case COMPARE_TRANSIENT:
+				compareTransient = true;
+				continue;
+			}
+		}
+		return equalsInternal(e1, e2, new HashSet<String>(), maxDepth, compareTransient);
 	}
 
-	public static boolean equals(Object e1, Object e2, Set<Method> done, int depth) {
+	public static boolean equals(Object e1, Object e2, Set<String> done, int depth) {
+		return equalsInternal(e1, e2, done, depth, false);
+	}
+
+	private static boolean equalsInternal(Object e1, Object e2, Set<String> done, int depth, boolean compareTransient) {
+
+		Class<?> clazz = e1.getClass();
+		log.debug("equalsInternal: Comparison started at depth level {} for entity class '{}'", depth, clazz);
 		if(depth < 0) {
+			log.trace("equalsInternal: Level is < 0 => assuming equals");
 			return true;
 		}
 		if (e1 == e2) {
+			log.trace("equalsInternal: Entities are the same. No difference.");
 			return true;
 		}
-		Class<?> clazz = e1.getClass();
 		if (clazz != e2.getClass()) {
+			log.trace("equalsInternal: Entities are instanes of different classes.");
 			return false;
 		}
 		String cln = clazz.getName();
 		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
-			return e1.equals(e2);
+			log.trace("equalsInternal: Java native class {}; compare direct", clazz);
+			return e1 == null ? e2 == null : e1.equals(e2);
 		}
 		do {
 			Field[] fields = clazz.getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
+				boolean transientFld = false;
 				Field fld = fields[i];
 				String fldn = fld.getName();
-				if (isTransient(fld)) {
+				if(Modifier.isStatic(fld.getModifiers())) {
+					log.trace("Static field '{}', ignored", fldn);
 					continue;
 				}
-				if (done.contains(fld)) {
+				if (compareTransient ? false : isTransient(fld)) {
+					log.trace("Transient field '{}', will be ignored at the next step", fldn);
+					transientFld = true;
+				}
+
+				String metn = "get" + fldn.substring(0, 1).toUpperCase() + fldn.substring(1);
+				Method m;
+				try {
+					Object v1, v2;
+					try {
+						m = clazz.getMethod(metn);
+						if(Modifier.isStatic(m.getModifiers())) {
+							log.trace("Static method '{}', ignored", fldn);
+							continue;
+						}
+						if(done.contains(metn)) {
+							log.trace("Getter with name '{}' already proccessed, ignore", metn);
+							continue;
+						}
+						if (compareTransient ? false : isTransient(m) || !Modifier.isPublic(m.getModifiers()) || transientFld) {
+							if(log.isTraceEnabled()) { log.trace("Transient getter '{}' or field '{}', ignore", metn, fldn); }
+							continue;
+						}
+						done.add(metn);
+					} catch (NoSuchMethodException ex) { // exceptions can be OK here if getter does not exists
+						continue;
+					}
+					v1 = m.invoke(e1);
+					v2 = m.invoke(e2);
+					if(v1 == v2) {
+						log.trace("Values for field '{}' are the same => equals", fldn);
+						continue;
+					} else if (v1 == null || v2 == null) {
+						log.trace("One value for field '{}' is null, the other not => not equals", fldn);
+						return false;
+					} else if (!equalsInternal(v1, v2, done, depth - 1, compareTransient)) {
+						log.trace("Deep equals for field '{}' returned false => NOT equals", fldn);
+						return false;
+					}
+				} catch (Exception e) {
+					log.error("Cannot get value for field: '{}'\nValue type: '{}'", fld, fld.getType());
+					throw new AppException(e);
+				}
+			}
+		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
+		return true;
+	}
+	
+	public static class Property {
+
+		public final String name;
+		public final Object value1;
+		public final Object value2;
+
+		public Property(String fldn, Object v1, Object v2) {
+			this.value1 = v1;
+			this.value2 = v2;
+			this.name = fldn;
+		}
+		
+		public boolean equals(Object o) {
+			if(o == null || !(o instanceof Property)) {
+				return false;
+			}
+			Property p = (Property) o;
+			return eq(name, p.name) && eq(value1, p.value1) && eq(value2, p.value2);
+		}
+		
+		private boolean eq(Object o1, Object o2) {
+			return o1 == null ? o2 == null : o1.equals(o2);
+		}
+
+		public String toString() {
+			return "Property: " + name + ", v1="+ value1 + ", v2=" + value2;
+		}
+		
+	}
+	
+	/** compares two entities and returns list of properties (aka fields) that are different.
+	 * Each compared property must exist as field and must have corresponding getter, utherwise it is ignored diring comparison.
+	 * @param e1 first (source) entity
+	 * @param e2 second (target) entity
+	 * @param flags 
+	 * @return
+	 */
+	public static List<Property> listDifferencies(Object e1, Object e2, DiffFlags... flags) {
+
+		boolean compareTransient = false;
+		
+		for(DiffFlags fl : flags) {
+			switch(fl) {
+			case COMPARE_TRANSIENT:
+				compareTransient = true;
+				continue;
+			}
+		}
+		
+		Set<String> done = new HashSet<String>();
+
+		List<Property> list = new ArrayList<EntityUtils.Property>();
+		Class<?> clazz = e1.getClass();
+		log.debug("listDifferencies: Comparison started");
+		if (e1 == e2) {
+			log.trace("listDifferencies: Entities are the same. No difference.");
+			return list;
+		}
+		if (clazz != e2.getClass()) {
+			throw new IllegalArgumentException("Both entities nust be instance of the same class");
+		}
+		String cln = clazz.getName();
+		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
+			throw new IllegalArgumentException("java native classes cannot be compared");
+		}
+		do {
+			Field[] fields = clazz.getDeclaredFields();
+			for (int i = 0; i < fields.length; i++) {
+				boolean transientFld = false;
+				Field fld = fields[i];
+				String fldn = fld.getName();
+				log.trace("Field {}", fldn);
+				if(Modifier.isStatic(fld.getModifiers())) {
+					log.trace("Static field '{}', ignored", fldn);
 					continue;
+				}
+				if (compareTransient ? false : isTransient(fld)) {
+					log.trace("Transient field {}, will be ignored at the next step", fldn);
+					transientFld = true;
 				}
 				String metn = "get" + fldn.substring(0, 1).toUpperCase() + fldn.substring(1);
 				Method m;
@@ -222,24 +390,33 @@ public class
 					Object v1, v2;
 					try {
 						m = clazz.getMethod(metn);
-						if(done.contains(m)) {
+						if(Modifier.isStatic(fld.getModifiers())) {
+							log.trace("Static method '{}', ignored", metn);
 							continue;
 						}
-						done.add(m);
-						if (isTransient(m) || !Modifier.isPublic(m.getModifiers())) {
+						if(done.contains(metn)) {
+							log.trace("Getter with name {} already proccessed, ignore", metn);
 							continue;
 						}
+						if (compareTransient ? false : isTransient(m) || !Modifier.isPublic(m.getModifiers()) || transientFld) {
+							if(log.isTraceEnabled()) { log.trace("Transient getter {} or field {}, ignore", metn, fldn); }
+							continue;
+						}
+						done.add(metn);
 					} catch (NoSuchMethodException ex) { // exceptions can be OK here if getter does not exists
+						log.trace("Getter {} does not exist, ignore", metn);
 						continue;
 					}
 					v1 = m.invoke(e1);
 					v2 = m.invoke(e2);
 					if(v1 == v2) {
+						log.trace("Values for field {} are the same, ignore", fldn);
 						continue;
-					} else if (v1 == null || v2 == null) {
-						return false;
-					} else if (!equals(v1, v2, done, depth - 1)) {
-						return false;
+					} else if (v1 == null || v2 == null || !v1.equals(v2)) {
+						if(log.isTraceEnabled()) {
+							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
+						}
+						list.add(new Property(fldn, v1, v2));
 					}
 				} catch (Exception e) {
 					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());
@@ -247,7 +424,7 @@ public class
 				}
 			}
 		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
-		return true;
+		return list;
 	}
 	
 	private static boolean isAnnotation(Object fldOrMethod, Class<? extends Annotation> annot) {

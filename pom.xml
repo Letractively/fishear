@@ -74,6 +74,17 @@
 			<version>1.9.0-rc1</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- 
+			logging framework for testing purposes. 
+			It is supposed that real application will have its own logging, so no logging library is really imported. 
+		-->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
