@@ -120,17 +120,40 @@ public class SearchUtils
 								Number n = (Number) m.invoke(entity, EntityUtils.EOA);
 								log.trace("Adding propety {} of type 'Number' and value {}", fldName, n);
 								if(n != null) {
+									boolean localOk = false;
 									if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
-										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
+										localOk = cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
 									} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
-										anyOk |= cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
+										localOk = cond.addNan(fldName, n == null ? Double.NaN : n.doubleValue());
 									} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
-										if(n.intValue() != 0) {
+										if(retvalType.isPrimitive() ? n.intValue() != 0 : true) {
 											cond.addEquals(fldName, n.intValue());
+											localOk = true;
+										}
+									} else if (Short.class == retvalType || Short.TYPE == retvalType) {
+										if(retvalType.isPrimitive() ? n.shortValue() != 0 : true) {
+											cond.addEquals(fldName, n.shortValue());
+											localOk = true;
+										}
+									} else if (Byte.class == retvalType || Byte.TYPE == retvalType) {
+										if(retvalType.isPrimitive() ? n.byteValue() != 0 : true) {
+											cond.addEquals(fldName, n.byteValue());
+											localOk = true;
 										}
 									} else {
-										anyOk |= cond.addNotZero(fldName, n == null ? 0 : n.longValue());
+										if(retvalType.isPrimitive() ? n.longValue() != 0 : true) {
+											cond.addEquals(fldName, n.longValue());
+											localOk = true;
+										}
 									}
+									if(localOk) {
+										anyOk |= true;
+										log.trace("Numeric property {} with value {} hes been added", fldName, n);
+									} else {
+										log.trace("Numeric property {} with value {} hes NOT been added", fldName, n);
+									}
+								} else {
+									log.trace("Numeric property {} ommitted since value is null", fldName);
 								}
 							} else if (retvalType == Class.class) {
 								Class<?> cl = (Class<?>) m.invoke(entity, EntityUtils.EOA);

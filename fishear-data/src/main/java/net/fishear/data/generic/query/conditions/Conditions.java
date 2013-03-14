@@ -6,6 +6,8 @@ import net.fishear.data.generic.query.conditions.Join.JoinType;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ implements
 	Cloneable
 {
 
+	private static Logger log = LoggerFactory.getLogger(Conditions.class);
+	
 	/**
 	 * Restrictions has composite structure and this is root restriction.
 	 */
@@ -274,9 +278,12 @@ implements
 	 *         changed.
 	 */
 	public boolean addNan(String fldName, double value) {
+		log.trace("Adding double value {} for property {}", value, fldName);
 		if (!Double.isNaN(value)) {
 			add(Restrictions.equal(fldName, new Double(value)));
 			return true;
+		} else {
+			log.trace("");
 		}
 		return false;
 	}
