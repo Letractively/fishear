@@ -217,7 +217,6 @@ implements
 	public void saveInitialState() {
 		try {
 			originalState = this.clone();
-System.err.println("\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB: " + originalState);
 		} catch (CloneNotSupportedException ex) {
 			throw new IllegalStateException(ex);
 		}
