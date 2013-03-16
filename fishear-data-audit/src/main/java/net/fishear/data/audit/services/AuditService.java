@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.fishear.FishearConstants;
+import net.fishear.Interfaces.IdI;
 import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.audit.entities.AuditHader;
 import net.fishear.data.generic.entities.EntityI;
@@ -44,7 +46,12 @@ implements
 			diflist = EntityUtils.fillDifferencies(e2, true);
 			break;
 		case UPDATE:
-			diflist = EntityUtils.listDifferencies(e1, e2);
+			if(e2 == null) {
+				log.warn("UPDATE is performed but second entity ('e2') is null. Treated as insert.");
+				diflist = EntityUtils.listDifferencies(e1, true);
+			} else {
+				diflist = EntityUtils.listDifferencies(e1, e2);
+			}
 			break;
 		default:
 			throw new IllegalArgumentException("'action' argument has unsupported value: " + action);
@@ -84,6 +91,11 @@ implements
 	private String tos(Object o) {
 		if(o == null) {
 			return null;
+		}
+		if(o instanceof IdI<?>) {
+			return tos(EntityUtils.getId((IdI<?>)o));
+		} else if (o instanceof Date) {
+			return FishearConstants.ANSI_DATETIME_FORMAT_MILLIS.format((Date)o);
 		}
 		return o.toString();
 	}

@@ -412,7 +412,7 @@ public class
 					if(v1 == v2) {
 						log.trace("Values for field {} are the same, ignore", fldn);
 						continue;
-					} else if (v1 == null || v2 == null || !v1.equals(v2)) {
+					} else if (v1 == null || v2 == null || (e1 instanceof IdI<?> ? equalsId((IdI<?>)e1, (IdI<?>)e2) : !v1.equals(v2))) {
 						if(log.isTraceEnabled()) {
 							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
 						}
