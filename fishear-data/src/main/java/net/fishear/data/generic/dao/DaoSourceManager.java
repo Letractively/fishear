@@ -131,4 +131,8 @@ public abstract class DaoSourceManager
 	public static DaoSourceI removeDaoSource(String jpaName) {
 		return daoSources.remove(jpaName);
 	}
+
+	public Map<String, DaoSourceI> getDaoSources() {
+		return new HashMap<String, DaoSourceI>(daoSources);
+	}
 }

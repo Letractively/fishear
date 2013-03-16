@@ -21,6 +21,8 @@ public class FishearRightsModule
 	
     public void contributeComponentClassResolver(Configuration<LibraryMapping> configuration) throws IOException {
         configuration.add(new LibraryMapping("feac", "net.fishear.web.rights.t5"));
+        //TODO: should be moved to better (more common) place
+        configuration.add(new LibraryMapping("feaud", "net.fishear.data.audit"));
     }
 
 /**

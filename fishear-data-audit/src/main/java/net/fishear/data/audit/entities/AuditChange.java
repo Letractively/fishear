@@ -1,28 +1,35 @@
 package net.fishear.data.audit.entities;
 
-public class AuditData {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
-	public enum Action {
-		INSERT,
-		
-		UPDATE,
-		
-		DELETE
-	}
-	
+import net.fishear.data.audit.AuditConstants;
+import net.fishear.data.generic.entities.AbstractEntity;
+
+@Entity
+@Table(name=AuditConstants.AUDIT_CHANGES_TABLE_NAME)
+public class AuditChange extends AbstractEntity {
+
+	@ManyToOne
+	@JoinColumn(name="HEADER_ID")
 	private AuditHader header;
 	
 	private String propertyName;
 
-	private Object oldValue;
+	@MapsId
+	private String oldValue;
 	
-	private Object newValue;
-
-	private Action action;
+	private String newValue;
 
 	/**
 	 * @return the header
 	 */
+	@ManyToOne
+	@JoinColumn(name="AUDIT_ID")
 	public AuditHader getHeader() {
 		return header;
 	}
@@ -37,6 +44,7 @@ public class AuditData {
 	/**
 	 * @return the propertyName
 	 */
+	@Column(name="PROPERTY_NAME")
 	public String getPropertyName() {
 		return propertyName;
 	}
@@ -51,43 +59,31 @@ public class AuditData {
 	/**
 	 * @return the oldValue
 	 */
-	public Object getOldValue() {
+	@Column(name="OLD_VALUE")
+	public String getOldValue() {
 		return oldValue;
 	}
 
 	/**
 	 * @param oldValue the oldValue to set
 	 */
-	public void setOldValue(Object oldValue) {
+	public void setOldValue(String oldValue) {
 		this.oldValue = oldValue;
 	}
 
 	/**
 	 * @return the newValue
 	 */
-	public Object getNewValue() {
+	@Column(name="NEW_VALUE")
+	public String getNewValue() {
 		return newValue;
 	}
 
 	/**
 	 * @param newValue the newValue to set
 	 */
-	public void setNewValue(Object newValue) {
+	public void setNewValue(String newValue) {
 		this.newValue = newValue;
 	}
 
-	/**
-	 * @return the action
-	 */
-	public Action getAction() {
-		return action;
-	}
-
-	/**
-	 * @param action the action to set
-	 */
-	public void setAction(Action action) {
-		this.action = action;
-	}
-	
 }

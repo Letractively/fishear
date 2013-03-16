@@ -9,7 +9,8 @@ import java.sql.Statement;
 import java.util.List;
 
 import net.fishear.data.generic.query.QueryFactory;
-import net.fishear.data.hibernate.ClassisSessionSource;
+import net.fishear.data.hibernate.DefaultHibernateConfigurationSource;
+import net.fishear.data.hibernate.HibernateSessionSource;
 import net.fishear.data.hibernate.HibernateContext;
 import net.fishear.data.hibernate.dao.entities.StringIdEntity;
 import net.fishear.data.hibernate.dao.entities.UserSample;
@@ -33,10 +34,9 @@ public class DaoTest
 		conf.configure("/hibernate.cfg.xml");
 		conf.addAnnotatedClass(UserSample.class);
 		conf.addAnnotatedClass(StringIdEntity.class);
-		SessionFactory sessionFactory = conf.buildSessionFactory();
-//		Session session = sessionFactory.openSession();
-		ClassisSessionSource.init(sessionFactory);
-		HibernateDaoSource.init();
+//		SessionFactory sessionFactory = conf.buildSessionFactory();
+		HibernateSessionSource.init(conf);
+		HibernateDaoSource.init(new DefaultHibernateConfigurationSource(conf));
 	}
 
 	@Test

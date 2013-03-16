@@ -32,7 +32,7 @@ public class InMemoryDaoSource extends ClassBasedDaoSource
 	}
 
 	@Override
-	public void registerPackage(String packageName, int subclassLevel) {
+	public void registerPackage(String packageName) {
 
 	}
 

@@ -4,8 +4,10 @@ package net.fishear.data.generic.entities;
 import java.lang.reflect.ParameterizedType;
 
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 
+import net.fishear.data.generic.services.GenericService;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Classes;
 import net.fishear.utils.EntityUtils;
@@ -28,7 +30,8 @@ import org.slf4j.LoggerFactory;
 public abstract class 
 	GenericEntity<T>
 implements 
-	EntityI<T>
+	EntityI<T>,
+	Cloneable
 {
 
 	private static final Logger log = LoggerFactory.getLogger(GenericEntity.class);
@@ -36,6 +39,8 @@ implements
 	private T id;
 	
 	private Class<T> idType;
+	
+	private Object originalState;
 
 	public GenericEntity() {
 		idType = findType();
@@ -207,5 +212,22 @@ implements
 	@Transient
 	public Class<T> getIdType() {
 		return idType;
+	}
+	
+	public void saveInitialState() {
+		try {
+			originalState = this.clone();
+System.err.println("\nBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB: " + originalState);
+		} catch (CloneNotSupportedException ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+	
+	/**
+	 * @return state of the entity after it is loaded 
+	 */
+	@Transient
+	public Object getOriginalState() {
+		return originalState;
 	}
 }

@@ -5,6 +5,7 @@ import net.fishear.utils.Globals;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 
 /**
@@ -14,18 +15,23 @@ import org.slf4j.Logger;
  * @author terber
  *
  */
-public class ClassisSessionSource
-	implements SessionSourceI
+public class 
+	HibernateSessionSource
+implements 
+	SessionSourceI,
+	HibernateConfigurationSourceI
 {
 	private static final Logger log = Globals.getLogger();
 
 	private final ThreadLocal<Session> sessionHolder = new ThreadLocal<Session>();
+	
+	private Configuration configuration;
 
 	private SessionFactory sessionFactory;
 
-	public ClassisSessionSource(SessionFactory sessionFactory) {
-		Defender.notNull(sessionFactory, "sessionFactory");
-		this.sessionFactory = sessionFactory;
+	public HibernateSessionSource(Configuration configuration) {
+		Defender.notNull(configuration, "configuration");
+		this.configuration = configuration;
 	}
 
 	/** returns Hibernate session associated to current thread. 
@@ -35,6 +41,10 @@ public class ClassisSessionSource
 	@Override
 	public Session getSession() {
 
+		if(sessionFactory == null) {
+			this.sessionFactory = buildSessionFactory();
+		}
+		
 		Session ses = sessionHolder.get();
 		if(ses == null) {
 			ses = sessionFactory.openSession();
@@ -43,17 +53,37 @@ public class ClassisSessionSource
 		return ses;
 	}
 
+	private synchronized SessionFactory buildSessionFactory() {
+		return configuration.buildSessionFactory();
+	}
+
 	@Override
 	public void releaseSession() {
 		sessionHolder.set(null);
 	}
 
-	public static void init(SessionFactory sessionFactory) {
+	public static void init(Configuration conf) {
 		if(HibernateContext.getSessionSource() == null) {
-			HibernateContext.setSessionSource(new ClassisSessionSource(sessionFactory));
+			HibernateContext.setSessionSource(new HibernateSessionSource(conf));
 		} else {
 			log.warn("Hibernate session source already set to {}", HibernateContext.getSessionSource().getClass().getName());
 		}
+	}
+
+	/**
+	 * @return the configuration
+	 */
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	/**
+	 * @param configuration the configuration to set
+	 */
+	public void setConfiguration(Configuration configuration) {
+		Defender.notNull(configuration, "configuration");
+		this.configuration = configuration;
 	}
 
 }

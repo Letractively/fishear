@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
+import net.fishear.data.generic.services.AdonsI;
 import net.fishear.data.generic.services.CurrentStateSourceI;
+import net.fishear.data.generic.services.impl.AdonsService;
 import net.fishear.exceptions.AppException;
 
 
@@ -28,6 +30,8 @@ public class ClassBasedDaoSource implements DaoSourceI
 	private Class<?> daoClass;
 
 	private CurrentStateSourceI currentStateSource;
+	
+	private AdonsI adons;
 
 	public ClassBasedDaoSource(Class<?> daoClass) {
 		this.daoClass = daoClass;
@@ -63,7 +67,7 @@ public class ClassBasedDaoSource implements DaoSourceI
 	}
 
 	@Override
-	public void registerPackage(String packageName, int subclassLevel) {
+	public void registerPackage(String packageName) {
 		throw new EntityRegistrationNotSupportedException(String.format("Required package: %s", packageName));
 	}
 
@@ -80,6 +84,32 @@ public class ClassBasedDaoSource implements DaoSourceI
 	@Override
 	public void setCurrentStateSource(CurrentStateSourceI currentStateSource) {
 		this.currentStateSource = currentStateSource;
+	}
+
+	/**
+	 * @return the adons
+	 */
+	public AdonsI getAdons() {
+		if(this.adons == null) {
+			log.info("'adons' were uninitialized. Initializing.");
+			this.adons = initAdonsService();
+		}
+		return this.adons;
+	}
+
+	private synchronized AdonsI initAdonsService() {
+		if(this.adons == null) {
+			return new AdonsService(this);
+		} else {
+			return this.adons;
+		}
+	}
+
+	/**
+	 * @param adons the adons to set
+	 */
+	public void setAdons(AdonsI adons) {
+		this.adons = adons;
 	}
 
 }

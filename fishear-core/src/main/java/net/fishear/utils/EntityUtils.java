@@ -427,6 +427,87 @@ public class
 		return list;
 	}
 	
+	/** provides list of all values form entity as list of differencies.
+	 * @param e rhe entity
+	 * @param isTarget if true, values are filled to target value of list item. Default is source value.
+	 * @param flags the flags
+	 * @return list of all values
+	 */
+	public static List<Property> fillDifferencies(Object e, boolean isTarget, DiffFlags... flags) {
+
+		boolean compareTransient = false;
+		
+		for(DiffFlags fl : flags) {
+			switch(fl) {
+			case COMPARE_TRANSIENT:
+				compareTransient = true;
+				continue;
+			}
+		}
+		
+		Set<String> done = new HashSet<String>();
+
+		List<Property> list = new ArrayList<EntityUtils.Property>();
+		Class<?> clazz = e.getClass();
+		log.debug("listDifferencies: Comparison started");
+
+		String cln = clazz.getName();
+		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
+			throw new IllegalArgumentException("java native classes cannot be compared");
+		}
+		do {
+			Field[] fields = clazz.getDeclaredFields();
+			for (int i = 0; i < fields.length; i++) {
+				boolean transientFld = false;
+				Field fld = fields[i];
+				String fldn = fld.getName();
+				log.trace("Field {}", fldn);
+				if(Modifier.isStatic(fld.getModifiers())) {
+					log.trace("Static field '{}', ignored", fldn);
+					continue;
+				}
+				if (compareTransient ? false : isTransient(fld)) {
+					log.trace("Transient field {}, will be ignored at the next step", fldn);
+					transientFld = true;
+				}
+				String metn = "get" + fldn.substring(0, 1).toUpperCase() + fldn.substring(1);
+				Method m;
+				try {
+					try {
+						m = clazz.getMethod(metn);
+						if(Modifier.isStatic(fld.getModifiers())) {
+							log.trace("Static method '{}', ignored", metn);
+							continue;
+						}
+						if(done.contains(metn)) {
+							log.trace("Getter with name {} already proccessed, ignore", metn);
+							continue;
+						}
+						if (compareTransient ? false : isTransient(m) || !Modifier.isPublic(m.getModifiers()) || transientFld) {
+							if(log.isTraceEnabled()) { log.trace("Transient getter {} or field {}, ignore", metn, fldn); }
+							continue;
+						}
+						done.add(metn);
+					} catch (NoSuchMethodException ex) { // exceptions can be OK here if getter does not exists
+						log.trace("Getter {} does not exist, ignore", metn);
+						continue;
+					}
+					if(isTarget) {
+						log.trace("Target values for field {} setted", fldn);
+						list.add(new Property(fldn, null, m.invoke(e)));
+					} else {
+						log.trace("Source values for field {} setted", fldn);
+						list.add(new Property(fldn, m.invoke(e), null));
+					}
+				} catch (Exception ex) {
+					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());
+					throw new AppException(ex);
+				}
+			}
+		} while ((clazz = clazz.getSuperclass()) != TOP_LEVEL_CLASS);
+		return list;
+	}
+	
 	private static boolean isAnnotation(Object fldOrMethod, Class<? extends Annotation> annot) {
 		if(fldOrMethod instanceof Field) {
 			return ((Field)fldOrMethod).getAnnotation(annot) != null;

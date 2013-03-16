@@ -2,6 +2,8 @@ package net.fishear.web.rights.services.impl;
 
 import java.util.List;
 
+import javax.persistence.Transient;
+
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.services.CurrentStateI;
@@ -19,6 +21,8 @@ import org.apache.tapestry5.services.Cookies;
 import org.apache.tapestry5.services.Request;
 import org.apache.tapestry5.services.RequestGlobals;
 import org.apache.tapestry5.services.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -38,6 +42,8 @@ implements
 	CurrentStateSourceI
 {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private static final String REMENBER_ME_SEPARATOR = "\u0000";
 
 	@Inject
@@ -51,13 +57,28 @@ implements
 
 	public abstract UserInfoI doLoginImpl(String username, String password) throws Exception;
 	
-	private CurrentState currentState;
+	private transient CurrentState currentState;
 
+	
 	public AbstractLoginLogoutService() {
-		currentState = new CurrentState(this);
 		if(DaoSourceManager.getDefaultDaoSource() != null && DaoSourceManager.getDefaultDaoSource().getCurrentStateSource() == null) {
+			log.info("Default 'currentStateSource' has not been set. Setting this instance as 'currentStateSource'");
 			DaoSourceManager.getDefaultDaoSource().setCurrentStateSource(this);
 		}
+	}
+
+	public CurrentStateI getCurrentState() {
+		if(this.currentState == null) {
+			synchronized(this) {
+				if(this.currentState == null) {
+					currentState = new CurrentState(this);
+					if(DaoSourceManager.getDefaultDaoSource() != null && DaoSourceManager.getDefaultDaoSource().getCurrentStateSource() == null) {
+						DaoSourceManager.getDefaultDaoSource().setCurrentStateSource(this);
+					}
+				}
+			}
+		}
+		return this.currentState;
 	}
 
 	@Override
@@ -200,27 +221,5 @@ implements
 	 */
 	protected String gesAtrLoggedInKey() {
 		return "net!fishear!t5!account!key";
-	}
-	
-	public static class CurrentState implements CurrentStateI {
-
-		private final AbstractLoginLogoutService abstractLoginLogoutService;
-		
-		public CurrentState(AbstractLoginLogoutService abstractLoginLogoutService) {
-			this.abstractLoginLogoutService = abstractLoginLogoutService;
-		}
-
-		@Override
-		public Object getCurrentUser() {
-			if(abstractLoginLogoutService.getUserInfo() == null) {
-				return null;
-			}
-			return abstractLoginLogoutService.getUserInfo().getLoginName();
-		}
-		
-	}
-
-	public CurrentStateI getCurrentState() {
-		return this.currentState;
 	}
 }

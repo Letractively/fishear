@@ -1,12 +1,17 @@
 package net.fishear.t5.hibernate;
 
+import javax.inject.Inject;
+
+import net.fishear.data.hibernate.HibernateConfigurationSourceI;
 import net.fishear.data.hibernate.HibernateContext;
 import net.fishear.data.hibernate.SessionSourceI;
 import net.fishear.utils.Globals;
 
 import org.apache.tapestry5.hibernate.HibernateSessionManager;
+import org.apache.tapestry5.hibernate.HibernateSessionSource;
 import org.apache.tapestry5.ioc.annotations.EagerLoad;
 import org.hibernate.Session;
+import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 
 /** The main class to hold global application informations.
@@ -16,9 +21,13 @@ import org.slf4j.Logger;
 public class 
 	T5HibernateSessionSource
 implements 
-	SessionSourceI
+	SessionSourceI,
+	HibernateConfigurationSourceI
 {
 
+	@Inject
+	HibernateSessionSource sessionSource;
+	
 	private static final Logger log = Globals.getLogger();
 	
 	private HibernateSessionManager hibernateSessionManager;
@@ -48,6 +57,11 @@ implements
 
 	public HibernateSessionManager getHibernateSessionManager() {
 		return hibernateSessionManager;
+	}
+
+	@Override
+	public Configuration getConfiguration() {
+		return sessionSource.getConfiguration();
 	}
 
 }

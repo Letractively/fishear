@@ -2,6 +2,7 @@ package net.fishear.data.generic.services;
 
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,11 +16,13 @@ import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.AbstractEntity;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.GenericEntity;
 import net.fishear.data.generic.entities.StandardEntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.exceptions.TooManyRecordsException;
 import net.fishear.data.generic.query.restrictions.Restrictions;
+import net.fishear.data.generic.services.AuditServiceI.Action;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Defender;
 import net.fishear.utils.EntityUtils;
@@ -43,6 +46,20 @@ implements
 	ServiceI<K> 
 {
 
+	private static final Class<Annotation> auditable = getAuditable();
+
+	@SuppressWarnings("unchecked")
+	private static Class<Annotation> getAuditable() {
+		String auditableClass = "net.fishear.data.audit.annotations.Auditable";
+		try {
+			return (Class<Annotation>) GenericService.class.getClassLoader().loadClass(auditableClass);
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			LoggerFactory.getLogger(GenericService.class).info("Auditable annotation class '{}' is not available. Auditing is disabled.", auditableClass);
+			return null;
+		}
+	}
+	
     private final GenericDaoI<K> thisDao;
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
@@ -68,7 +85,7 @@ implements
 		log.trace("Reading entity for ID='{}'", id);
         K result = (K)getDao().read(id);
 		log.debug("Reading operation for ID='{}' returns {}", id, result);
-        return result;
+        return modifyEntity(result);
     }
 
 	@Override
@@ -79,6 +96,7 @@ implements
 			log.trace("Deleting entity {}", entity);
 		}
         getDao().delete(entity);
+		checkAudit(entity, AuditServiceI.Action.DELETE);
 		log.debug("Entity {} with ID={} has been deleted", entity, entity.getId());
     }
 
@@ -118,13 +136,14 @@ implements
     }
 
 	private void fillStandardEntity(K entity) {
+		CurrentStateI state = getCurrentState();
+		boolean newEntity = entity.isNew();
 		if(entity instanceof StandardEntityI) {
 			Date date = new Date();
-			CurrentStateI state = getCurrentState();
 			Object user = state == null ? null : state.getCurrentUser();
 			StandardEntityI stde = (StandardEntityI)entity;
 			log.trace("Entity {} is instance of 'StandardEntityI', filling update date=current / user='{}'", entity, user);
-			if(entity.isNew()) {
+			if(newEntity) {
 				log.trace("Entity is new object, '{}', filling create date=current / user='{}'", entity, user);
 				if(stde.getCreateDate() == null) { stde.setCreateDate(date); }
 				if(stde.getCreateUser() == null && user != null) {
@@ -135,7 +154,49 @@ implements
 			if(user != null) {
 				stde.setUpdateUser(user.toString());
 			}
-		} 
+		}
+		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
+	}
+
+	private void checkAudit(K entity, Action action) {
+		if(isAuditable(entity)) {
+			log.debug("Entity {} is auditable, performing audit.", entity.getClass());
+			if(!(entity instanceof GenericEntity<?>)) {
+				log.warn("Entity annotated as Auditable must be instance of GenericEntity");
+				return;
+			}
+			AdonsI adons;
+			if((adons = getDao().getDaoSource().getAdons()) != null) {
+				AuditServiceI aus;
+				if((aus = adons.getAuditService()) != null) {
+					if(action == Action.DELETE) {
+						aus.auditEntity(action, entity, null);
+					} else if(action == Action.INSERT) {
+						aus.auditEntity(action, null, entity);
+					} else {
+						aus.auditEntity(action, entity, (EntityI<?>) ((GenericEntity<?>)entity).getOriginalState());
+					}
+				}
+			} else {
+				log.debug("DaoSource '{}' does not have the addons set. Audit skipped.", getDao().getDaoSource());
+			}
+		}
+	}
+
+	/** 
+	 * Checks whether entity is annotated by Auditable annotation.
+	 * There is not direct reference to the "fishear-data-audit" module (all references are done by reflection).
+	 * So in case those classes are not in classpath, all objects are generally NOT aufitable without rexception.
+	 * 
+	 * @param entity the entity
+	 * @return true if entity is annottated by Auditable annotation.
+	 */
+	public static boolean isAuditable(Object entity) {
+		if(auditable == null) {
+			return false;
+		} else {
+			return entity.getClass().getAnnotation(auditable) != null;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -172,10 +233,24 @@ implements
 	@Override
 	public List<K> list(QueryConstraints constraints) {
     	List<K> list = query(constraints == null ? QueryFactory.create() : constraints);
-    	return list == null ? new ArrayList<K>() : list;
+    	return modifyList(list == null ? new ArrayList<K>() : list);
     }
 
-    @Override
+    private List<K> modifyList(List<K> list) {
+    	for(K entity : list) {
+    		modifyEntity(entity);
+    	}
+		return list;
+	}
+
+	private K modifyEntity(K entity) {
+		if(isAuditable(entity) && entity instanceof GenericEntity<?>) {
+			((GenericEntity<?>)entity).saveInitialState();
+		}
+		return entity;
+ 	}
+
+	@Override
     public K newEntityInstance() {
     	return getDao().newEntityInstance();
     }
@@ -208,7 +283,7 @@ implements
 			throw new TooManyRecordsException("only-one-record-expected-but-more-found", list.size(), getDao().type(), qc.toString());
 		}
 		
-		return list.get(0);
+		return modifyEntity(list.get(0));
     }
 
 	@Override
