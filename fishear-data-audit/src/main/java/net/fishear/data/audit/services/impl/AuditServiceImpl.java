@@ -123,13 +123,13 @@ implements
 		List<AuditChange>  chlist = new ArrayList<AuditChange>();
 		for(Property p : diflist) {
 			// in case standard entity, user and date of update are ignored
-			if(stdEntity && ("updateDate".equals(p.name) || "updateUser".equals(p.name))) {
+			if(stdEntity && ("updateDate".equals(p.getName()) || "updateUser".equals(p.getName()))) {
 				continue;
 			}
 			AuditChange ch = new AuditChange();
 			ch.setAudit(header);
-			ch.setPropertyName(p.name);
-			ch.setNewValue(tos(p.value2));
+			ch.setPropertyName(p.getName());
+			ch.setNewValue(tos(p.getValue2()));
 			chlist.add(ch);
 		}
 		return chlist;

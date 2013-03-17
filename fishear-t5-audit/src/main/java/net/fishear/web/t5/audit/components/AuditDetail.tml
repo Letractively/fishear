@@ -2,10 +2,12 @@
 	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
 	xmlns:p="tapestry:parameter"
 >
-	<h2>Audit detail: ${audit.auditedEntity.className} ${audit.objectId}</h2>
-	
 	<br />
-	
+	<h3>Audit detail: ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}, change ${audit.changeNumber}, ${audit.actionDate} </h3>
+
+	<t:grid t:source="DisplayProeprties">
+	</t:grid>
+	<br />
 	<t:eventlink t:event="hideDetail" >Hide Detail</t:eventlink>
 
 </t:container>
