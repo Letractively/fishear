@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.management.StandardEmitterMBean;
+
 import net.fishear.FishearConstants;
 import net.fishear.Interfaces.IdI;
 import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.audit.entities.Audit;
 import net.fishear.data.audit.services.AuditedEntityService;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.StandardEntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.results.Functions;
@@ -35,10 +38,12 @@ implements
 
 		log.debug("Auditing: action {}", action);
 		List<Property> diflist;
+		boolean forceSave = false;
 		switch(action) {
 		case DELETE:
 			//diflist = EntityUtils.fillDifferencies(e1, false);
 			diflist = new ArrayList<EntityUtils.Property>();
+			forceSave = true;
 			break;
 		case INSERT:
 			diflist = EntityUtils.fillDifferencies(e2, true);
@@ -55,27 +60,32 @@ implements
 			throw new IllegalArgumentException("'action' argument has unsupported value: " + action);
 		}
 
-		if(diflist.size() > 0 || action == Action.DELETE) {
+		if(forceSave || diflist.size() > 0) {
 			log.trace("Entities differencies found: {}", diflist.size());
 
 			Audit audit = newEntityInstance();
+			audit.setChanges(toChanges(diflist, audit, (e2 == null ? e1 : e2) instanceof StandardEntityI));
 
-			audit.setAuditedEntity(entityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
-			audit.setChanges(toChanges(diflist, audit));
-			audit.setObjectId(e2 == null ? e1.getIdString() : e2.getIdString());
-			audit.setChangeNumber(getNextChangeNumber(audit));
+			if(forceSave || audit.getChanges().size() > 0) {
 
-			CurrentStateI state = getCurrentState();
-			Object user = state == null ? null : state.getCurrentUser();
-			audit.setActionUser(user == null ? "(unknown)" : user.toString());
-			audit.setAction(action);
-			audit.setActionDate(new Date());
-			return audit;
+				audit.setAuditedEntity(entityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
+				audit.setObjectId(e2 == null ? e1.getIdString() : e2.getIdString());
+				audit.setChangeNumber(getNextChangeNumber(audit));
+	
+				CurrentStateI state = getCurrentState();
+				Object user = state == null ? null : state.getCurrentUser();
+				audit.setActionUser(user == null ? "(unknown)" : user.toString());
+				audit.setAction(action);
+				audit.setActionDate(new Date());
+				
+				return audit;
+			} else {
+				log.trace("No entities differencies found in second step");
+			}
 		} else {
 			log.trace("No entities differencies found");
-			return null;
 		}
-		
+		return null;
 		
 	}
 	
@@ -107,9 +117,13 @@ implements
 		}
 	}
 	
-	private List<AuditChange> toChanges(List<Property> diflist, Audit header) {
+	private List<AuditChange> toChanges(List<Property> diflist, Audit header, boolean stdEntity) {
 		List<AuditChange>  chlist = new ArrayList<AuditChange>();
 		for(Property p : diflist) {
+			// in case standard entity, user and date of update are ignored
+			if(stdEntity && ("updateDate".equals(p.name) || "updateUser".equals(p.name))) {
+				continue;
+			}
 			AuditChange ch = new AuditChange();
 			ch.setHeader(header);
 			ch.setPropertyName(p.name);
