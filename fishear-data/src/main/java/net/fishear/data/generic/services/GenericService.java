@@ -130,9 +130,12 @@ implements
      */
 	@Override
     public Object save(K entity) {
-		log.debug("Saving entity {} not found", entity);
-		fillStandardEntity(entity);
-		return getDao().save(entity);
+		boolean newEntity = entity.isNew();
+		log.debug("Saving entity {} with ID {}", entity, entity.getId());
+		fillStandardEntity(entity, newEntity);
+		Object reto = getDao().save(entity);
+		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
+		return reto;
     }
 	
 	public void saveAll(Collection<K> list) {
@@ -141,11 +144,10 @@ implements
 		}
 	}
 
-	private void fillStandardEntity(K entity) {
-		CurrentStateI state = getCurrentState();
-		boolean newEntity = entity.isNew();
+	private void fillStandardEntity(K entity, boolean newEntity) {
 		if(entity instanceof StandardEntityI) {
 			Date date = new Date();
+			CurrentStateI state = getCurrentState();
 			Object user = state == null ? null : state.getCurrentUser();
 			StandardEntityI stde = (StandardEntityI)entity;
 			log.trace("Entity {} is instance of 'StandardEntityI', filling update date=current / user='{}'", entity, user);
@@ -161,7 +163,6 @@ implements
 				stde.setUpdateUser(user.toString());
 			}
 		}
-		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
 	}
 
 	private void checkAudit(K entity, Action action) {

@@ -363,7 +363,7 @@ public class
 			return list;
 		}
 		if (clazz != e2.getClass()) {
-			throw new IllegalArgumentException("Both entities nust be instance of the same class");
+			throw new IllegalArgumentException(String.format("Both entities nust be instance of the same class: %s <=> %s", clazz, e2.getClass()));
 		}
 		String cln = clazz.getName();
 		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
@@ -416,7 +416,7 @@ public class
 						if(log.isTraceEnabled()) {
 							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
 						}
-						list.add(new Property(fldn, v1, v2));
+						list.add(new Property(fldn, v2, v1));
 					}
 				} catch (Exception e) {
 					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());

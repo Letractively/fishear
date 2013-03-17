@@ -49,7 +49,14 @@ implements
 				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(Classes.AUDIT_CHANGE));
 				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(Classes.AUDIT_ENTITY));
 
-				auditService = (AuditServiceI) cl.loadClass(Classes.AUDIT_SERVICE).newInstance();
+				log.info("Instance of AuditService has been created");
+			} catch(Exception ex) {
+				log.info("Exception during registering audit entity: {}. Audit framework may not work properly", ex.toString());
+			}
+
+			try {
+
+				auditService = (AuditServiceI) cl.loadClass(Classes.AUDIT_SERVICE_IMPL).newInstance();
 				auditService.initForcedInstance();
 
 				log.info("Instance of AuditService has been created");

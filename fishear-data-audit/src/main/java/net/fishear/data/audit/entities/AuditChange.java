@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 import net.fishear.data.audit.AuditConstants;
@@ -20,9 +19,6 @@ public class AuditChange extends AbstractEntity {
 	
 	private String propertyName;
 
-	@MapsId
-	private String oldValue;
-	
 	private String newValue;
 
 	/**
@@ -54,21 +50,6 @@ public class AuditChange extends AbstractEntity {
 	 */
 	public void setPropertyName(String propertyName) {
 		this.propertyName = propertyName;
-	}
-
-	/**
-	 * @return the oldValue
-	 */
-	@Column(name="OLD_VALUE")
-	public String getOldValue() {
-		return oldValue;
-	}
-
-	/**
-	 * @param oldValue the oldValue to set
-	 */
-	public void setOldValue(String oldValue) {
-		this.oldValue = oldValue;
 	}
 
 	/**

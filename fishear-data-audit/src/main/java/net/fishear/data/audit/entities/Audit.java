@@ -27,11 +27,18 @@ public class Audit extends AbstractEntity {
 
 	private List<AuditChange> changes;
 	
-	private AuditedEntity entity;
+	private AuditedEntity auditedEntity;
 
 	private Date actionDate;
 	
 	private String actionUser;
+	
+	private String objectId;
+	
+	/**
+	 * change number in the same entity and onject ID
+	 */
+	private Long changeNumber;
 
 	/**
 	 * @return the propertiesChanged
@@ -83,18 +90,46 @@ public class Audit extends AbstractEntity {
 	}
 
 	/**
-	 * @return the entity
+	 * @return the auditedEntity
 	 */
 	@ManyToOne
-	@JoinColumn(name="ENTITY_ID")
-	public AuditedEntity getEntity() {
-		return entity;
+	@JoinColumn(name="ENTITY_CLASS_ID")
+	public AuditedEntity getAuditedEntity() {
+		return auditedEntity;
 	}
 
 	/**
-	 * @param entity the entity to set
+	 * @param auditedEntity the auditedEntity to set
 	 */
-	public void setEntity(AuditedEntity entity) {
-		this.entity = entity;
+	public void setAuditedEntity(AuditedEntity entity) {
+		this.auditedEntity = entity;
+	}
+
+	/**
+	 * @return the objectId
+	 */
+	public String getObjectId() {
+		return objectId;
+	}
+
+	/**
+	 * @param objectId the objectId to set
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
+	/**
+	 * @return the changeNumber
+	 */
+	public Long getChangeNumber() {
+		return changeNumber;
+	}
+
+	/**
+	 * @param changeNumber the changeNumber to set
+	 */
+	public void setChangeNumber(Long changeNumber) {
+		this.changeNumber = changeNumber;
 	}
 }

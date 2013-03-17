@@ -5,7 +5,7 @@ import net.fishear.data.generic.services.ServiceI;
 
 public interface AuditedEntityService extends ServiceI<AuditedEntity> {
 
-	AuditedEntity getOrCreate(Class<?> entityClass);
+	AuditedEntity getOrCreate(Class<?> audEntityClass);
 
 	AuditedEntity getOrCreate(String className);
 

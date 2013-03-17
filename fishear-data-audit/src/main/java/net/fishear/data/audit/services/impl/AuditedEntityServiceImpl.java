@@ -19,9 +19,9 @@ implements
 	
 	private static Hashtable<String, AuditedEntity> CACHE = new Hashtable<String, AuditedEntity>();
 
-	public AuditedEntity getOrCreate(Class<?> entityClass) {
+	public AuditedEntity getOrCreate(Class<?> audEntityClass) {
 
-		return getOrCreate(entityClass.getName());
+		return getOrCreate(audEntityClass.getName());
 
 	}
 
