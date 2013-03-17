@@ -7,10 +7,10 @@
 >
 
 	<t:form t:id="search">
-		Action: <t:select t:model="Actions" value="selectedAction" />
-		Entity: <t:select t:model="Entities" value="entityHash" />
+		Action: <t:select t:model="Actions" value="selectedAction" onchange="form.submit(); " />
+		Entity: <t:select t:model="Entities" value="entityHash" onchange="form.submit(); " />
 		ObjectID: <t:textfield t:id="selectedObjectId" size="10" />
-		Property: <t:select t:model="AvailableProperies" t:value="selectedProperty" />
+		Property: <t:select t:model="AvailableProperies" t:value="selectedProperty" onchange="form.submit(); " />
 		<t:submit value="Search"/>
 		&#160; <t:eventlink t:event="clearSearch">Clear Search</t:eventlink>
 	</t:form>
