@@ -3,6 +3,7 @@ package net.fishear.data.generic.services.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.fishear.data.FishearDataConstants.Classes;
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.AdonsI;
@@ -43,22 +44,17 @@ implements
 
 			ClassLoader cl = getClass().getClassLoader();
 
-			String auditServiceClass = "net.fishear.data.audit.services.AuditService";
-			String auditHeaderEntityClass = "net.fishear.data.audit.entities.AuditHader";
-			String auditDetailEntityClass = "net.fishear.data.audit.entities.AuditChange";
-			String auditEntityClass = "net.fishear.data.audit.entities.AuditEntity";
-
 			try {
-				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(auditHeaderEntityClass));
-				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(auditDetailEntityClass));
-				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(auditEntityClass));
+				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(Classes.AUDIT));
+				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(Classes.AUDIT_CHANGE));
+				daoSource.registerEntity((Class<EntityI<?>>) cl.loadClass(Classes.AUDIT_ENTITY));
 
-				auditService = (AuditServiceI) cl.loadClass(auditServiceClass).newInstance();
+				auditService = (AuditServiceI) cl.loadClass(Classes.AUDIT_SERVICE).newInstance();
 				auditService.initForcedInstance();
 
 				log.info("Instance of AuditService has been created");
 			} catch(Exception ex) {
-				log.info("Audit Service Class canot be loaded: {}. Cause: {}", auditServiceClass, ex.toString());
+				log.info("Audit Framework canot be initialized. Cause: {}", ex.toString());
 			}
 			auditServiceInitialized = true;
 		}

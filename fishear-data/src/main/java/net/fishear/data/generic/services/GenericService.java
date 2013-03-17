@@ -134,6 +134,12 @@ implements
 		fillStandardEntity(entity);
 		return getDao().save(entity);
     }
+	
+	public void saveAll(Collection<K> list) {
+    	for (K k : list) {
+			save(k);
+		}
+	}
 
 	private void fillStandardEntity(K entity) {
 		CurrentStateI state = getCurrentState();

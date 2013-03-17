@@ -21,13 +21,13 @@ import net.fishear.data.generic.services.AuditServiceI.Action;
 
 @Entity
 @Table(name=AuditConstants.AUDIT_HEADERS_TABLE_NAME)
-public class AuditHader extends AbstractEntity {
+public class Audit extends AbstractEntity {
 
 	private Action action;
 
 	private List<AuditChange> changes;
 	
-	private AuditEntity entity;
+	private AuditedEntity entity;
 
 	private Date actionDate;
 	
@@ -68,7 +68,7 @@ public class AuditHader extends AbstractEntity {
 		this.actionDate = createDate;
 	}
 
-	@Column(name = AuditConstants.AUDIT_COL_ACTION_DATE)
+	@Column(name = AuditConstants.AUDIT_COLUMN_ACTION_DATE)
 	public Date getActionDate() {
 		return actionDate;
 	}
@@ -77,7 +77,7 @@ public class AuditHader extends AbstractEntity {
 		this.actionUser = createUserId;
 	}
 
-	@Column(name = AuditConstants.AUDIT_COL_ACTION_USER, length=EntityConstants.USERID_LENGTH)
+	@Column(name = AuditConstants.AUDIT_COLUMN_ACTION_USER, length=EntityConstants.USERID_LENGTH)
 	public String getActionUser() {
 		return actionUser;
 	}
@@ -87,14 +87,14 @@ public class AuditHader extends AbstractEntity {
 	 */
 	@ManyToOne
 	@JoinColumn(name="ENTITY_ID")
-	public AuditEntity getEntity() {
+	public AuditedEntity getEntity() {
 		return entity;
 	}
 
 	/**
 	 * @param entity the entity to set
 	 */
-	public void setEntity(AuditEntity entity) {
+	public void setEntity(AuditedEntity entity) {
 		this.entity = entity;
 	}
 }

@@ -1,4 +1,4 @@
-package net.fishear.data.audit.services;
+package net.fishear.data.audit.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +7,8 @@ import java.util.List;
 import net.fishear.FishearConstants;
 import net.fishear.Interfaces.IdI;
 import net.fishear.data.audit.entities.AuditChange;
-import net.fishear.data.audit.entities.AuditHader;
+import net.fishear.data.audit.entities.Audit;
+import net.fishear.data.audit.services.AuditedEntityService;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.AuditServiceI;
 import net.fishear.data.generic.services.CurrentStateI;
@@ -16,25 +17,18 @@ import net.fishear.utils.EntityUtils;
 import net.fishear.utils.EntityUtils.Property;
 
 public class 
-	AuditService 
+	AuditServiceImpl 
 extends 
-	GenericService<AuditHader> 
+	GenericService<Audit> 
 implements
 	AuditServiceI
 {
 
 	private AuditedEntityService entityService;
 
-	private AuditChangeService changeService;
+	private AuditChangeServiceImpl changeService;
 	
-	/** creates and returns audit entity that can be stored to database.
-	 *  
-	 * @param action action performed
-	 * @param e1 first (source) entity 
-	 * @param e2 second (target) entity
-	 * @return null if no difference exists between entities, otherwise antity. 
-	 */
-	public AuditHader createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
+	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
 
 		log.debug("Auditing: action {}", action);
 		List<Property> diflist;
@@ -59,7 +53,7 @@ implements
 
 		if(diflist.size() > 0) {
 			log.trace("Entities differencies found: {}", diflist.size());
-			AuditHader audit = newEntityInstance();
+			Audit audit = newEntityInstance();
 			audit.setEntity(entityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
 			audit.setChanges(toChanges(diflist, audit));
 			CurrentStateI state = getCurrentState();
@@ -76,13 +70,8 @@ implements
 		
 	}
 	
-	/** implementation of 
-	 * @param action
-	 * @param e1
-	 * @param e2
-	 */
 	public void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
-		AuditHader audit = createAuditEntity(action, e1, e2);
+		Audit audit = createAuditEntity(action, e1, e2);
 		if(audit != null) {
 			save(audit);
 		}
@@ -100,7 +89,7 @@ implements
 		return o.toString();
 	}
 	
-	private List<AuditChange> toChanges(List<Property> diflist, AuditHader header) {
+	private List<AuditChange> toChanges(List<Property> diflist, Audit header) {
 		List<AuditChange>  chlist = new ArrayList<AuditChange>();
 		for(Property p : diflist) {
 			AuditChange ch = new AuditChange();
@@ -112,10 +101,10 @@ implements
 		}
 		return chlist;
 	}
-	
-	public Object save(AuditHader audit) {
+
+	public Object save(Audit audit) {
 		Object id = super.save(audit);
-		changeService.save(audit.getChanges());		
+		changeService.saveAll(audit.getChanges());
 		return id;
 	}
 
@@ -136,22 +125,22 @@ implements
 	/**
 	 * @return the changeService
 	 */
-	public AuditChangeService getChangeService() {
+	public AuditChangeServiceImpl getChangeService() {
 		return changeService;
 	}
 
 	/**
 	 * @param changeService the changeService to set
 	 */
-	public void setChangeService(AuditChangeService changeService) {
+	public void setChangeService(AuditChangeServiceImpl changeService) {
 		this.changeService = changeService;
 	}
 
 	@Override
 	public void initForcedInstance() {
 
-		setChangeService(new AuditChangeService());
-		setEntityService(new AuditedEntityService());
+		setChangeService(new AuditChangeServiceImpl());
+		setEntityService(new AuditedEntityServiceImpl());
 		log.debug("Forced instance initialized.");
 	}
 	

@@ -16,7 +16,7 @@ public class AuditChange extends AbstractEntity {
 
 	@ManyToOne
 	@JoinColumn(name="HEADER_ID")
-	private AuditHader header;
+	private Audit header;
 	
 	private String propertyName;
 
@@ -30,14 +30,14 @@ public class AuditChange extends AbstractEntity {
 	 */
 	@ManyToOne
 	@JoinColumn(name="AUDIT_ID")
-	public AuditHader getHeader() {
+	public Audit getHeader() {
 		return header;
 	}
 
 	/**
 	 * @param header the header to set
 	 */
-	public void setHeader(AuditHader header) {
+	public void setHeader(Audit header) {
 		this.header = header;
 	}
 

@@ -8,8 +8,8 @@ import net.fishear.data.audit.AuditConstants;
 import net.fishear.data.generic.entities.GenericEntity;
 
 @Entity
-@Table(name=AuditConstants.AUDIT_ENTITY_TABLE_NAME)
-public class AuditEntity extends GenericEntity<Integer> {
+@Table(name=AuditConstants.AUDIT_ENTITYIES_TABLE_NAME)
+public class AuditedEntity extends GenericEntity<Integer> {
 
 
 	private String className;

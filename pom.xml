@@ -31,6 +31,7 @@
 	<modules>
 		<module>fishear-core</module>
 		<module>fishear-data</module>
+		<module>fishear-data-audit</module>
 		<module>fishear-hibernate</module>
 		<module>fishear-t5</module>
 		<module>fishear-t5-hibernate</module>

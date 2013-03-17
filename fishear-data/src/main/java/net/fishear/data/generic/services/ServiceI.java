@@ -20,6 +20,7 @@ public interface
 
     /**
      * Reads object from a database by specified identifier.
+     * If audit module is available and entity is annotates as Auditable, initial state is saved for auditing purpose.
      *
      * @param id Identifier value.
      * @return Return object with given identifier.
@@ -29,6 +30,7 @@ public interface
     /**
      * Reads none or single object from a database by specified condition.
      * Conditions must be created to return none or exactly one record.
+     * If audit module is available and entity is annotates as Auditable, initial state is saved for auditing purpose.
      *
      * @param qc query constraints to select one record.
      * @return Return null if no record met {@link QueryConstraints} 'qc', or loaded record. If more than one record is loaded, the {@link net.fishear.data.generic.query.exceptions.TooManyRecordsException} is thrown.
@@ -40,14 +42,24 @@ public interface
      * Save entity permanently.
      * Either creates new object or updates existing object - in dependency on ID's value.
      * If ID is null, zero or -1, creates new one; otherwise updates existing object with given ID.
+     * If audit module is available, entity is audited before save (if annnotates).
      *
      * @param object Inserted entity object.
      * @return Returns primary key of inserted or updated object.
      */
     Object save(K object);
 
+    /** 
+     * Saves all entities in list. 
+     * If audit module is available, each entity is audited before save.
+     * 
+     * @param list list of entities to be saved
+     */
+    void saveAll(Collection<K> list);
+    
     /**
      * Delete object from persistent storage.
+     * If audit module is available, entity is audited before save (if annnotates).
      *
      * @param object Deleted object (must not be null)
      */
@@ -75,6 +87,8 @@ public interface
      * It behaves similarly as {@link #query(QueryConstraints)}, but it is type safe. 
      * It cannot be used for general purpose queries too (only entity lists) and never returns null.
      * {@link QueryConstraints#projection()} in 'constraints' must  not be set in case this call (otherwise exception is thrown).
+     * If audit module is available and entity is annotates as Auditable, initial state of each entity in list is saved for auditing purpose.
+     * 
      * @param constraints constraint to restrict and modify the result. If it is null, the "full result" constraints are used (see {@link QueryFactory#fullResult()}).
      * @return list of entities by constraints
      */

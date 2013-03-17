@@ -18,6 +18,11 @@ public interface AuditServiceI {
 		DELETE
 	}
 	
+	/** compares entities regarding action and creates the result, which is stored to audit tables later on.
+	 * @param action the action
+	 * @param e1 first (source) entity instance
+	 * @param e2 second (target) entity instance
+	 */
 	void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2);
 
 	/**

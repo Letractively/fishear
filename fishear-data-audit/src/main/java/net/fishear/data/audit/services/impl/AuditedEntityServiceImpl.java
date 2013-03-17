@@ -1,22 +1,25 @@
-package net.fishear.data.audit.services;
+package net.fishear.data.audit.services.impl;
 
 import java.util.Hashtable;
 import java.util.List;
 
-import net.fishear.data.audit.entities.AuditEntity;
+import net.fishear.data.audit.entities.AuditedEntity;
+import net.fishear.data.audit.services.AuditedEntityService;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.services.GenericService;
 
 public class 
-	AuditedEntityService 
+	AuditedEntityServiceImpl 
 extends 
-	GenericService<AuditEntity> 
+	GenericService<AuditedEntity>
+implements
+	AuditedEntityService
 {
 	
-	private static Hashtable<String, AuditEntity> CACHE = new Hashtable<String, AuditEntity>();
+	private static Hashtable<String, AuditedEntity> CACHE = new Hashtable<String, AuditedEntity>();
 
-	public AuditEntity getOrCreate(Class<?> entityClass) {
+	public AuditedEntity getOrCreate(Class<?> entityClass) {
 
 		return getOrCreate(entityClass.getName());
 
@@ -28,17 +31,17 @@ extends
 	 * @param className
 	 * @return
 	 */
-	private AuditEntity getOrCreate(String className) {
+	public AuditedEntity getOrCreate(String className) {
 
-		AuditEntity ae;
+		AuditedEntity ae;
 		if((ae = CACHE.get(className)) != null) {
 			return ae;
 		}
 
 		QueryConstraints qc = QueryFactory.equals("className", className);
-		List<AuditEntity> list = list(qc);
+		List<AuditedEntity> list = list(qc);
 		if(list.size() == 0) {
-			ae = new AuditEntity();
+			ae = new AuditedEntity();
 			ae.setClassName(className);
 			ae.setId(className.hashCode());
 			save(ae);

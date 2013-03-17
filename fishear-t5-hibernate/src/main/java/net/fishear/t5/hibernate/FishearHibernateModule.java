@@ -16,6 +16,7 @@ package net.fishear.t5.hibernate;
 
 import java.io.IOException;
 
+import net.fishear.data.FishearDataConstants.Classes;
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.hibernate.dao.HibernateDaoSource;
@@ -33,9 +34,6 @@ import org.slf4j.Logger;
  */
 public class FishearHibernateModule
 {
-	private static final String AUDIT_HEADER_ENTITY_CLASS = "net.fishear.data.audit.entities.AuditHader";
-	private static final String AUDIT_DETAIL_ENTITY_CLASS = "net.fishear.data.audit.entities.AuditChange";
-	private static final String AUDIT_CLASS_ENTITY_CLASS = "net.fishear.data.audit.entities.AuditEntity";
 
 	private static Logger log = Globals.getLogger();
 
@@ -69,9 +67,10 @@ public class FishearHibernateModule
 
 				// in case fishear-data-audit exists on classpath, adds audit entities
 				try {
-					configuration.addAnnotatedClass(cl.loadClass(AUDIT_DETAIL_ENTITY_CLASS));
-					configuration.addAnnotatedClass(cl.loadClass(AUDIT_HEADER_ENTITY_CLASS));
-					configuration.addAnnotatedClass(cl.loadClass(AUDIT_CLASS_ENTITY_CLASS));
+					configuration.addAnnotatedClass(cl.loadClass(Classes.AUDIT_CHANGE));
+					configuration.addAnnotatedClass(cl.loadClass(Classes.AUDIT));
+					configuration.addAnnotatedClass(cl.loadClass(Classes.AUDIT_ENTITY));
+					
 					log.trace("Audit entities has been added to hibernat econfig");
 				} catch(Exception ex) {
 					log.info("Audit Entities canot be added. Cause: {}", ex.toString());
