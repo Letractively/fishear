@@ -43,7 +43,7 @@ public class Audit extends AbstractEntity {
 	/**
 	 * @return the propertiesChanged
 	 */
-	@OneToMany(mappedBy="header", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+	@OneToMany(mappedBy="audit", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
 	public List<AuditChange> getChanges() {
 		return changes;
 	}

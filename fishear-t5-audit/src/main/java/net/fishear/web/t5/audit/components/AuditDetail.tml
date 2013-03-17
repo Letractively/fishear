@@ -1,0 +1,11 @@
+<t:container
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+>
+	<h2>Audit detail: ${audit.auditedEntity.className} ${audit.objectId}</h2>
+	
+	<br />
+	
+	<t:eventlink t:event="hideDetail" >Hide Detail</t:eventlink>
+
+</t:container>

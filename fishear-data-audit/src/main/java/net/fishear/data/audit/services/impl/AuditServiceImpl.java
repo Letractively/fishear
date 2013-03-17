@@ -1,22 +1,22 @@
 package net.fishear.data.audit.services.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.management.StandardEmitterMBean;
 
 import net.fishear.FishearConstants;
 import net.fishear.Interfaces.IdI;
 import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.audit.entities.Audit;
+import net.fishear.data.audit.services.AuditChangeService;
+import net.fishear.data.audit.services.AuditService;
 import net.fishear.data.audit.services.AuditedEntityService;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.entities.StandardEntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.results.Functions;
-import net.fishear.data.generic.services.AuditServiceI;
 import net.fishear.data.generic.services.CurrentStateI;
 import net.fishear.data.generic.services.GenericService;
 import net.fishear.utils.EntityUtils;
@@ -27,12 +27,12 @@ public class
 extends 
 	GenericService<Audit> 
 implements
-	AuditServiceI
+	AuditService
 {
 
-	private AuditedEntityService entityService;
+	private AuditedEntityService auditedEntityService;
 
-	private AuditChangeServiceImpl changeService;
+	private AuditChangeService auditChangeService;
 	
 	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
 
@@ -68,7 +68,7 @@ implements
 
 			if(forceSave || audit.getChanges().size() > 0) {
 
-				audit.setAuditedEntity(entityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
+				audit.setAuditedEntity(auditedEntityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
 				audit.setObjectId(e2 == null ? e1.getIdString() : e2.getIdString());
 				audit.setChangeNumber(getNextChangeNumber(audit));
 	
@@ -111,6 +111,8 @@ implements
 				return tos(EntityUtils.getId((IdI<?>)o));
 			} else if (o instanceof Date) {
 				return FishearConstants.ANSI_DATETIME_FORMAT_MILLIS.format((Date)o);
+			} else if (o instanceof Timestamp) {
+				return FishearConstants.ANSI_DATETIME_FORMAT_MILLIS.format((Timestamp)o);
 			} else {
 				return o.toString();
 			}
@@ -125,7 +127,7 @@ implements
 				continue;
 			}
 			AuditChange ch = new AuditChange();
-			ch.setHeader(header);
+			ch.setAudit(header);
 			ch.setPropertyName(p.name);
 			ch.setNewValue(tos(p.value2));
 			chlist.add(ch);
@@ -135,43 +137,43 @@ implements
 
 	public Object save(Audit audit) {
 		Object id = super.save(audit);
-		changeService.saveAll(audit.getChanges());
+		auditChangeService.saveAll(audit.getChanges());
 		return id;
 	}
 
 	/**
-	 * @return the entityService
+	 * @return the auditedEntityService
 	 */
-	public AuditedEntityService getEntityService() {
-		return entityService;
+	public AuditedEntityService getAuditedEntityService() {
+		return auditedEntityService;
 	}
 
 	/**
-	 * @param entityService the entityService to set
+	 * @param auditedEntityService the auditedEntityService to set
 	 */
-	public void setEntityService(AuditedEntityService entityService) {
-		this.entityService = entityService;
+	public void setAuditedEntityService(AuditedEntityService entityService) {
+		this.auditedEntityService = entityService;
 	}
 
 	/**
-	 * @return the changeService
+	 * @return the auditChangeService
 	 */
-	public AuditChangeServiceImpl getChangeService() {
-		return changeService;
+	public AuditChangeService getAuditChangeService() {
+		return auditChangeService;
 	}
 
 	/**
-	 * @param changeService the changeService to set
+	 * @param auditChangeService the auditChangeService to set
 	 */
-	public void setChangeService(AuditChangeServiceImpl changeService) {
-		this.changeService = changeService;
+	public void setAuditChangeService(AuditChangeService changeService) {
+		this.auditChangeService = changeService;
 	}
 
 	@Override
 	public void initForcedInstance() {
 
-		setChangeService(new AuditChangeServiceImpl());
-		setEntityService(new AuditedEntityServiceImpl());
+		setAuditChangeService(new AuditChangeServiceImpl());
+		setAuditedEntityService(new AuditedEntityServiceImpl());
 		log.debug("Forced instance initialized.");
 	}
 	

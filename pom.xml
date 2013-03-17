@@ -36,6 +36,7 @@
 		<module>fishear-t5</module>
 		<module>fishear-t5-hibernate</module>
 		<module>fishear-t5-rights</module>
+		<module>fishear-t5-audit</module>
 		<module>fishear-datatree</module>
 		<module>fishear-testsupport</module>
 <!-- 		<module>fishear-t5-sample</module> -->

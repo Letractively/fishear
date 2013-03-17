@@ -1,7 +1,5 @@
 package net.fishear.data.audit.services;
 
-import java.util.List;
-
 import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.generic.services.ServiceI;
 

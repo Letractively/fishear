@@ -12,13 +12,27 @@ extends
 	AuditServiceI
 {
 
-	/** creates and returns audit entity that can be stored to database.
-	 *  
-	 * @param action action performed
-	 * @param e1 first (source) entity 
-	 * @param e2 second (target) entity
-	 * @return null if no difference exists between entities, otherwise antity. 
+	/**
+	 * creates and returns audit entity that can be stored to database.
+	 * 
+	 * @param action
+	 *            action performed
+	 * @param e1
+	 *            first (source) entity
+	 * @param e2
+	 *            second (target) entity
+	 * @return null if no difference exists between entities, otherwise antity.
 	 */
-	 Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2);
-	
+	Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2);
+
+	/**
+	 * @return enity list service
+	 */
+	AuditedEntityService getAuditedEntityService();
+
+	/**
+	 * @return change service
+	 */
+	AuditChangeService getAuditChangeService();
 }
+
