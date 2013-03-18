@@ -23,7 +23,7 @@ public interface AuditServiceI {
 	 * @param e1 first (source) entity instance
 	 * @param e2 second (target) entity instance
 	 */
-	void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2);
+	void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> service);
 
 	/**
 	 * initializes internal services - creates instance of them.
