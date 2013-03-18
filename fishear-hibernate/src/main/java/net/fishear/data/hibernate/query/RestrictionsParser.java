@@ -21,7 +21,9 @@ import org.hibernate.criterion.Subqueries;
 import org.slf4j.Logger;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class 
 	RestrictionsParser
@@ -65,25 +67,26 @@ extends
     private Criterion parseConjuction(Conjunction conjunction) {
 
         Criterion leftRestricitions = parseRestriction(conjunction.getLeft());
-        Restrictions[] restrictions = conjunction.getRight();
-        Criterion[] criterias = new Criterion[restrictions.length];
-        for (int i = 0; i < criterias.length; i++) {
-            criterias[i] = parseRestriction(restrictions[i]);
-		}
+        List<Criterion> criterias = new ArrayList<Criterion>(conjunction.getRight().length);
+        for(Restrictions r : conjunction.getRight()) {
+        	if(r != null) {
+        		criterias.add(parseRestriction(r));
+        	}
+        }
 
         Criterion crit;
         switch (conjunction.getType()) {
             case AND:
                 crit = leftRestricitions;
-                for (int i = 0; i < criterias.length; i++) {
-                    crit = org.hibernate.criterion.Restrictions.and(crit, criterias[i]);
-				}
+                for(Criterion cr : criterias) {
+                    crit = org.hibernate.criterion.Restrictions.and(crit, cr);
+                }
                 return crit;
             case OR:
                 crit = leftRestricitions;
-                for (int i = 0; i < criterias.length; i++) {
-                    crit = org.hibernate.criterion.Restrictions.or(crit, criterias[i]);
-				}
+                for(Criterion cr : criterias) {
+                    crit = org.hibernate.criterion.Restrictions.and(crit, cr);
+                }
                 return crit;
             case NOT:
                 return org.hibernate.criterion.Restrictions.not(leftRestricitions);
