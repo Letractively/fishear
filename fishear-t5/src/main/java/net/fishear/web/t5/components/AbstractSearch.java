@@ -56,11 +56,13 @@ implements
 	 * @param entity
 	 */
 	protected void beforeSearch(T entity) {
-		beforeSearch(entity, null);
+
 	}
 
 	protected void beforeSearch(T entity, T entity2) {
-
+		if(entity2 == null) {
+			beforeSearch(entity);
+		}
 	}
 
 	/** called before constraints are returned.
