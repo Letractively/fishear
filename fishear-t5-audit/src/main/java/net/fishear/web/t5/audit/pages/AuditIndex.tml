@@ -7,24 +7,29 @@
 >
 
 	<t:form t:id="search">
-		Action: <t:select t:model="Actions" value="selectedAction" onchange="form.submit(); " />
 		Entity: <t:select t:model="Entities" value="entityHash" onchange="form.submit(); " />
+		Action: <t:select t:model="Actions" value="selectedAction" onchange="form.submit(); " />
 		ObjectID: <t:textfield t:id="selectedObjectId" size="10" />
 		Property: <t:select t:model="AvailableProperies" t:value="selectedProperty" onchange="form.submit(); " />
 		<t:submit value="Search"/>
 		&#160; <t:eventlink t:event="clearSearch">Clear Search</t:eventlink>
 	</t:form>
 	
-	<t:grid 
-		t:source="Audits"
-		t:row="row"
-		include="action,actionDate,actionUser,objectId,changeNumber"
-		add="auditedEntity,detail"
-		reorder="auditedEntity,action,actionDate,actionUser,objectId,changeNumber,detail"
-	>
-	<p:auditedEntityCell>${getEntityShortName(row.auditedEntity)}</p:auditedEntityCell>
-	<p:detailCell><t:eventlink t:event="detail" t:context="row.id" >Detail</t:eventlink></p:detailCell>
-	</t:grid>
+	<t:if t:test="entityHash">
+		<t:grid 
+			t:source="Audits"
+			t:row="row"
+			include="action,actionDate,actionUser,objectId,changeNumber"
+			add="auditedEntity,detail"
+			reorder="auditedEntity,action,actionDate,actionUser,objectId,changeNumber,detail"
+		>
+		<p:auditedEntityCell>${getEntityShortName(row.auditedEntity)}</p:auditedEntityCell>
+		<p:detailCell><t:eventlink t:event="detail" t:context="row.id" >Detail</t:eventlink></p:detailCell>
+		</t:grid>
+	<p:else>
+		<h2>Please select an entity first</h2>
+	</p:else>
+	</t:if>
 
 	<t:if t:test="detail">
 		<t:component t:id="auditDetail" />

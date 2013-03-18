@@ -15,7 +15,9 @@ public interface AuditServiceI {
 
 		UPDATE,
 
-		DELETE
+		DELETE,
+		
+		VIRTUAL
 	}
 	
 	/** compares entities regarding action and creates the result, which is stored to audit tables later on.

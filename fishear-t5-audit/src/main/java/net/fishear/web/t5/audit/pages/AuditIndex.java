@@ -66,6 +66,7 @@ public class AuditIndex extends ComponentBase {
 		list.add(Action.DELETE);
 		list.add(Action.UPDATE);
 		list.add(Action.INSERT);
+		list.add(Action.VIRTUAL);
 		return list;
 	}
 	
@@ -81,12 +82,14 @@ public class AuditIndex extends ComponentBase {
 	}
 	
 	public List<String> getAvailableProperies() {
-		QueryConstraints qc = QueryFactory.create();
-		if(entityHash != null) {
+		if(entityHash == null) {
+			return new ArrayList<String>();
+		} else {
+			QueryConstraints qc = QueryFactory.create();
 			qc.addJoin("audit", Restrictions.equal("auditedEntity", getAudiedEntity()));
+			qc.projection().distinct("propertyName");
+			return auditService.getAuditChangeService().query(qc);
 		}
-		qc.projection().distinct("propertyName");
-		return auditService.getAuditChangeService().query(qc);
 	}
 	
 	public List<Audit> getAudits() {

@@ -16,9 +16,11 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.entities.StandardEntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
+import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.query.results.Functions;
 import net.fishear.data.generic.services.CurrentStateI;
 import net.fishear.data.generic.services.GenericService;
+import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.EntityUtils;
 import net.fishear.utils.EntityUtils.Property;
 
@@ -33,25 +35,27 @@ implements
 	private AuditedEntityService auditedEntityService;
 
 	private AuditChangeService auditChangeService;
-	
-	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
+
+	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
 
 		log.debug("Auditing: action {}", action);
 		List<Property> diflist;
 		boolean forceSave = false;
 		switch(action) {
 		case DELETE:
-			//diflist = EntityUtils.fillDifferencies(e1, false);
 			diflist = new ArrayList<EntityUtils.Property>();
 			forceSave = true;
+			break;
+		case VIRTUAL:
+			diflist = EntityUtils.fillDifferencies(e1 == null ? e2 : e1, true);
 			break;
 		case INSERT:
 			diflist = EntityUtils.fillDifferencies(e2, true);
 			break;
 		case UPDATE:
-			if(e2 == null) {
-				log.warn("UPDATE is performed but second entity ('e2') is null. Full log is performed.");
-				diflist = EntityUtils.listDifferencies(e1, true);
+			if(e1 == null) {
+				log.warn("UPDATE is performed but source entity ('e1') is null. Full log is performed.");
+				diflist = EntityUtils.listDifferencies(e2, true);
 			} else {
 				diflist = EntityUtils.listDifferencies(e1, e2);
 			}
@@ -96,8 +100,19 @@ implements
 		return ll == null ? 1L : ll + 1L;
 	}
 
-	public void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2) {
-		Audit audit = createAuditEntity(action, e1, e2);
+	public void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
+		
+		if(action == Action.DELETE || action == Action.UPDATE) {
+			if(countChanges(e2 == null ? e1 : e2) == 0) {
+				log.debug("Entity {} has no change registered. Creating virtual insert.", e2 == null ? e1 : e2);
+				Audit virtAudit = createAuditEntity(Action.VIRTUAL, e1, e2, targetService);
+				if(virtAudit != null) {
+					save(virtAudit);
+				}
+			}
+		}
+
+		Audit audit = createAuditEntity(action, e1, e2, targetService);
 		if(audit != null) {
 			save(audit);
 		}
@@ -176,5 +191,27 @@ implements
 		setAuditedEntityService(new AuditedEntityServiceImpl());
 		log.debug("Forced instance initialized.");
 	}
-	
+
+	@Override
+	public List<Audit> listForEntity(EntityI<?> entity) {
+		QueryConstraints qc = QueryFactory.equals("auditedEntity", getAuditedEntityService().getOrCreate(entity.getClass()));
+		qc.add(Restrictions.equal("objectId", entity.getIdString()));
+		return list(qc);
+	}
+
+	public Audit getLatestChange(EntityI<?> entity) {
+		QueryConstraints qc = QueryFactory.equals("auditedEntity", getAuditedEntityService().getOrCreate(entity.getClass()));
+		qc.add(Restrictions.equal("objectId", entity.getIdString()));
+		qc.orderBy("changeNumber");
+		qc.results().setResultsPerPage(1);
+		return read(qc);
+	}
+
+	public long countChanges(EntityI<?> entity) {
+		QueryConstraints qc = QueryFactory.andEquals(
+				"auditedEntity", getAuditedEntityService().getOrCreate(entity.getClass()), 
+				"objectId", entity.getIdString()
+		);
+		return super.queryCount(qc);
+	}
 }
