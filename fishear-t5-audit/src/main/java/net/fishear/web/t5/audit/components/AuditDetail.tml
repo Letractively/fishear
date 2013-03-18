@@ -3,9 +3,10 @@
 	xmlns:p="tapestry:parameter"
 >
 	<br />
-	<h3>Audit detail: ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}, change ${audit.changeNumber}, ${audit.actionDate} </h3>
+	<h4 style="padding: 0;">Audit detail: ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}</h4>
+	<div style="padding-bottom: 5px; ">change ${audit.changeNumber}, ${audit.actionDate} </div>
 
-	<t:grid t:source="DisplayProeprties">
+	<t:grid t:source="DisplayProeprties" rowsPerPage="1000">
 	</t:grid>
 	<br />
 	<t:eventlink t:event="hideDetail" >Hide Detail</t:eventlink>
