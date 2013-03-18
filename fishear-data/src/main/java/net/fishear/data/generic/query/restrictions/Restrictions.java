@@ -30,8 +30,16 @@ implements
         return new Expression(ExpressionTypes.GREATER, propertyName, value);
     }
 
+    public static Restrictions greaterOrEqualThan(String propertyName, Object value) {
+        return new Expression(ExpressionTypes.GREATER_OR_EQUAL, propertyName, value);
+    }
+
     public static Restrictions lessThan(String propertyName, Object value) {
         return new Expression(ExpressionTypes.LESS, propertyName, value);
+    }
+
+    public static Restrictions lessOrEqualThan(String propertyName, Object value) {
+        return new Expression(ExpressionTypes.LESS_OR_EQUAL, propertyName, value);
     }
 
     public static Restrictions like(String propertyName, String expression) {
@@ -231,6 +239,30 @@ implements
     		};
     	}
     	return between(propertyName, lo, hi);
+    }
+    
+
+    /**
+     * if both 'lo' and 'hi' are passed, creates {@link #between(String, Object, Object)}. 
+     * If 'hi' is null, creates value >= 'lo', if 'lo' is null, creates value <= 'hi'.
+     * If both are null, do nothing (returns {@link #TRUE} ).
+     * 
+     * @param propertyName
+     * @param lo lower value (may be null)
+     * @param hi higher value (may be null)
+     * @return restriction
+     */
+	public static Restrictions interval(String propertyName, Object lo, Object hi) {
+    	if(lo == null && hi == null) {
+    		return Restrictions.TRUE;
+    	}
+    	if(hi == null) {
+    		return Restrictions.greaterOrEqualThan(propertyName, lo);
+    	} else if (lo == null) {
+    		return Restrictions.lessOrEqualThan(propertyName, hi);
+    	} else {
+	    	return between(propertyName, lo, hi);
+    	}
     }
 
     public static Restrictions between(String propertyName, Object lo, Object hi) {
