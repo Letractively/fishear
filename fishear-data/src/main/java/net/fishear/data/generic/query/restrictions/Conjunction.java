@@ -9,6 +9,13 @@ public class Conjunction extends Restrictions {
     private final Restrictions left;
     private final Restrictions[] right;
 
+    /**
+     * creates conjunction of given type.
+     * 
+     * @param type conjunction type
+     * @param left first (mandatory) condition
+     * @param right additional conditions. May contain null values that are skipped.
+     */
     public Conjunction( ConjunctionTypes type, Restrictions left, Restrictions... right) {
     	Defender.notNull(type, "type");
     	Defender.notNull(left, "left");
@@ -18,12 +25,12 @@ public class Conjunction extends Restrictions {
     		}
     	} else {
         	Defender.notNull(right, "right");
-        	for (int i = 0; i < right.length; i++) {
-        		if(right[i] == null) {
-        			String expdesc = i == 0 ? "first expression" : i == 1 ? "second expression" : i == 2 ? "third expression" : "expression at index " + i;
-        			throw new IllegalArgumentException("Right expression(s) is not allowed to be null, but " + expdesc + " is null");
-        		}
-			}
+//        	for (int i = 0; i < right.length; i++) {
+//        		if(right[i] == null) {
+//        			String expdesc = i == 0 ? "first expression" : i == 1 ? "second expression" : i == 2 ? "third expression" : "expression at index " + i;
+//        			throw new IllegalArgumentException("Right expression(s) is not allowed to be null, but " + expdesc + " is null");
+//        		}
+//			}
     	}
         this.type = type;
         this.left = left;
