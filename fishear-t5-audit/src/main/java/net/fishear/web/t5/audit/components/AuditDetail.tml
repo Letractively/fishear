@@ -3,7 +3,7 @@
 	xmlns:p="tapestry:parameter"
 >
 	<br />
-	<h4 style="padding: 0;">Audit detail: ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}</h4>
+	<h4 style="padding: 0;">${audit.action} on object ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}</h4>
 	<div style="padding-bottom: 5px; ">change ${audit.changeNumber} at ${audit.actionDate} by  ${audit.actionUser} </div>
 
 	<t:grid t:source="DisplayProeprties" rowsPerPage="1000">
