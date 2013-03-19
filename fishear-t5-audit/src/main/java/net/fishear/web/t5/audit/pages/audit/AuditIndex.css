@@ -1,0 +1,21 @@
+
+
+#auditSearch,
+#auditSearch input,
+#auditSearch select
+{
+	font-size: 12px;
+}
+
+#auditSearch #selectedProperty {
+	min-width:150px;
+}
+
+#auditSearch #entityHash {
+	min-width:250px;
+}
+
+.selectedEntityHeader {
+	padding:0; 
+	margin: 0;
+}

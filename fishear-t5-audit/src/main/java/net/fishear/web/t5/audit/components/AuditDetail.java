@@ -15,7 +15,9 @@ import org.apache.tapestry5.annotations.Property;
 import net.fishear.data.audit.entities.Audit;
 import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.audit.entities.AuditedEntity;
+import net.fishear.data.audit.services.AuditChangeService;
 import net.fishear.data.audit.services.AuditService;
+import net.fishear.data.generic.services.AuditServiceI.Action;
 import net.fishear.utils.EntityUtils;
 import net.fishear.web.t5.base.ComponentBase;
 
@@ -30,18 +32,28 @@ public class AuditDetail extends ComponentBase {
 
 	@Cached
 	public List<DspProp> getDisplayProeprties() {
-		
+
 		List<DspProp> list = new ArrayList<AuditDetail.DspProp>();
 		Map<String, String> pp = getPropertyValues();
 
 		for(net.fishear.utils.EntityUtils.Property p : getAllProperties()) {
 			DspProp dp = new DspProp();
 			list.add(dp);
-			dp.setKey(p.getName());
-			dp.setNewValue(pp.get(p.getName()));
+			dp.setPropertyName(p.getName());
+			dp.setNewValue(pp.containsKey(p.getName()) ? pp.get(p.getName()) : AuditChangeService.NA);
+			dp.setCurrentValue(getCurretnValue(p.getName()));
+			dp.setOldValue(auditService.getAuditChangeService().getPreviousValue(audit, p.getName()));
 		}
 
 		return list;
+	}
+	
+	private String getCurretnValue(String propName) {
+		if(audit.getAction() == Action.DELETE) {
+			return AuditChangeService.NA;
+		} else {
+			return auditService.getAuditChangeService().getCurrentValue(audit, propName);
+		}
 	}
 	
 	@Cached
@@ -79,26 +91,26 @@ public class AuditDetail extends ComponentBase {
 
 	public static class DspProp {
 		
-		private String key;
+		private String propertyName;
 
 		private String oldValue;
 
 		private String newValue;
 		
-		private String user;
+		private String currentValue;
 
 		/**
-		 * @return the key
+		 * @return the propertyName
 		 */
-		public String getKey() {
-			return key;
+		public String getPropertyName() {
+			return propertyName;
 		}
 
 		/**
-		 * @param key the key to set
+		 * @param propertyName the propertyName to set
 		 */
-		public void setKey(String key) {
-			this.key = key;
+		public void setPropertyName(String key) {
+			this.propertyName = key;
 		}
 
 		/**
@@ -130,17 +142,17 @@ public class AuditDetail extends ComponentBase {
 		}
 
 		/**
-		 * @return the user
+		 * @return the currentValue
 		 */
-		public String getUser() {
-			return user;
+		public String getCurrentValue() {
+			return currentValue;
 		}
 
 		/**
-		 * @param user the user to set
+		 * @param currentValue the currentValue to set
 		 */
-		public void setUser(String user) {
-			this.user = user;
+		public void setCurrentValue(String currentValue) {
+			this.currentValue = currentValue;
 		}
 
 	}

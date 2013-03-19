@@ -11,7 +11,14 @@ public interface
 extends
 	ServiceI<AuditChange>
 {
+	/**
+	 * text returned in case no value is available.
+	 */
+	public static final String NA = "(N/A)";
 
 	List<AuditChange> listForAudit(Audit audit);
-	
+
+	String getCurrentValue(Audit audit, String name);
+
+	String getPreviousValue(Audit audit, String propertyName);
 }

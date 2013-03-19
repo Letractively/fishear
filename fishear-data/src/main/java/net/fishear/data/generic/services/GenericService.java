@@ -251,7 +251,7 @@ implements
 	}
 
 	private K modifyEntity(K entity) {
-		if(isAuditable(entity) && entity instanceof GenericEntity<?>) {
+		if(entity != null && isAuditable(entity) && entity instanceof GenericEntity<?>) {
 			((GenericEntity<?>)entity).saveInitialState();
 		}
 		return entity;
