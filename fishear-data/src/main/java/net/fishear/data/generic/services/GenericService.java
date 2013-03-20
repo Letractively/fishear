@@ -16,7 +16,7 @@ import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.dao.GenericDaoI;
 import net.fishear.data.generic.entities.AbstractEntity;
 import net.fishear.data.generic.entities.EntityI;
-import net.fishear.data.generic.entities.GenericEntity;
+import net.fishear.data.generic.entities.InitialStateI;
 import net.fishear.data.generic.entities.StandardEntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
@@ -82,10 +82,11 @@ implements
 
 	@Override
     public K read(Object id) {
-		log.trace("Reading entity for ID='{}'", id);
-        K result = (K)getDao().read(id);
-		log.debug("Reading operation for ID='{}' returns {}", id, result);
-        return modifyEntity(result);
+		return modifyEntity(read_(id));
+	}
+
+    private K read_(Object id) {
+        return (K)getDao().read(id);
     }
 
 	@Override
@@ -133,11 +134,18 @@ implements
 		boolean newEntity = entity.isNew();
 		log.debug("Saving entity {} with ID {}", entity, entity.getId());
 		fillStandardEntity(entity, newEntity);
-		Object reto = getDao().save(entity);
 		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
+		Object reto = getDao().save(entity);
+		checkSaveState(entity);
 		return reto;
     }
 	
+	private void checkSaveState(K entity) {
+		if(entity instanceof InitialStateI) {
+			((InitialStateI)entity).saveInitialState();
+		}
+	}
+
 	public void saveAll(Collection<K> list) {
     	for (K k : list) {
 			save(k);
@@ -168,8 +176,8 @@ implements
 	private void checkAudit(K entity, Action action) {
 		if(isAuditable(entity)) {
 			log.debug("Entity {} is auditable, performing audit.", entity.getClass());
-			if(!(entity instanceof GenericEntity<?>)) {
-				log.warn("Entity annotated as Auditable must be instance of GenericEntity");
+			if(!(entity instanceof InitialStateI)) {
+				log.warn("Entity annotated as Auditable must be instance of InitialStateI");
 				return;
 			}
 			AdonsI adons;
@@ -181,7 +189,7 @@ implements
 					} else if(action == Action.INSERT) {
 						aus.auditEntity(action, null, entity, this);
 					} else {
-						aus.auditEntity(action, entity, (EntityI<?>) ((GenericEntity<?>)entity).getOriginalState(), this);
+						aus.auditEntity(action, entity, (EntityI<?>) ((InitialStateI)entity).getInitialState(), this);
 					}
 				}
 			} else {
@@ -251,8 +259,9 @@ implements
 	}
 
 	private K modifyEntity(K entity) {
-		if(entity != null && isAuditable(entity) && entity instanceof GenericEntity<?>) {
-			((GenericEntity<?>)entity).saveInitialState();
+		if(entity != null && entity instanceof InitialStateI && isAuditable(entity) ) {
+			log.trace("Initial state of entity {} stored");
+			((InitialStateI)entity).saveInitialState();
 		}
 		return entity;
  	}
@@ -270,12 +279,12 @@ implements
     	if(entity.isNew()) {
     		return entity;
     	}
-    	K nent = read(entity.getId());
+    	K nent = read_(entity.getId());
     	if(nent == null) {
     		return entity;
     	}
     	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
-    	return nent;
+    	return modifyEntity(nent);
     }
 
 	@Override
@@ -344,12 +353,13 @@ implements
 
 	@Override
 	public K fillNewEntity(K entity) {
-		if(!entity.isNew()) {
-			K e1 = read(entity.getId());
+		if(entity.isNew()) {
+			return entity;
+		} else {
+			K e1 = read_(entity.getId());
 			EntityUtils.fillDestination(entity, e1);
-			return e1;
+			return modifyEntity(e1);
 		}
-		return entity;
 	}
 
 	@Override

@@ -14,7 +14,7 @@ extends
 	/**
 	 * text returned in case no value is available.
 	 */
-	public static final String NA = "(N/A)";
+	public final String NA = "(N/A)";
 
 	List<AuditChange> listForAudit(Audit audit);
 

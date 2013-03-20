@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
+import org.apache.tapestry5.Link;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Property;
@@ -17,8 +18,10 @@ import net.fishear.data.audit.entities.AuditChange;
 import net.fishear.data.audit.entities.AuditedEntity;
 import net.fishear.data.audit.services.AuditChangeService;
 import net.fishear.data.audit.services.AuditService;
+import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.AuditServiceI.Action;
 import net.fishear.utils.EntityUtils;
+import net.fishear.web.t5.audit.pages.audit.AuditIndex;
 import net.fishear.web.t5.base.ComponentBase;
 
 public class AuditDetail extends ComponentBase {
@@ -30,6 +33,24 @@ public class AuditDetail extends ComponentBase {
 	@Property
 	private Audit audit;
 
+	@Property
+	DspProp row;
+
+	@Cached(watch="row")
+	public String getLinkEntityId() {
+		if(row.property.getValueType() != null && EntityI.class.isAssignableFrom(row.property.getValueType())) {
+			String chto = row.getCurrentValue();
+			if(chto != null && chto.trim().length() > 0 && !AuditChangeService.NA.equals(chto)) {
+				return chto;
+			}
+			String cur = row.getCurrentValue();
+			if(cur != null && cur.trim().length() > 0 && !AuditChangeService.NA.equals(cur)) {
+				return cur;
+			}
+		}
+		return null;
+	}
+	
 	@Cached
 	public List<DspProp> getDisplayProeprties() {
 
@@ -43,6 +64,7 @@ public class AuditDetail extends ComponentBase {
 			dp.setNewValue(pp.containsKey(p.getName()) ? pp.get(p.getName()) : AuditChangeService.NA);
 			dp.setCurrentValue(getCurretnValue(p.getName()));
 			dp.setOldValue(auditService.getAuditChangeService().getPreviousValue(audit, p.getName()));
+			dp.property = p;
 		}
 
 		return list;
@@ -69,7 +91,7 @@ public class AuditDetail extends ComponentBase {
 			diffs = new ArrayList<net.fishear.utils.EntityUtils.Property>();
 			Map<String, String> pp = getPropertyValues();
 			for(Entry<String, String> p : pp.entrySet()) {
-				diffs.add(new net.fishear.utils.EntityUtils.Property(p.getKey(), null, null));
+				diffs.add(new net.fishear.utils.EntityUtils.Property(p.getKey(), null, null, null));
 			}
 		}
 		return diffs;
@@ -84,13 +106,19 @@ public class AuditDetail extends ComponentBase {
 		return map;
 	}
 
+	public Link onFollowEntity(String entityHash, String entityId) {
+		return prsc.createPageRenderLinkWithContext(AuditIndex.class, entityHash, entityId);
+	}
+
 	public String getEntityShortName(AuditedEntity en) {
 		String cn = en.getClassName();
 		return cn.substring(cn.lastIndexOf('.') + 1);
 	}
 
 	public static class DspProp {
-		
+
+		private net.fishear.utils.EntityUtils.Property property;
+
 		private String propertyName;
 
 		private String oldValue;
@@ -155,6 +183,10 @@ public class AuditDetail extends ComponentBase {
 			this.currentValue = currentValue;
 		}
 
+		public String getEntityHash() {
+			return property.getValueType() == null ? null : Integer.toString(property.getValueType().getName().hashCode());
+		}
+		
 	}
 	
 }

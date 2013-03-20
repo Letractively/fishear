@@ -10,6 +10,7 @@ import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
+import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.runtime.Component;
@@ -88,6 +89,7 @@ implements
 //		throw new IllegalStateException(String.format("The implementation of AbstractSearch component has to be placed into implementation of %s", SearchableI.class.getName()));
 	}
 
+	@Cached
 	public T getEntity() {
 		if(entity == null) {
 			entity = thisService.newEntityInstance();
@@ -96,6 +98,7 @@ implements
 		return entity;
 	}
 
+	@Cached
 	public T getEntity2() {
 		if(entity2 == null) {
 			entity2 = thisService.newEntityInstance();

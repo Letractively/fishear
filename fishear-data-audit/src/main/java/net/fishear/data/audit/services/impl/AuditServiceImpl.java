@@ -108,13 +108,15 @@ implements
 				Audit virtAudit = createAuditEntity(Action.VIRTUAL, e1, e2, targetService);
 				if(virtAudit != null) {
 					save(virtAudit);
+				} else {
+					log.warn("Virtual insert for entity {} with ID {} cannot be created (bo changes).", e2 == null ? e1 : e2, (e2 == null ? e1 : e2).getIdString());
 				}
 			}
 		}
-
 		Audit audit = createAuditEntity(action, e1, e2, targetService);
 		if(audit != null) {
 			save(audit);
+		} else {
 		}
 	}
 

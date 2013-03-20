@@ -31,6 +31,7 @@ public abstract class
 	GenericEntity<T>
 implements 
 	EntityI<T>,
+	InitialStateI,
 	Cloneable
 {
 
@@ -40,7 +41,7 @@ implements
 	
 	private Class<T> idType;
 	
-	private Object originalState;
+	private EntityI<?> initialState;
 
 	public GenericEntity() {
 		idType = findType();
@@ -214,9 +215,10 @@ implements
 		return idType;
 	}
 	
+	@Transient
 	public void saveInitialState() {
 		try {
-			originalState = this.clone();
+			initialState = (EntityI<?>) this.clone();
 		} catch (CloneNotSupportedException ex) {
 			throw new IllegalStateException(ex);
 		}
@@ -226,7 +228,7 @@ implements
 	 * @return state of the entity after it is loaded 
 	 */
 	@Transient
-	public Object getOriginalState() {
-		return originalState;
+	public EntityI<?> getInitialState() {
+		return initialState;
 	}
 }

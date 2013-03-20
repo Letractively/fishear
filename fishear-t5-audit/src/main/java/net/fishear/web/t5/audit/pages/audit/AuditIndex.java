@@ -9,6 +9,7 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
+import org.apache.tapestry5.EventConstants;
 import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Component;
@@ -28,6 +29,7 @@ import net.fishear.data.generic.query.results.Functions;
 import net.fishear.data.generic.services.AuditServiceI.Action;
 import net.fishear.web.t5.audit.components.AuditDetail;
 import net.fishear.web.t5.base.ComponentBase;
+import net.fishear.web.t5.data.PagingDataSource;
 
 @Import(stylesheet="AuditIndex.css")
 public class AuditIndex extends ComponentBase {
@@ -149,12 +151,15 @@ public class AuditIndex extends ComponentBase {
 			return auditService.getAuditChangeService().query(qc);
 		}
 	}
-	
-	public List<Audit> getAudits() {
-		
+
+//	public List<Audit> getAudits() {
+	public PagingDataSource getAudits() {
+
+		PagingDataSource pds = new PagingDataSource(auditService);
 		QueryConstraints qc = QueryFactory.create();
+		pds.setQueryConstraint(qc);
 		if(entityHash == null) {
-			return new ArrayList<Audit>();
+			qc.add(Restrictions.FALSE);
 		} else {
 			qc.add(Restrictions.equal("auditedEntity", getAudiedEntity()));
 			if(selectedProperty != null) {
@@ -182,9 +187,9 @@ public class AuditIndex extends ComponentBase {
 			if(simpleList) {
 				qc.add(Restrictions.equal("changeNumber", 1L));
 			}
-			
-			return auditService.list(qc);
 		}
+		
+		return pds;
 	}
 
 	void onHideDetail() {
@@ -200,6 +205,21 @@ public class AuditIndex extends ComponentBase {
 		if(objectId != null) {
 			selectedAction = null;
 			simpleList = false;
+		}
+	}
+	
+	@OnEvent(EventConstants.ACTIVATE)
+	public void onActivate(String entityHash, String entityId) {
+		onClearSearch();
+		this.entityHash = entityHash;
+		this.selectedObjectId = entityId;
+		try {
+			List<Audit> list = auditService.listForEntity(auditService.getAuditedEntityService().read(Integer.parseInt(entityHash)));
+			if(list.size() > 0) {
+				detail = list.get(0);
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 	
@@ -219,6 +239,8 @@ public class AuditIndex extends ComponentBase {
 		changedTo = null;
 
 		simpleList = true;
+		
+		detail = null;
 
 		onHideDetail();
 	}

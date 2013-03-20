@@ -309,11 +309,13 @@ public class
 		private String name;
 		private Object value1;
 		private Object value2;
+		private Class<?> valueType;
 
-		public Property(String fldn, Object v1, Object v2) {
+		public Property(String fldn, Object v1, Object v2, Class<?> type) {
 			this.value1 = v1;
 			this.value2 = v2;
 			this.name = fldn;
+			this.valueType = type;
 		}
 		
 		public boolean equals(Object o) {
@@ -329,7 +331,7 @@ public class
 		}
 
 		public String toString() {
-			return "Property: " + name + ", v1="+ value1 + ", v2=" + value2;
+			return "" + name + ": "+ value1 + "<=>" + value2;
 		}
 
 		/**
@@ -372,6 +374,20 @@ public class
 		 */
 		public void setValue2(Object value2) {
 			this.value2 = value2;
+		}
+
+		/**
+		 * @return the valueType
+		 */
+		public Class<?> getValueType() {
+			return valueType;
+		}
+
+		/**
+		 * @param valueType the valueType to set
+		 */
+		public void setValueType(Class<?> valueType) {
+			this.valueType = valueType;
 		}
 		
 	}
@@ -458,7 +474,7 @@ public class
 						if(log.isTraceEnabled()) {
 							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
 						}
-						list.add(new Property(fldn, v2, v1));
+						list.add(new Property(fldn, v2, v1, fld.getType()));
 					}
 				} catch (Exception e) {
 					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());
@@ -536,10 +552,10 @@ public class
 					}
 					if(isTarget) {
 						log.trace("Target values for field {} setted", fldn);
-						list.add(new Property(fldn, null, m.invoke(e)));
+						list.add(new Property(fldn, null, m.invoke(e), fld.getType()));
 					} else {
 						log.trace("Source values for field {} setted", fldn);
-						list.add(new Property(fldn, m.invoke(e), null));
+						list.add(new Property(fldn, m.invoke(e), null, fld.getType()));
 					}
 				} catch (Exception ex) {
 					log.error("Cannot get value for field: {}\nValue type: {}", fld, fld.getType());

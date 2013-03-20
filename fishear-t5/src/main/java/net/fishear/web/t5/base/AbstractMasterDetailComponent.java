@@ -8,6 +8,7 @@ import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
+import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.slf4j.Logger;
@@ -78,6 +79,7 @@ implements
 	 * @return an entity instance; depending on persistent state it may erturn new instance or existing one.
 	 * Never returns null.
 	 */
+	@Cached
 	public T getEntity() {
 		if(entity == null) {
 			log.trace("getEntity(): Entity variable is null => creating new entity instance");

@@ -6,8 +6,19 @@
 	<h4 style="padding: 0;">${audit.action} on object ${getEntityShortName(audit.auditedEntity)}, id ${audit.objectId}</h4>
 	<div style="padding-bottom: 5px; ">change ${audit.changeNumber} at ${audit.actionDate} by  ${audit.actionUser} </div>
 
-	<t:grid t:source="DisplayProeprties" rowsPerPage="1000">
-	
+	<t:grid 
+		t:source="DisplayProeprties" t:row="row" 
+		rowsPerPage="1000"
+		include="propertyName,oldValue,newValue,currentValue"
+	>
+
+		<p:propertyNameCell>
+			<t:if t:test="LinkEntityId">
+				<t:eventlink t:event="followEntity" t:context="[row.entityHash,LinkEntityId]">${row.propertyName}</t:eventlink>
+				<p:else>${row.propertyName}</p:else>
+			</t:if>
+		</p:propertyNameCell>
+
 		<p:oldValueHeader>Value Before</p:oldValueHeader>
 		<p:newValueHeader>Changed To</p:newValueHeader>
 	</t:grid>

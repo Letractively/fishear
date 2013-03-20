@@ -25,31 +25,31 @@ public class EntityUtilsTestDiff2 {
 	ArrayList<Property> fillDiffs(boolean isTarget) {
 		ArrayList<Property> ll = new ArrayList<Property>();
 		if(isTarget) {
-			ll.add(new Property("id", null, null));
-			ll.add(new Property("str1", null, "aaaa"));
-			ll.add(new Property("str2", null, "bbbb"));
-			ll.add(new Property("intO", null, 99111));
-			ll.add(new Property("intP", null, 99222));
-			ll.add(new Property("longO", null, 991111L));
-			ll.add(new Property("longP", null, 992222L));
-			ll.add(new Property("dblO", null, 99111.5D));
-			ll.add(new Property("dblP", null, 99222.5D));
-			ll.add(new Property("date1", null, new Date(99100000L)));
-			ll.add(new Property("date2", null, new Date(9910000000L)));
-			ll.add(new Property("type", null, null));
+			ll.add(new Property("id", null, null, null));
+			ll.add(new Property("str1", null, "aaaa", null));
+			ll.add(new Property("str2", null, "bbbb", null));
+			ll.add(new Property("intO", null, 99111, null));
+			ll.add(new Property("intP", null, 99222, null));
+			ll.add(new Property("longO", null, 991111L, null));
+			ll.add(new Property("longP", null, 992222L, null));
+			ll.add(new Property("dblO", null, 99111.5D, null));
+			ll.add(new Property("dblP", null, 99222.5D, null));
+			ll.add(new Property("date1", null, new Date(99100000L), null));
+			ll.add(new Property("date2", null, new Date(9910000000L), null));
+			ll.add(new Property("type", null, null, null));
 		} else {
-			ll.add(new Property("id", null, null));
-			ll.add(new Property("str1", "AAAA", null));
-			ll.add(new Property("str2", "BBBB", null));
-			ll.add(new Property("intO", 111, null));
-			ll.add(new Property("intP", 222, null));
-			ll.add(new Property("longO", 1111L, null));
-			ll.add(new Property("longP", 2222L, null));
-			ll.add(new Property("dblO", 111.5D, null));
-			ll.add(new Property("dblP", 222.5D, null));
-			ll.add(new Property("date1", new Date(100000L), null));
-			ll.add(new Property("date2", new Date(10000000L), null));
-			ll.add(new Property("type", null, null));
+			ll.add(new Property("id", null, null, null));
+			ll.add(new Property("str1", "AAAA", null, null));
+			ll.add(new Property("str2", "BBBB", null, null));
+			ll.add(new Property("intO", 111, null, null));
+			ll.add(new Property("intP", 222, null, null));
+			ll.add(new Property("longO", 1111L, null, null));
+			ll.add(new Property("longP", 2222L, null, null));
+			ll.add(new Property("dblO", 111.5D, null, null));
+			ll.add(new Property("dblP", 222.5D, null, null));
+			ll.add(new Property("date1", new Date(100000L), null, null));
+			ll.add(new Property("date2", new Date(10000000L), null, null));
+			ll.add(new Property("type", null, null, null));
 		}
 
 		return ll;

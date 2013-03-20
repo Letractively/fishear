@@ -24,16 +24,16 @@ public class EntityUtilsTestDiff {
 	
 	ArrayList<Property> fillDiffs() {
 		ArrayList<Property> ll = new ArrayList<Property>();
-		ll.add(new Property("str1", "AAAA", "aaaa"));
-		ll.add(new Property("str2", "BBBB", "bbbb"));
-		ll.add(new Property("intO", 111, 99111));
-		ll.add(new Property("intP", 222, 99222));
-		ll.add(new Property("longO", 1111L, 991111L));
-		ll.add(new Property("longP", 2222L, 992222L));
-		ll.add(new Property("dblO", 111.5D, 99111.5D));
-		ll.add(new Property("dblP", 222.5D, 99222.5D));
-		ll.add(new Property("date1", new Date(100000L), new Date(99100000L)));
-		ll.add(new Property("date2", new Date(10000000L), new Date(9910000000L)));
+		ll.add(new Property("str1", "AAAA", "aaaa", null));
+		ll.add(new Property("str2", "BBBB", "bbbb", null));
+		ll.add(new Property("intO", 111, 99111, null));
+		ll.add(new Property("intP", 222, 99222, null));
+		ll.add(new Property("longO", 1111L, 991111L, null));
+		ll.add(new Property("longP", 2222L, 992222L, null));
+		ll.add(new Property("dblO", 111.5D, 99111.5D, null));
+		ll.add(new Property("dblP", 222.5D, 99222.5D, null));
+		ll.add(new Property("date1", new Date(100000L), new Date(99100000L), null));
+		ll.add(new Property("date2", new Date(10000000L), new Date(9910000000L), null));
 		return ll;
 	}
 
@@ -102,8 +102,8 @@ public class EntityUtilsTestDiff {
 		List<Property> list = EntityUtils.listDifferencies(ta[0], ta[1]);
 
 		ArrayList<Property> ll = new ArrayList<Property>();
-		ll.add(new Property("str1", null, "AAAA"));
-		ll.add(new Property("str2", "BBBB", null));
+		ll.add(new Property("str1", null, "AAAA", null));
+		ll.add(new Property("str2", "BBBB", null, null));
 		
 		assertEquals(list.size(), 2);
 		assertEquals(list, ll);
