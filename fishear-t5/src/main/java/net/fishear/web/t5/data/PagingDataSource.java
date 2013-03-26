@@ -132,7 +132,6 @@ implements
 
 		OrderBy orderBy = constraints.orderBy();
 		orderBy.getSortedProperties().clear();
-		List<String> added = new ArrayList<String>();
 
 		if (sortConstraints != null) {
 			for (SortConstraint sc : sortConstraints) {
@@ -142,10 +141,6 @@ implements
 					log.debug("Transient property '{}' - removed from order");
 					continue;
 				}
-				if(added.contains(propertyName)) {
-					continue;
-				}
-				added.add(propertyName);
 
 				if (sc.getColumnSort() == ColumnSort.ASCENDING) {
 					orderBy.add(propertyName, SortDirection.ASCENDING);
