@@ -101,15 +101,19 @@ implements
 	}
 
 	public void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
-		
-		if(action == Action.DELETE || action == Action.UPDATE) {
-			if(countChanges(e2 == null ? e1 : e2) == 0) {
-				log.debug("Entity {} has no change registered. Creating virtual insert.", e2 == null ? e1 : e2);
+
+		if(action == Action.VIRTUAL) {
+			throw new IllegalArgumentException("Action.VIRTUAL is internal only and cannot be passed from outside");
+		}
+		EntityI<?> ex = e2 == null ? e1 : e2;
+		if(action != Action.INSERT) {
+			if(countChanges(ex) == 0) {
+				log.debug("Entity {} has no change registered. Creating virtual insert.", ex);
 				Audit virtAudit = createAuditEntity(Action.VIRTUAL, e1, e2, targetService);
 				if(virtAudit != null) {
 					save(virtAudit);
 				} else {
-					log.warn("Virtual insert for entity {} with ID {} cannot be created (bo changes).", e2 == null ? e1 : e2, (e2 == null ? e1 : e2).getIdString());
+					log.warn("Virtual insert for entity {} with ID {} cannot be created (bo changes).", ex, ex.getIdString());
 				}
 			}
 		}
@@ -117,6 +121,7 @@ implements
 		if(audit != null) {
 			save(audit);
 		} else {
+			log.debug("No changes found forf entity {}. Saving skipped.", ex);
 		}
 	}
 
