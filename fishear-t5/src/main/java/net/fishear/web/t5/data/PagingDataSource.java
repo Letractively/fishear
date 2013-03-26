@@ -1,5 +1,6 @@
 package net.fishear.web.t5.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.fishear.data.generic.entities.EntityI;
@@ -128,11 +129,19 @@ implements
 
 		OrderBy orderBy = constraints.orderBy();
 		orderBy.getSortedProperties().clear();
+		List<String> added = new ArrayList<String>();
 
 		if (sortConstraints != null) {
 			for (SortConstraint sc : sortConstraints) {
 
 				String propertyName = sc.getPropertyModel().getPropertyName();
+				if(propertyName.equals("idString")) {
+					propertyName = "id";
+				}
+				if(added.contains(propertyName)) {
+					continue;
+				}
+				added.add(propertyName);
 
 				if (sc.getColumnSort() == ColumnSort.ASCENDING) {
 					orderBy.add(propertyName, SortDirection.ASCENDING);
