@@ -87,7 +87,7 @@ public class AuditDetail extends ComponentBase {
 				true
 			);
 		} catch(Exception ex) {
-			ex.printStackTrace();
+//			ex.printStackTrace();
 			diffs = new ArrayList<net.fishear.utils.EntityUtils.Property>();
 			Map<String, String> pp = getPropertyValues();
 			for(Entry<String, String> p : pp.entrySet()) {

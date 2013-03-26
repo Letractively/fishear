@@ -84,8 +84,15 @@ public class AuditIndex extends ComponentBase {
 //	@Persist(PersistenceConstants.FLASH)
 	String changeFrom;
 
+	private static final Audit DUMMY_AUDIT;
+	static {
+		DUMMY_AUDIT = new Audit();
+		DUMMY_AUDIT.setAction(Action.VIRTUAL);
+	}
+	
 	@Cached(watch="row")
 	public Audit getLastForRow() {
+		Audit row = this.row; 
 		if(simpleList) {
 			QueryConstraints qc = QueryFactory.create();
 			qc.results().add("changeNumber", Functions.MAX);
@@ -95,8 +102,13 @@ public class AuditIndex extends ComponentBase {
 			QueryConstraints qc2 = QueryFactory.create();
 			qc2.add(Restrictions.equal("changeNumber", rn));
 			qc2.add(Restrictions.equal("objectId", row.getObjectId()));
-	
-			return auditService.read(qc2);
+			
+			row = auditService.read(qc2);
+			if(row == null) {
+				return DUMMY_AUDIT;
+			} else {
+				return row;
+			}
 		} else {
 			return row;
 		}
@@ -283,7 +295,7 @@ public class AuditIndex extends ComponentBase {
 	
 	private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 	public String formatDate(Date date) {
-		return SDF.format(date);
+		return date == null ? "" : SDF.format(date);
 	}
 	
 }
