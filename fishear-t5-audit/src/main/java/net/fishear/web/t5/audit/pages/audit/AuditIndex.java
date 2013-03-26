@@ -203,15 +203,27 @@ public class AuditIndex extends ComponentBase {
 		
 		return pds;
 	}
+	
+	public Object onException(Throwable ex) {
+		return this;
+	}
 
 	void onHideDetail() {
 		detail = null;
 	}
-	
-	void onDetail(Long id) {
-		detail = auditService.read(id);
+
+	void onDetail() {
+		
 	}
-	
+
+	void onDetail(Long id) {
+		if(id == null) {
+			alerts.warn("Auditted objectId not passed");
+		} else {
+			detail = auditService.read(id);
+		}
+	}
+
 	void onSelectObjectId(String objectId) {
 		this.selectedObjectId = objectId;
 		if(objectId != null) {

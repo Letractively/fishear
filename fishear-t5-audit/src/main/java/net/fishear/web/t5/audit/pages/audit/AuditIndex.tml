@@ -6,6 +6,8 @@
 	xmlns:p="tapestry:parameter"
 >
 
+<t:alerts />
+
 <div id="auditSearch">
 	<t:form t:id="search">
 		<t:hidden t:id="changeFrom" />
