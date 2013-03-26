@@ -3,6 +3,8 @@ package net.fishear.web.t5.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Transient;
+
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
@@ -11,6 +13,7 @@ import net.fishear.data.generic.query.order.OrderBy;
 import net.fishear.data.generic.query.order.SortDirection;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.utils.EntityUtils;
 import net.fishear.utils.Globals;
 
 import org.apache.tapestry5.grid.ColumnSort;
@@ -135,8 +138,9 @@ implements
 			for (SortConstraint sc : sortConstraints) {
 
 				String propertyName = sc.getPropertyModel().getPropertyName();
-				if(propertyName.equals("idString")) {
-					propertyName = "id";
+				if(EntityUtils.isTransientProperty(rowType, propertyName)) {
+					log.debug("Transient property '{}' - removed from order");
+					continue;
 				}
 				if(added.contains(propertyName)) {
 					continue;
