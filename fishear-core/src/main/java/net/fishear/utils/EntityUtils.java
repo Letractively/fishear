@@ -2,6 +2,7 @@ package net.fishear.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -567,12 +568,15 @@ public class
 	}
 	
 	private static boolean isAnnotation(Object fldOrMethod, Class<? extends Annotation> annot) {
+		if(fldOrMethod == null) {
+			return false;
+		}
 		if(fldOrMethod instanceof Field) {
 			return ((Field)fldOrMethod).getAnnotation(annot) != null;
 		} else if(fldOrMethod instanceof Method) {
 			return ((Method)fldOrMethod).getAnnotation(annot) != null;
 		} else {
-			throw new IllegalArgumentException("'fldOrMethod' must be field or method");
+			throw new IllegalArgumentException(String.format("'fldOrMethod' must be field or method, but '%s' is not", fldOrMethod));
 		}
 	}
 
@@ -591,6 +595,16 @@ public class
 			}
 		}
 		return false;
+	}
+
+	/** returns true if property or its getter is annotated ad {@link Transient}
+	 * @param entityClass the class
+	 * @param propertyName proiperty name
+	 * @return
+	 */
+	public static boolean isTransientProperty(Class<?> entityClass, String propertyName) {
+		FldDesc fd = getFldDesc(entityClass, propertyName);
+		return isTransient(fd.getGetter()) || isTransient(fd.getField());
 	}
 
 	/**
@@ -633,8 +647,7 @@ public class
 		private /*synchronized*/ void initField() {
 			if (this.fld == null && this.hasField) {
 				try {
-					this.fld = clazz.getField(name.substring(0, 1)
-							.toLowerCase().concat(name.substring(1)));
+					this.fld = clazz.getField(name.substring(0, 1).toLowerCase().concat(name.substring(1)));
 					if (!this.fld.isAccessible()) {
 						this.fld.setAccessible(true);
 					}
@@ -656,7 +669,16 @@ public class
 				} catch (RuntimeException ex) {
 					throw ex;
 				} catch (Exception ex) {
-					this.hasGetter = false;
+					try {
+						this.getter = clazz.getMethod("is".concat(name));
+						if (!this.getter.isAccessible()) {
+							this.getter.setAccessible(true);
+						}
+					} catch (RuntimeException e2) {
+						throw e2;
+					} catch (Exception e2) {
+						this.hasGetter = false;
+					}
 				}
 			}
 		}
