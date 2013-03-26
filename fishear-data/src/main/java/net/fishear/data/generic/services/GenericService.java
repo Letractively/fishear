@@ -134,12 +134,12 @@ implements
 		boolean newEntity = entity.isNew();
 		log.debug("Saving entity {} with ID {}", entity, entity.getId());
 		fillStandardEntity(entity, newEntity);
-		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
 		Object reto = getDao().save(entity);
+		checkAudit(entity, newEntity ? AuditServiceI.Action.INSERT : AuditServiceI.Action.UPDATE);
 		checkSaveState(entity);
 		return reto;
     }
-	
+
 	private void checkSaveState(K entity) {
 		if(entity instanceof InitialStateI) {
 			((InitialStateI)entity).saveInitialState();
