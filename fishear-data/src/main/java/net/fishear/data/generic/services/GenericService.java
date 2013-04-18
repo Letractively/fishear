@@ -228,7 +228,8 @@ implements
 		log.debug("Querying data count for QueryConstraints={}", constraints);
     	QueryConstraints qc = QueryFactory.copyOrCreate(constraints);
         qc.results().addRowCount();
-        return ((Number)query(qc).get(0)).intValue();
+        List<Object> list = query(qc);
+        return list.size() == 0 ? 0L : ((Number)list.get(0)).intValue();
     }
 
     public GenericDaoI<K> getDao() {
