@@ -124,7 +124,7 @@ implements
 			log.trace("afterSave(entity) called fofr entity {}", entity);
 			afterSave(entity);
 			getService().getDao().commit();
-			alerts.info(translate("record-has-been-saved-message"));
+			alerts.success(translate("record-has-been-saved-message"));
 		} catch(BreakException ex) {
 			if(log.isDebugEnabled()) {
 				log.debug("Saving is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
@@ -158,7 +158,7 @@ implements
 		try {
 			if(getService().delete(id)) {
 				getService().getDao().commit();
-				alerts.info(translate("record-has-been-deleted-message"));
+				alerts.success(translate("record-has-been-deleted-message"));
 			} else {
 				alerts.error(translate("cannot-delete-record-message"));
 			}
