@@ -70,7 +70,7 @@ implements
 	 * 
 	 * @param id
 	 */
-	private void beforeDelete(Long id) {
+	private void beforeDelete(Object id) {
 
 	}
 
@@ -145,14 +145,14 @@ implements
 		return getReturn();
 	}
 
-	protected Object onDetail(Long id) {
+	protected Object onDetail(Object id) {
 		log.debug("onDetail({}) called", id);
 		entity = id == null ? null : getService().read(id);
 		return getReturn();
 	}
 
 //	@CommitAfter
-	protected Object onDelete(Long id) {
+	protected Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
