@@ -34,10 +34,15 @@ public class Confirm {
 
 	@AfterRender
 	public void afterRender() {
-		if(jqPath == null || jqPath.trim().length() == 0) {
-			js.addScript(String.format("new Confirm('%s', '%s');", element.getClientId(), confirmMessage()));
-		} else {
-			js.addInitializerCall("confirmation", new JSONObject("id", this.element.getClientId(), "message",  confirmMessage()));
+		
+		String msg = confirmMessage();
+
+		if(msg != null && msg.trim().length() > 0) {
+			if(jqPath == null || jqPath.trim().length() == 0) {
+				js.addScript(String.format("new Confirm('%s', '%s');", element.getClientId(), msg));
+			} else {
+				js.addInitializerCall("confirmation", new JSONObject("id", this.element.getClientId(), "message",  msg));
+			}
 		}
     }
 
