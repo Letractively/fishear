@@ -42,6 +42,30 @@ implements
 		return add(propertyName, Type.DISTINCT);
 	}
 
+	public Projection count(String propertyName) {
+		return add(propertyName, Type.COUNT);
+	}
+
+	public Projection countDistinct(String propertyName) {
+		return add(propertyName, Type.COUNTDISTINCT);
+	}
+
+	public Projection max(String propertyName) {
+		return add(propertyName, Type.MAX);
+	}
+
+	public Projection min(String propertyName) {
+		return add(propertyName, Type.MIN);
+	}
+
+	public Projection sum(String propertyName) {
+		return add(propertyName, Type.SUM);
+	}
+
+	public Projection avg(String propertyName) {
+		return add(propertyName, Type.AVG);
+	}
+
 	/**
 	 * adds the property projection type to the result.
 	 * @param propertyName

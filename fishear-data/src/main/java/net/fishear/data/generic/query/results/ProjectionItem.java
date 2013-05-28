@@ -18,7 +18,13 @@ implements
 		DISTINCT,
 		PROPERTY,
 		SQL,
-		GROUP
+		GROUP,
+		MAX,
+		MIN,
+		SUM,
+		COUNT,
+		COUNTDISTINCT,
+		AVG
 	}
 
 	private String propertyName;

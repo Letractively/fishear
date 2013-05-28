@@ -91,6 +91,24 @@ extends
 				case GROUP:
 					pList.add(Projections.groupProperty(p.getPropertyName()));
 					break;
+				case COUNT:
+					pList.add(Projections.count(p.getPropertyName()));
+					break;
+				case MAX:
+					pList.add(Projections.max(p.getPropertyName()));
+					break;
+				case MIN:
+					pList.add(Projections.min(p.getPropertyName()));
+					break;
+				case SUM:
+					pList.add(Projections.sum(p.getPropertyName()));
+					break;
+				case COUNTDISTINCT:
+					pList.add(Projections.countDistinct(p.getPropertyName()));
+					break;
+				case AVG:
+					pList.add(Projections.avg(p.getPropertyName()));
+					break;
 				default:
 					throw new IllegalStateException("Unknown projection type: " + p.getType());
 				}
