@@ -21,6 +21,11 @@
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
+			<artifactId>fishear-t5-context</artifactId>
+			<version>${parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.fishear</groupId>
 			<artifactId>fishear-data</artifactId>
 			<version>${parent.version}</version>
 		</dependency>
