@@ -1,9 +1,9 @@
 package net.fishear.web.t5.context.services;
 
-public interface ApplicationContextService {
+public interface T5ContextService {
 
 	
-	public static final ApplicationContextService[] singletonInstance = new ApplicationContextService[1];
+	public static final T5ContextService[] singletonInstance = new T5ContextService[1];
 	
 	/** 
 	 * @param beanClass class of the bean

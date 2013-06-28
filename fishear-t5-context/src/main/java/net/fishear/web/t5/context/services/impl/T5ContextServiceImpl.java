@@ -2,7 +2,7 @@ package net.fishear.web.t5.context.services.impl;
 
 import javax.inject.Inject;
 
-import net.fishear.web.t5.context.services.ApplicationContextService;
+import net.fishear.web.t5.context.services.T5ContextService;
 
 import org.apache.tapestry5.TapestryFilter;
 import org.apache.tapestry5.ioc.Registry;
@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 @EagerLoad
 public class 
-	ApplicationContextServiceImpl 
+	T5ContextServiceImpl 
 implements 
-	ApplicationContextService
+	T5ContextService
 {
 	
 	public static final String SPRING_CONTEXT_CLASS_NAME = "org.springframework.context.ApplicationContext";
@@ -27,7 +27,7 @@ implements
 	private ApplicationGlobals applicationGlobals;
 
 	
-	public ApplicationContextServiceImpl() {
+	public T5ContextServiceImpl() {
 		if(singletonInstance[0] == null) {
 			singletonInstance[0] = this;
 			log.info("Singleton context instance has been set.");
