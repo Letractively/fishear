@@ -85,7 +85,7 @@ extends
             case OR:
                 crit = leftRestricitions;
                 for(Criterion cr : criterias) {
-                    crit = org.hibernate.criterion.Restrictions.and(crit, cr);
+                    crit = org.hibernate.criterion.Restrictions.or(crit, cr);
                 }
                 return crit;
             case NOT:
