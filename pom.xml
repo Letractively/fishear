@@ -40,6 +40,7 @@
 		<module>fishear-datatree</module>
 		<module>fishear-testsupport</module>
 <!-- 		<module>fishear-t5-sample</module> -->
+		<module>fishear-t5-context</module>
 	</modules>
 	<properties>
 		<java-version>1.6</java-version>
