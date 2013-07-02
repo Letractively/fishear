@@ -14,6 +14,7 @@ import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
+import org.apache.tapestry5.corelib.data.BlankOption;
 import org.apache.tapestry5.ioc.annotations.Inject;
 
 @SupportsInformalParameters
@@ -39,6 +40,18 @@ public class Select {
 	@Property
 	String onchange;
 	
+    @Parameter(value = "auto", defaultPrefix = BindingConstants.LITERAL)
+    @Property
+    private BlankOption blankOption;
+
+    /**
+     * The label to use for the blank option, if rendered. If not specified, the container's message catalog is
+     * searched for a key, <code><em>id</em>-blanklabel</code>.
+     */
+    @Parameter(defaultPrefix = BindingConstants.LITERAL)
+    @Property
+    private String blankLabel;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@SetupRender
 	void setupRenser() {
