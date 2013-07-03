@@ -1,10 +1,12 @@
 package net.fishear.data.generic.entities;
 
+import net.fishear.data.generic.DataConstants;
+
 public class EntityConstants
 {
 
 	public static final String IDGEN_NAME = "fishearIdGen";
-	public static final String IDGEN_TABLE = "FE_SEQGEN";
+	public static final String IDGEN_TABLE = DataConstants.FISHEAR_OBJECTS_PREFIX + "SEQGEN";
 	public static final String IDGEN_PK_NAME = "GEN_KEY";
 	public static final String IDGEN_COLUMN = "GEN_VALUE";
 	public static final String IDGEN_COL_VALUE = "ENTITY_ID";
