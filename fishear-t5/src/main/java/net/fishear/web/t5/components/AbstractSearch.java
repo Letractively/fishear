@@ -93,7 +93,7 @@ implements
 	public T getEntity() {
 		if(entity == null) {
 			entity = thisService.newEntityInstance();
-			newEntityInstance(entity);
+			newEntityInstance(entity, EntityType.ENTITY);
 		}
 		return entity;
 	}
@@ -111,11 +111,11 @@ implements
 	 * @param entity
 	 */
 	public void newEntityInstance(T entity) {
-		newEntityInstance(entity, EntityType.ENTITY);
+
 	}
 
 	public void newEntityInstance(T entity, EntityType type) {
-		
+		newEntityInstance(entity);
 	}
 
 	public Object onSuccess() {
