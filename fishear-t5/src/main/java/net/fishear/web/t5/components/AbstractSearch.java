@@ -102,7 +102,7 @@ implements
 	public T getEntity2() {
 		if(entity2 == null) {
 			entity2 = thisService.newEntityInstance();
-			newEntityInstance(entity2);
+			newEntityInstance(entity2, EntityType.ENTITY2);
 		}
 		return entity2;
 	}
@@ -110,11 +110,11 @@ implements
 	/** called after new entity is created to allow successor to set needed values.
 	 * @param entity
 	 */
-	protected void newEntityInstance(T entity) {
+	public void newEntityInstance(T entity) {
 		newEntityInstance(entity, EntityType.ENTITY);
 	}
 
-	protected void newEntityInstance(T entity, EntityType type) {
+	public void newEntityInstance(T entity, EntityType type) {
 		
 	}
 
