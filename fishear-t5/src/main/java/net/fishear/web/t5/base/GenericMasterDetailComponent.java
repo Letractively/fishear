@@ -8,6 +8,7 @@ import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
+import net.fishear.utils.Classes;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
@@ -40,7 +41,7 @@ implements
 	/**
 	 * @return the service that manages entities for this 
 	 */
-	protected abstract ServiceI<T> getService();
+	public abstract ServiceI<T> getService();
 
 	/**
 	 * called in case form is submitted.
@@ -206,6 +207,15 @@ implements
 
 	@Override
 	public void setSearchComponent(SearchFormI<T> searchComponent) {
+		if(!searchComponent.getEntityType().isAssignableFrom(getEntityType())) {
+			throw new IllegalStateException(String.format(
+				"Both '%s' and '%s' (included inti it) must implement the same entity, but they does not. " +
+				"'%s' implements '%s' and '%s' implements '%s'", 
+					Classes.getShortClassName(this), Classes.getShortClassName(SearchFormI.class),
+					getClass().getName(), getEntityType().getName(),
+					searchComponent.getClass().getName(), searchComponent.getEntityType().getName()
+			));
+		}
 		this.searchComponent = searchComponent;
 	}
 

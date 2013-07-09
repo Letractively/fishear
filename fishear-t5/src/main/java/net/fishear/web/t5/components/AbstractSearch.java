@@ -9,8 +9,10 @@ import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
+import net.fishear.utils.Classes;
 import net.fishear.utils.Globals;
 import net.fishear.web.t5.base.ComponentBase;
+import net.fishear.web.t5.base.GenericMasterDetailComponent;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -39,8 +41,6 @@ implements
 	
 	private Class<T> entityType;
 
-	private ServiceI<T> thisService;
-
 	@Persist
 	private T entity;
 
@@ -54,7 +54,6 @@ implements
 
 	@SetupRender
 	public void pageLoaded() {
-		thisService = getService();
 		searchForGrid();
 	}
 	
@@ -95,10 +94,20 @@ implements
 //		throw new IllegalStateException(String.format("The implementation of AbstractSearch component has to be placed into implementation of %s", SearchableI.class.getName()));
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public ServiceI<T> getService() {
+		if(this.searchable != null && this.searchable instanceof GenericMasterDetailComponent<?>) {
+			return (ServiceI<T>) ((GenericMasterDetailComponent<?>)this.searchable).getService();
+		} else {
+			throw new IllegalStateException(String.format("The component that implements '%s' must be placed inside '%s' or must extend method 'getService()' to return propert service.", Classes.getShortClassName(AbstractSearch.class), Classes.getShortClassName(this)));
+		}
+	}
+	
 	@Cached
 	public T getEntity() {
 		if(entity == null) {
-			entity = thisService.newEntityInstance();
+			entity = getService().newEntityInstance();
 			newEntityInstance(entity, EntityType.ENTITY);
 		}
 		return entity;
@@ -107,7 +116,7 @@ implements
 	@Cached
 	public T getEntity2() {
 		if(entity2 == null) {
-			entity2 = thisService.newEntityInstance();
+			entity2 = getService().newEntityInstance();
 			newEntityInstance(entity2, EntityType.ENTITY2);
 		}
 		return entity2;
@@ -208,4 +217,13 @@ implements
 		}
 		throw new AppException("Subclass does not parametrize generic superclass.");
 	}
+
+	/**
+	 * for tests only
+	 * @param searchable the searchable to set
+	 */
+	protected void setSearchable(SearchableI<T> searchable) {
+		this.searchable = searchable;
+	}
+
 }
