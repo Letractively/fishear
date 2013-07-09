@@ -1,9 +1,12 @@
 package net.fishear.web.t5.base;
 
 
+import java.lang.reflect.ParameterizedType;
+
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
@@ -23,9 +26,10 @@ implements
 	SearchableI<T>
 {
 
-	
 	Logger log = LoggerFactory.getLogger(getClass());
 	
+	private Class<T> entityType;
+
 	protected T row;
 
 	@Persist
@@ -222,5 +226,29 @@ implements
 	 */
 	public void setRow(T row) {
 		this.row = row;
+	}
+
+	public Class<T> getEntityType() {
+		if(entityType == null) {
+			entityType = findType();
+		}
+		return entityType;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<T> findType() {
+		Class<?> clazz = this.getClass();
+		while(clazz != Object.class) {
+			Object gscl = clazz.getGenericSuperclass();
+			if(ParameterizedType.class.isAssignableFrom(gscl.getClass())) {
+				ParameterizedType pt = (ParameterizedType)gscl;
+				Object[] oa = pt.getActualTypeArguments();
+				if(oa != null && oa.length > 0) {
+					return (Class<T>)oa[0];
+				}
+			}
+			clazz = clazz.getSuperclass();
+		}
+		throw new AppException("Subclass does not parametrize generic superclass.");
 	}
 }
