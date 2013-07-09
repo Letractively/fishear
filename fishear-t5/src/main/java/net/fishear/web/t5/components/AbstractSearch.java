@@ -17,6 +17,7 @@ import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
 import org.apache.tapestry5.annotations.Cached;
+import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.runtime.Component;
@@ -51,6 +52,9 @@ implements
 	
 	@Persist
 	private Conditions extraConditions;
+
+	@Parameter(value="true")
+	private boolean clearEntity;
 
 	@SetupRender
 	public void pageLoaded() {
@@ -133,12 +137,27 @@ implements
 		newEntityInstance(entity);
 	}
 
+	private void resetEntity() {
+		if(clearEntity) {
+			log.trace("Flag 'reserEntity' is set = reseting {} entity to null ", Classes.getShortClassName(GenericMasterDetailComponent.class));
+			if(this.searchable != null && this.searchable instanceof GenericMasterDetailComponent<?>) {
+				((GenericMasterDetailComponent<?>)this.searchable).setEntity(null);
+			} else {
+				log.debug("Flag 'reserEntity' is set but the component is not inside {}", Classes.getShortClassName(GenericMasterDetailComponent.class));
+			}
+		} else {
+
+		}
+	}
+
 	public Object onSuccess() {
+		resetEntity();
 		return Boolean.TRUE;
 	}
 	
 	public Object onClearSearch() {
 		clearSearchForm();
+		resetEntity();
 		return Boolean.TRUE;
 	}
 
