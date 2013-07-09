@@ -54,8 +54,11 @@ implements
 		try {
 			return (Class<Annotation>) GenericService.class.getClassLoader().loadClass(auditableClass);
 		} catch(Exception ex) {
-			ex.printStackTrace();
-			LoggerFactory.getLogger(GenericService.class).info("Auditable annotation class '{}' is not available. Auditing is disabled.", auditableClass);
+			Logger log = LoggerFactory.getLogger(GenericService.class);
+			String emsg = String.format("Auditable annotation class '%s' is not available. Auditing is disabled.", auditableClass);
+			log.debug(emsg + " The cause:", ex);
+			log.warn(emsg);
+			System.err.println(emsg);
 			return null;
 		}
 	}
