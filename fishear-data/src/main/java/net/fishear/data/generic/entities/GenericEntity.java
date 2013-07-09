@@ -11,6 +11,7 @@ import net.fishear.data.generic.services.GenericService;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Classes;
 import net.fishear.utils.EntityUtils;
+import net.fishear.utils.Globals;
 import net.fishear.utils.ListFilter;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
@@ -35,7 +36,7 @@ implements
 	Cloneable
 {
 
-	private static final Logger log = LoggerFactory.getLogger(GenericEntity.class);
+	private static final Logger log = Globals.getLogger();
 	
 	private T id;
 	
