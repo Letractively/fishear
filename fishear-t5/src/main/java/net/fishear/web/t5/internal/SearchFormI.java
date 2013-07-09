@@ -28,4 +28,11 @@ extends
 	 * @return whole {@link QueryConstraints} instance created using {@link QueryFactory#create()}
 	 */
 	QueryConstraints getQueryConstraints();
+
+	/** 
+	 * finds type of entity that this master-detail  component is constructed for.
+	 * 
+	 * @return entity type
+	 */
+	Class<T> getEntityType();
 }
