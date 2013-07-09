@@ -270,6 +270,32 @@ implements
     	}
     }
 
+    /**
+     * if both 'lo' and 'hi' are passed, creates {@link #between(String, Object, Object)}. 
+     * If 'hi' is null, creates value >= 'lo', if 'lo' is null, creates value <= 'hi'.
+     * If both are null, do nothing (returns {@link #TRUE} ).
+     * 
+     * @param property1Name
+     * @param lo lower value (may be null)
+     * @param hi higher value (may be null)
+     * @return restriction
+     */
+	public static Restrictions overlap(String property1Name, String property2Name, Object lo, Object hi) {
+    	if(lo == null && hi == null) {
+    		return Restrictions.TRUE;
+    	}
+    	if(hi == null) {
+    		return Restrictions.or(Restrictions.isNull(property1Name), Restrictions.greaterOrEqualThan(property1Name, lo));
+    	} else if (lo == null) {
+    		return Restrictions.or(Restrictions.isNull(property2Name), Restrictions.lessOrEqualThan(property2Name, hi));
+    	} else {
+    		return Restrictions.and(
+   				Restrictions.or(Restrictions.isNull(property1Name), Restrictions.lessOrEqualThan(property1Name, lo)),
+   				Restrictions.or(Restrictions.isNull(property2Name), Restrictions.greaterOrEqualThan(property2Name, hi))
+   			);
+    	}
+    }
+
     public static Restrictions between(String propertyName, Object lo, Object hi) {
         return new Expression(ExpressionTypes.BETWEEN, propertyName, new Object[] {lo, hi});    	
 //        Restrictions result = Restrictions.and(
