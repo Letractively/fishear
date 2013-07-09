@@ -175,7 +175,7 @@ implements
 
 		beforeSearch(entity, entity2);
 
-		Conditions cond = SearchUtils.createSearchConditions(entity);
+		Conditions cond = SearchUtils.createSearchConditions(entity, entity2);
 		Conditions conditions = getExtraConditions();
 
 		if(conditions != null) {
