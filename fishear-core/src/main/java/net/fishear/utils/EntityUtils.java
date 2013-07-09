@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -965,18 +966,40 @@ public class
 	}
 	
 	/**
+	 * gets String representation of attribute value from bean instance and returns it as proper type.
+	 * In case internal exception occurs, returns 'defaultValue'. Logs exception only if logLevel is set to DEBUG.
+	 * Returns String representation of value. If do you need original value, use {@link #getRawValue(String, Object, Object)}
+	 * 
+	 * @param attrName
+	 * @param entity
+	 * @param defaultValue
+	 * @return property value as string, or default value in case exception occurs.
+	 */
+	public static String getValue(String attrName, Object entity, String defaultValue) {
+		try {
+			return BeanUtils.getProperty(entity, attrName);
+		} catch (Exception ex) {
+			log.debug("exception during value getting", ex);
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * gets attribute value from bean instance and returns it as proper type.
 	 * In case internal exception occurs, returns 'defaultValue'. Logs exception only if logLevel is set to DEBUG.
 	 * 
 	 * @param attrName
 	 * @param entity
 	 * @param defaultValue
-	 * @return property value, or default value in case exception occurs.
+	 * @return property value as string, or default value in case exception occurs.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getValue(String attrName, Object entity, T defaultValue) {
+	public static <T> T getRawValue(String attrName, Object entity, T defaultValue) {
 		try {
-			return (T) BeanUtils.getProperty(entity, attrName);
+			if(entity == null) {
+				return null;
+			}
+			return (T) BeanUtilsBean.getInstance().getPropertyUtils().getNestedProperty(entity, attrName);
 		} catch (Exception ex) {
 			log.debug("exception during value getting", ex);
 			return defaultValue;

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Vector;
 
+import javax.persistence.Embedded;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -12,6 +13,7 @@ import javax.persistence.Transient;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
+import net.fishear.data.generic.annotations.Interval;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
@@ -103,134 +105,170 @@ public class SearchUtils
 			// marked as searchable ?
 			if ((metName.startsWith("get") && metName.length() > 4 && Character.isUpperCase(metName.charAt(3)) && m.getParameterTypes().length == 0)) {
 				// method is not annotated as any known 'nonvalue' type
-				if ((m.getAnnotation(Id.class) == null && m.getAnnotation(GeneratedValue.class) == null && m.getAnnotation(Transient.class) == null)) {
+				if ((m.getAnnotation(Id.class) != null || m.getAnnotation(GeneratedValue.class) != null || m.getAnnotation(Transient.class) != null)) {
+					continue;
+				}
+
+				try {
 					Class<?> retvalType = m.getReturnType();
+
 					// checks if the set method exists with the same argument as
 					// return value of get method
-					try {
-						if ((clazz.getMethod("set".concat(metName.substring(3)), new Class[] { retvalType }) != null)) {
-							String fldName;
-							fldName = innerName.concat(metName.substring(3, 4).toLowerCase().concat(metName.substring(4)));
-							if (CharSequence.class.isAssignableFrom(retvalType)) {
-								CharSequence chs = (CharSequence) m.invoke(entity1, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'CharSequence' and value {}", fldName, chs);
-								anyOk |= cond.addLikeNotEmpty(fldName, chs == null ? null : chs.toString());
-							} else if (retvalType == char[].class) {
-								char[] chs = (char[]) m.invoke(entity1, EntityUtils.EOA);
-								if(chs != null) {
-									String str = new StringBuilder(chs.length).append(chs).toString();
-									log.trace("Adding propety {} of type 'char[]' and value {}", fldName, str);
-									anyOk |= cond.addLikeNotEmpty(fldName, str);
-								} else {
-									log.trace("Adding propety {} of type 'char[]' and value {}", fldName, chs);
-								}
-							} else if (retvalType == Character.class || retvalType == Character.TYPE) {
-								Character ch = (Character) m.invoke(entity1, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Character' and value {}", fldName, ch);
-								anyOk |= cond.addLikeNotEmpty(fldName, ch == null ? null : ch.toString());
-							} else if (retvalType == Boolean.class || retvalType == Boolean.TYPE) {
-								Boolean fl = (Boolean) m.invoke(entity1, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Boolean' and value {}", fldName, fl);
-								if (fl != null) {
-									cond.add(Restrictions.equal(fldName, fl));
-									anyOk |= true;
-								}
-							} else if (Date.class.isAssignableFrom(retvalType)) {
-								Date date1 = entity1 == null ? null : (Date) m.invoke(entity1, EntityUtils.EOA);
-								Date date2 = entity2 == null ? null : (Date) m.invoke(entity2, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Date' and value {}", fldName, date1);
-								if (date1 != null && date2 != null) {
-									cond.add(Restrictions.interval(fldName, date1, date2));
-									anyOk |= true;
-								} else if (date1 != null) {
-									cond.add(Restrictions.equal(fldName, date1));
-									anyOk |= true;
-								}
-							} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
-								Number n1 = entity1 == null ? null : (Number) m.invoke(entity1, EntityUtils.EOA);
-								Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Number' and value {}", fldName, n1);
-								if(n1 != null) {
-									boolean localOk = false;
-									if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
-										localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
-									} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
-										localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
-									} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
-										if(retvalType.isPrimitive() ? n1.intValue() != 0 : true) {
-											cond.addEquals(fldName, n1.intValue());
-											localOk = true;
-										}
-									} else if (Short.class == retvalType || Short.TYPE == retvalType) {
-										if(retvalType.isPrimitive() ? n1.shortValue() != 0 : true) {
-											cond.addEquals(fldName, n1.shortValue());
-											localOk = true;
-										}
-									} else if (Byte.class == retvalType || Byte.TYPE == retvalType) {
-										if(retvalType.isPrimitive() ? n1.byteValue() != 0 : true) {
-											cond.addEquals(fldName, n1.byteValue());
-											localOk = true;
-										}
-									} else {
-										if(retvalType.isPrimitive() ? n1.longValue() != 0 : true) {
-											cond.addEquals(fldName, n1.longValue());
-											localOk = true;
-										}
+					if ((clazz.getMethod("set".concat(metName.substring(3)), new Class[] { retvalType }) != null)) {
+						String fldName;
+						fldName = innerName.concat(metName.substring(3, 4).toLowerCase().concat(metName.substring(4)));
+
+						if(m.getAnnotation(Embedded.class) != null) {
+							if(m.getAnnotation(Interval.class) != null) {
+								log.debug("Embedded property '{}' is annotated as Interval", fldName);
+								Object o1 = entity1 == null ? null : m.invoke(entity1, EntityUtils.EOA);
+								if(o1 != null) {
+									Interval ano = m.getAnnotation(Interval.class);
+									Object startval = EntityUtils.getRawValue(ano.start(), o1, null);
+									Object endval = EntityUtils.getRawValue(ano.end(), o1, null);
+									if(log.isTraceEnabled()) {
+										log.trace(String.format("Generationg interval for property %s.%s ... %s.%s, values %s ... %s", fldName, ano.start(), fldName, ano.end(), startval, endval));
 									}
-									if(localOk) {
-										anyOk |= true;
-										log.trace("Numeric property {} with value {} hes been added", fldName, n1);
-									} else {
-										log.trace("Numeric property {} with value {} hes NOT been added", fldName, n1);
+									if(startval != null || endval != null) {
+										cond.add(Restrictions.overlap(fldName + "." + ano.start(), fldName + "." + ano.end(), startval, endval));
+										anyOk = true;
 									}
 								} else {
-									log.trace("Numeric property {} ommitted since value is null", fldName);
+									log.debug("Embedded property is annotated as Interval, but its value is null");
 								}
-							} else if (retvalType == Class.class) {
-								Class<?> cl = (Class<?>) m.invoke(entity1, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Class' and value {}", fldName, cl);
-								anyOk |= cond.addLikeNotEmpty(fldName, cl.getName());
-							} else if (Enum.class.isAssignableFrom(retvalType)) {
-								Enum<?> en = (Enum<?>) m.invoke(entity1, EntityUtils.EOA);
-								log.trace("Adding propety {} of type 'Enum' and value {}", fldName, en);
-								if(en != null) {
-									cond.addEquals(fldName, en);
-									anyOk = true;
-								}
-							} else if (EntityI.class.isAssignableFrom(retvalType)) {
-								EntityI<?> e1 = entity1 == null ? null : (EntityI<?>) m.invoke(entity1, EntityUtils.EOA);
-								EntityI<?> e2 = entity2 == null ? null : (EntityI<?>) m.invoke(entity2, EntityUtils.EOA);
-								if (e1 != null || e2 != null) {
-									log.trace("Field {} is type of EntityI, analysing entity", fldName, EntityI.class);
-									if(e1.isNew()) {
-										log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
-//										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
-										Conditions cond1 = createSearchConditions(e1, e2, "", done, level + 1);
-										if (cond1 != null) {
-											cond.addJoin(fldName, cond1.getRootRestriction());
-											anyOk = true;
-										}
-									} else {
-										log.trace("Field {} is existing persistent instance, assuming equals entity", fldName);
-										cond.addEquals(fldName, e1);
+							} else {
+								Object o1 = entity1 == null ? null : m.invoke(entity1, EntityUtils.EOA);
+								Object o2 = entity2 == null ? null : m.invoke(entity2, EntityUtils.EOA);
+								if(o1 != null || o2 != null) {
+									Conditions cond1 = createSearchConditions(o1, o2, fldName.concat("."), done, level + 1);
+									if (cond1 != null) {
+										cond.add(cond1.getRootRestriction());
 										anyOk = true;
 									}
 								}
+							}
+							continue;
+						}
+
+						if (CharSequence.class.isAssignableFrom(retvalType)) {
+							CharSequence chs = (CharSequence) m.invoke(entity1, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'CharSequence' and value {}", fldName, chs);
+							anyOk |= cond.addLikeNotEmpty(fldName, chs == null ? null : chs.toString());
+						} else if (retvalType == char[].class) {
+							char[] chs = (char[]) m.invoke(entity1, EntityUtils.EOA);
+							if(chs != null) {
+								String str = new StringBuilder(chs.length).append(chs).toString();
+								log.trace("Adding propety {} of type 'char[]' and value {}", fldName, str);
+								anyOk |= cond.addLikeNotEmpty(fldName, str);
 							} else {
-								Object o = m.invoke(entity1, EntityUtils.EOA);
-								if(o != null) {
-									log.warn("Field {} is unsupported type {}; ignored", fldName, retvalType.getName());
+								log.trace("Adding propety {} of type 'char[]' and value {}", fldName, chs);
+							}
+						} else if (retvalType == Character.class || retvalType == Character.TYPE) {
+							Character ch = (Character) m.invoke(entity1, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Character' and value {}", fldName, ch);
+							anyOk |= cond.addLikeNotEmpty(fldName, ch == null ? null : ch.toString());
+						} else if (retvalType == Boolean.class || retvalType == Boolean.TYPE) {
+							Boolean fl = (Boolean) m.invoke(entity1, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Boolean' and value {}", fldName, fl);
+							if (fl != null) {
+								cond.add(Restrictions.equal(fldName, fl));
+								anyOk |= true;
+							}
+						} else if (Date.class.isAssignableFrom(retvalType)) {
+							Date date1 = entity1 == null ? null : (Date) m.invoke(entity1, EntityUtils.EOA);
+							Date date2 = entity2 == null ? null : (Date) m.invoke(entity2, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Date' and value {}", fldName, date1);
+							if (date1 != null && date2 != null) {
+								cond.add(Restrictions.interval(fldName, date1, date2));
+								anyOk |= true;
+							} else if (date1 != null) {
+								cond.add(Restrictions.equal(fldName, date1));
+								anyOk |= true;
+							}
+						} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
+							Number n1 = entity1 == null ? null : (Number) m.invoke(entity1, EntityUtils.EOA);
+							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Number' and value {}", fldName, n1);
+							if(n1 != null) {
+								boolean localOk = false;
+								if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
+									localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
+								} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
+									localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
+								} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
+									if(retvalType.isPrimitive() ? n1.intValue() != 0 : true) {
+										cond.addEquals(fldName, n1.intValue());
+										localOk = true;
+									}
+								} else if (Short.class == retvalType || Short.TYPE == retvalType) {
+									if(retvalType.isPrimitive() ? n1.shortValue() != 0 : true) {
+										cond.addEquals(fldName, n1.shortValue());
+										localOk = true;
+									}
+								} else if (Byte.class == retvalType || Byte.TYPE == retvalType) {
+									if(retvalType.isPrimitive() ? n1.byteValue() != 0 : true) {
+										cond.addEquals(fldName, n1.byteValue());
+										localOk = true;
+									}
 								} else {
-									log.debug("Field {} is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
+									if(retvalType.isPrimitive() ? n1.longValue() != 0 : true) {
+										cond.addEquals(fldName, n1.longValue());
+										localOk = true;
+									}
+								}
+								if(localOk) {
+									anyOk |= true;
+									log.trace("Numeric property {} with value {} hes been added", fldName, n1);
+								} else {
+									log.trace("Numeric property {} with value {} hes NOT been added", fldName, n1);
+								}
+							} else {
+								log.trace("Numeric property {} ommitted since value is null", fldName);
+							}
+						} else if (retvalType == Class.class) {
+							Class<?> cl = (Class<?>) m.invoke(entity1, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Class' and value {}", fldName, cl);
+							anyOk |= cond.addLikeNotEmpty(fldName, cl.getName());
+						} else if (Enum.class.isAssignableFrom(retvalType)) {
+							Enum<?> en = (Enum<?>) m.invoke(entity1, EntityUtils.EOA);
+							log.trace("Adding propety {} of type 'Enum' and value {}", fldName, en);
+							if(en != null) {
+								cond.addEquals(fldName, en);
+								anyOk = true;
+							}
+						} else if (EntityI.class.isAssignableFrom(retvalType)) {
+							EntityI<?> e1 = entity1 == null ? null : (EntityI<?>) m.invoke(entity1, EntityUtils.EOA);
+							EntityI<?> e2 = entity2 == null ? null : (EntityI<?>) m.invoke(entity2, EntityUtils.EOA);
+							if (e1 != null || e2 != null) {
+								log.trace("Field {} is type of EntityI, analysing entity", fldName, EntityI.class);
+								if(e1.isNew()) {
+									log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
+//										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
+									Conditions cond1 = createSearchConditions(e1, e2, "", done, level + 1);
+									if (cond1 != null) {
+										cond.addJoin(fldName, cond1.getRootRestriction());
+										anyOk = true;
+									}
+								} else {
+									log.trace("Field {} is existing persistent instance, assuming equals entity", fldName);
+									cond.addEquals(fldName, e1);
+									anyOk = true;
 								}
 							}
-						}
-					} catch (Exception ex) {
-						if(ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException) {
-							// do nothing so far ?
 						} else {
-							log.error("Error while getting property value", ex);
+							Object o = m.invoke(entity1, EntityUtils.EOA);
+							if(o != null) {
+								log.warn("Field {} is unsupported type {}; ignored", fldName, retvalType.getName());
+							} else {
+								log.debug("Field {} is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
+							}
 						}
+					}
+				} catch (Exception ex) {
+					if(ex instanceof NoSuchMethodException || ex instanceof IllegalAccessException) {
+						// do nothing so far ?
+					} else {
+						log.error("Error while getting property value", ex);
 					}
 				}
 			}

@@ -290,8 +290,8 @@ implements
     		return Restrictions.or(Restrictions.isNull(property2Name), Restrictions.lessOrEqualThan(property2Name, hi));
     	} else {
     		return Restrictions.and(
-   				Restrictions.or(Restrictions.isNull(property1Name), Restrictions.lessOrEqualThan(property1Name, lo)),
-   				Restrictions.or(Restrictions.isNull(property2Name), Restrictions.greaterOrEqualThan(property2Name, hi))
+   				Restrictions.or(Restrictions.isNull(property1Name), Restrictions.greaterOrEqualThan(property1Name, lo)),
+   				Restrictions.or(Restrictions.isNull(property2Name), Restrictions.lessOrEqualThan(property2Name, hi))
    			);
     	}
     }

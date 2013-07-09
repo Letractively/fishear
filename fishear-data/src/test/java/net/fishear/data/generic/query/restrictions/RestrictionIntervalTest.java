@@ -12,7 +12,7 @@ public class RestrictionIntervalTest {
 	@Test
 	public void overlapTest() {
 		Restrictions ret1 = Restrictions.overlap("validFrom", "validTo", -100, 100);
-		assertEquals(ret1.toString(), "validFrom IS NULL OR validFrom LESS_OR_EQUAL -100 AND validTo IS NULL OR validTo GREATER_OR_EQUAL 100");
+		assertEquals(ret1.toString(), "validFrom IS NULL OR validFrom GREATER_OR_EQUAL -100 AND validTo IS NULL OR validTo LESS_OR_EQUAL 100");
 
 		Restrictions ret2 = Restrictions.overlap("validFrom", "validTo", -100, null);
 		assertEquals(ret2.toString(), "validFrom IS NULL OR validFrom GREATER_OR_EQUAL -100");
