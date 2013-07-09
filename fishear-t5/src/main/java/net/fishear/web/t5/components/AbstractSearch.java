@@ -1,11 +1,15 @@
 package net.fishear.web.t5.components;
 
+import java.lang.reflect.ParameterizedType;
+
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.exceptions.AppException;
+import net.fishear.utils.Globals;
 import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
@@ -31,8 +35,10 @@ implements
 		ENTITY2
 	}
 	
-	private static Logger log = LoggerFactory.getLogger(AbstractSearch.class);
+	private static Logger log = Globals.getLogger();
 	
+	private Class<T> entityType;
+
 	private ServiceI<T> thisService;
 
 	@Persist
@@ -177,5 +183,29 @@ implements
 
 	public QueryConstraints getQueryConstraints() {
 		return QueryFactory.create(getSearchConstraints());
+	}
+
+	public Class<T> getEntityType() {
+		if(entityType == null) {
+			entityType = findType();
+		}
+		return entityType;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Class<T> findType() {
+		Class<?> clazz = this.getClass();
+		while(clazz != Object.class) {
+			Object gscl = clazz.getGenericSuperclass();
+			if(ParameterizedType.class.isAssignableFrom(gscl.getClass())) {
+				ParameterizedType pt = (ParameterizedType)gscl;
+				Object[] oa = pt.getActualTypeArguments();
+				if(oa != null && oa.length > 0) {
+					return (Class<T>)oa[0];
+				}
+			}
+			clazz = clazz.getSuperclass();
+		}
+		throw new AppException("Subclass does not parametrize generic superclass.");
 	}
 }
