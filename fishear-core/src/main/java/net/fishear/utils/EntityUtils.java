@@ -154,6 +154,29 @@ public class
 		} catch (Exception ex) {}
 		return null;
 	}
+	
+	
+	/**
+	 * creates getter/setter name from field name.
+	 * 
+	 * @param fldName field name (without get/set prefix, first character case is not important)
+	 * @param prefix the "get" or "set" 
+	 * @return getter / setter name
+	 */
+	public static String toMethodName(String fldName, String prefix) {
+		return prefix.concat(fldName.substring(0, 1).toUpperCase().concat(fldName.substring(1)));
+	}
+
+	/**
+	 * creates field name from getter/setter name.
+	 * 
+	 * @param getterSetterName getter or setter name (starting with get/set prefix)
+	 * @return field name always starting with lower case
+	 */
+	public static String toFieldName(String getterSetterName) {
+		String fldName = getterSetterName.substring(3);
+		return fldName.substring(0, 1).toLowerCase().concat(fldName.substring(1));
+	}
 
 	/** search for public method in class of 'source' and call it.
 	 * @param source the source object
