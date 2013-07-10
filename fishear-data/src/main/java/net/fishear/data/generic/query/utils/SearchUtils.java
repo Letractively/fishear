@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.fishear.data.generic.annotations.Interval;
+import net.fishear.data.generic.annotations.Intervals;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
@@ -25,6 +26,8 @@ public class SearchUtils
 {
 
 	private static Logger log = LoggerFactory.getLogger(SearchUtils.class);
+
+	private static final Object UNDEFINED = "(UNDEFINED)";
 	
 	/**
 	 * Creates search conditions in accordancy to values filled in 'idao'
@@ -41,7 +44,7 @@ public class SearchUtils
 		if (entity == null) {
 			throw new NullPointerException("entity must not be null");
 		}
-		return createSearchConditions(entity, null, "", new Vector<Method>(), 0);
+		return createSearchConditions(entity, null, "", new Vector<String>(), 0);
 	}
 
 	/**
@@ -61,7 +64,7 @@ public class SearchUtils
 		if (entity1 == null) {
 			throw new NullPointerException("entity must not be null");
 		}
-		return createSearchConditions(entity1, entity2, "", new Vector<Method>(), 0);
+		return createSearchConditions(entity1, entity2, "", new Vector<String>(), 0);
 	}
 
 	/**
@@ -76,7 +79,7 @@ public class SearchUtils
 	 * @param isInnerEntity
 	 * @return
 	 */
-	private static Conditions createSearchConditions(Object entity1, Object entity2, String innerName, Vector<Method> done, int level) {
+	private static Conditions createSearchConditions(Object entity1, Object entity2, String innerName, Vector<String> done, int level) {
 		Conditions cond = new Conditions();
 		boolean anyOk = false;
 		Class<?> clazz = entity1.getClass();
@@ -93,13 +96,46 @@ public class SearchUtils
 		if(entity2 != null && entity2.getClass() != clazz) {
 			throw new IllegalStateException(String.format("Both entities must be the same type, but first is '%s' and second is '%s'.", clazz.getName(), entity2.getClass().getName()));
 		}
+		
+		// creates interval when class is annotated first
+		if(clazz.getAnnotation(Interval.class) != null || clazz.getAnnotation(Intervals.class) != null) {
+			Interval[] inta;
+			if(clazz.getAnnotation(Interval.class) != null) {
+				if(clazz.getAnnotation(Intervals.class) != null) {
+					throw new IllegalStateException("Both 'Interval' and 'Intervals' annotations are not allowed at single entity");
+				}
+				log.debug("Proccesdsing interval annotated as 'Interval' at class level");
+				inta = new Interval[] {clazz.getAnnotation(Interval.class)};
+			} else {
+				log.debug("Proccesdsing interval annotated as 'Intervals' at class level");
+				inta = clazz.getAnnotation(Intervals.class).value();
+			}
+			for(Interval ano : inta) {
+				log.trace("Class level interval for properties {} - {} ", ano.start(), ano.end());
+				Object startval = EntityUtils.getRawValue(ano.start(), entity1, UNDEFINED);
+				Object endval = EntityUtils.getRawValue(ano.end(), entity1, UNDEFINED);
+				if(log.isTraceEnabled()) {
+					log.trace(String.format("Generationg interval for property %s ... %s, values %s ... %s", ano.start(), ano.end(), startval, endval));
+				}
+				if(startval == UNDEFINED || endval == UNDEFINED) {
+					throw new IllegalStateException(String.format("One of start or end value ('%s' or '%s') is not defined: ", ano.start(), ano.end()));
+				}
+				if(startval != null || endval != null) {
+					cond.add(Restrictions.overlap(ano.start(), ano.end(), startval, endval));
+					anyOk = true;
+					done.add(EntityUtils.toMethodName(ano.start(), "get"));
+					done.add(EntityUtils.toMethodName(ano.end(), "get"));
+				}
+			}
+		}
+		
 		for (int i = 0; i < met.length; i++) {
 			Method m = met[i];
-			if (done.contains(m)) {
+			String metName = m.getName();
+			if (done.contains(metName)) {
 				continue;
 			}
-			done.add(m);
-			String metName = m.getName();
+			done.add(metName);
 
 			// Has the method name the convenience 'getSomething' form, or is
 			// marked as searchable ?
@@ -124,8 +160,11 @@ public class SearchUtils
 								Object o1 = entity1 == null ? null : m.invoke(entity1, EntityUtils.EOA);
 								if(o1 != null) {
 									Interval ano = m.getAnnotation(Interval.class);
-									Object startval = EntityUtils.getRawValue(ano.start(), o1, null);
-									Object endval = EntityUtils.getRawValue(ano.end(), o1, null);
+									Object startval = EntityUtils.getRawValue(ano.start(), o1, UNDEFINED);
+									Object endval = EntityUtils.getRawValue(ano.end(), o1, UNDEFINED);
+									if(startval == UNDEFINED || endval == UNDEFINED) {
+										throw new IllegalStateException(String.format("One of start or end value ('%s' or '%s') is not defined: ", ano.start(), ano.end()));
+									}
 									if(log.isTraceEnabled()) {
 										log.trace(String.format("Generationg interval for property %s.%s ... %s.%s, values %s ... %s", fldName, ano.start(), fldName, ano.end(), startval, endval));
 									}
