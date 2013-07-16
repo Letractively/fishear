@@ -95,18 +95,28 @@ implements
 	 */
 	@Cached
 	public T getEntity() {
-		if(entity == null) {
-			log.trace("getEntity(): Entity variable is null => creating new entity instance");
-			entity = getService().newEntityInstance();
-			log.trace("Calling 'newEntityInstance' for entity {}", entity);
-			newEntityInstance(entity);
-		} else if(entity.getId() != null) {
-			log.trace("getEntity(): Reading entity for ID '{}'", entity.getIdString());
-			entity = getService().syncRead(entity);
+		try {
 			if(entity == null) {
-				log.warn("Entity with id {} not found", entity.getId());
+				log.trace("getEntity(): Entity variable is null => creating new entity instance");
 				entity = getService().newEntityInstance();
+				log.trace("Calling 'newEntityInstance' for entity {}", entity);
 				newEntityInstance(entity);
+			} else if(entity.getId() != null) {
+				log.trace("getEntity(): Reading entity for ID '{}'", entity.getIdString());
+				entity = getService().syncRead(entity);
+				if(entity == null) {
+					log.warn("Entity with id {} not found", entity.getId());
+					entity = getService().newEntityInstance();
+					newEntityInstance(entity);
+				}
+			}
+		} catch(Exception ex) {
+			alerts.error(String.format("Cannot load entity, cause: %s. See server log for more details.", ex.toString()));
+			ex.printStackTrace();
+			log.error("Exception during entity gettting", ex);
+			if(entity == null) {
+				log.warn("entity is null after exception, creating new entity instance");
+				entity = getService().newEntityInstance();
 			}
 		}
 		return entity;

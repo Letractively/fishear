@@ -7,6 +7,8 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.ListDataHolder;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.Coercions;
+import net.fishear.utils.Texts;
+import net.fishear.web.t5.base.ComponentBase;
 
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
@@ -20,10 +22,11 @@ import org.apache.tapestry5.corelib.components.Select;
 import org.apache.tapestry5.ioc.annotations.Inject;
 
 @SupportsInformalParameters
-public class Combobox<T> {
-
-	@Inject
-	private ComponentResources crsc;
+public class 
+	Combobox<T> 
+extends 
+	ComponentBase 
+{
 
 	@Parameter(principal = true, autoconnect = true, required = true, allowNull = true)
 	private EntityI<T> value;
@@ -33,8 +36,11 @@ public class Combobox<T> {
 
 	private String[] columns;
 
-	@Persist
+	@Parameter(required=true, allowNull=false)
 	private ServiceI<?> service;
+
+//	@Persist
+//	private ServiceI<?> service_;
 	
 	@Parameter(defaultPrefix=BindingConstants.LITERAL) 
 	@Property
@@ -42,13 +48,12 @@ public class Combobox<T> {
 
 	@SetupRender
 	void setupRenser() {
-		Object o = crsc.getInformalParameter("service", Object.class);
-		if(o != null) {
-			service = (ServiceI<?>) o;
-		}
+//		if(service != null) {
+//			service = service;
+//		}
 		String cols = crsc.getInformalParameter("columns", String.class);
 		if(cols != null && cols.trim().length() > 0) {
-			this.columns = cols.split(","); 
+			this.columns = Texts.trimAll(cols.split(","), ""); 
 		}
 		this.key = value == null ? null : value.getId();
 	}
