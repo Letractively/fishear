@@ -186,4 +186,22 @@ public class Texts {
 		return s.substring(0, 1).toUpperCase().concat(s.substring(1).toLowerCase());
 	}
 	
+	
+	/**
+	 * trims all strings in array. In cayse any item is null, sets 'dft' value (without change).
+	 * 
+	 * @param as
+	 * @param dft default value that is set in case array element is null
+	 * @return trimmed values
+	 */
+	public static String[] trimAll(String[] as, String dft) {
+		if(as == null) {
+			return null;
+		}
+		for(int i = 0; i < as.length; i++) {
+			as[i] = as[i] == null ? dft : as[i].trim();
+		}
+		return as;
+	}
+	
 }
