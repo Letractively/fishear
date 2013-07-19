@@ -1,6 +1,7 @@
 package net.fishear.web.t5.base;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.EntitySourceI;
 import net.fishear.web.t5.internal.SearchableI;
 
 public abstract class
@@ -8,7 +9,8 @@ public abstract class
 extends 
 	GenericMasterDetailComponent<T>
 implements 
-	SearchableI<T>
+	SearchableI<T>,
+	EntitySourceI<T>
 {
 	
 	public T getRow() {
