@@ -64,7 +64,7 @@ implements
 			return null;
 		}
 		if(!(id instanceof Serializable)) {
-			throw new DataException(String.format("Entity ID must implement Serializable interface. Entity: %s", type.getName()));
+			throw new DataException(String.format("Entity ID must implement Serializable interface. Entity: '%s', ID class '%s', ID value %s", type.getName(), id.getClass().getName(), id));
 		}
 		return (K) getSession().get(type, (Serializable) id);
 	}
