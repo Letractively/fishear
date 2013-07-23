@@ -119,10 +119,11 @@ implements
     }
 
     /**
-     * generates and returns likeAll for more properties.
+     * generates and returns likeAll for more entity properties.
+     * All particular restrictions (generated for every property) are connected by OR.
      * 
      * @param searchedString the string that is searched for
-     * @param propertyNames list of property names that lte {@link #likeAll(String, String)} is constructed for
+     * @param propertyNames list of property names that the {@link #likeAll(String, String)} is constructed for
      * @return new restriction
      */
     public static Restrictions searchAll(String searchedString, String... propertyNames) {
@@ -134,10 +135,11 @@ implements
     }
     
     /**
-     * generates and returns likeAll for more properties.
+     * generates and returns likeAny for more properties.
+     * All particular restrictions (generated for every property) are connected by OR.
      * 
      * @param searchedString the string that is searched for
-     * @param propertyNames list of property names that lte {@link #likeAny(String, String)} is constructed for
+     * @param propertyNames list of property names that the {@link #likeAny(String, String)} is constructed for
      * @return new restriction
      */
     public static Restrictions searchAny(String searchedString, String... propertyNames) {
