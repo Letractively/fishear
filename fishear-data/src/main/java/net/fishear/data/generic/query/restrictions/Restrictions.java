@@ -3,6 +3,7 @@ package net.fishear.data.generic.query.restrictions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.fishear.data.generic.query.AbstractQueryPart;
@@ -68,19 +69,83 @@ implements
      * In case 'str' is one word only, behaves like the {@link #like(String, String)} method.
      */
     public static Restrictions likeAll(String propertyName, String str) {
-		str = Texts.normalizeWhitespaces(str);
 		List<Restrictions> rlist = new ArrayList<Restrictions>();
 		String[] as = Texts.normalizeWhitespaces(str).split(" ");
 		for (int i = 0; i < as.length; i++) {
 			rlist.add(Restrictions.like(propertyName, as[i]));
 		}
-		Restrictions left = rlist.get(0);
-		rlist.remove(0);
-		if(rlist.size() > 0) {
-			return Restrictions.and(left, rlist.toArray(new Restrictions[rlist.size()]));
+		return toAnd(rlist);
+//		Restrictions left = rlist.get(0);
+//		rlist.remove(0);
+//		if(rlist.size() > 0) {
+//			return Restrictions.and(left, rlist.toArray(new Restrictions[rlist.size()]));
+//		} else {
+//			return left;
+//		}
+    }
+    
+    /**
+     * merges all restrictions in list by "OR".
+     * 
+     * @param rlist the list 
+     * @return the restriction joined by OR function
+     */
+    private static Restrictions toOr(List<Restrictions> rlist) {
+    	if(rlist == null || rlist.size() == 0) {
+    		return Restrictions.TRUE;
+    	}
+		if(rlist.size() > 1) {
+			return Restrictions.or(rlist.get(0), rlist.subList(1, rlist.size()).toArray(new Restrictions[rlist.size()]));
 		} else {
-			return left;
+			return rlist.get(0);
 		}
+    }
+    
+    /**
+     * merges all restrictions in list by "OR".
+     * 
+     * @param rlist the list 
+     * @return the restriction joined by OR function
+     */
+    private static Restrictions toAnd(List<Restrictions> rlist) {
+    	if(rlist == null || rlist.size() == 0) {
+    		return Restrictions.TRUE;
+    	}
+		if(rlist.size() > 1) {
+			return Restrictions.and(rlist.get(0), rlist.subList(1, rlist.size()).toArray(new Restrictions[rlist.size()]));
+		} else {
+			return rlist.get(0);
+		}
+    }
+
+    /**
+     * generates and returns likeAll for more properties.
+     * 
+     * @param searchedString the string that is searched for
+     * @param propertyNames list of property names that lte {@link #likeAll(String, String)} is constructed for
+     * @return new restriction
+     */
+    public static Restrictions searchAll(String searchedString, String... propertyNames) {
+		List<Restrictions> rlist = new ArrayList<Restrictions>();
+    	for(String prop : propertyNames) {
+    		rlist.add(likeAll(prop, searchedString));
+    	}
+    	return toOr(rlist);
+    }
+    
+    /**
+     * generates and returns likeAll for more properties.
+     * 
+     * @param searchedString the string that is searched for
+     * @param propertyNames list of property names that lte {@link #likeAny(String, String)} is constructed for
+     * @return new restriction
+     */
+    public static Restrictions searchAny(String searchedString, String... propertyNames) {
+		List<Restrictions> rlist = new ArrayList<Restrictions>();
+    	for(String prop : propertyNames) {
+    		rlist.add(likeAny(prop, searchedString));
+    	}
+    	return toOr(rlist);
     }
     
     /** returns LIKE restrictions with OR parts in case the 'str' consist of more than one word (words are separated by whitespaces).
@@ -88,19 +153,19 @@ implements
      * In case 'str' is one word only, behaves like the {@link #like(String, String)} method.
      */
     public static Restrictions likeAny(String propertyName, String str) {
-		str = Texts.normalizeWhitespaces(str);
 		List<Restrictions> rlist = new ArrayList<Restrictions>();
 		String[] as = Texts.normalizeWhitespaces(str).split(" ");
 		for (int i = 0; i < as.length; i++) {
 			rlist.add(Restrictions.like(propertyName, as[i]));
 		}
-		Restrictions left = rlist.get(0);
-		rlist.remove(0);
-		if(rlist.size() > 0) {
-			return Restrictions.or(left, rlist.toArray(new Restrictions[rlist.size()]));
-		} else {
-			return left;
-		}
+		return toOr(rlist);
+//		Restrictions left = rlist.get(0);
+//		rlist.remove(0);
+//		if(rlist.size() > 0) {
+//			return Restrictions.or(left, rlist.toArray(new Restrictions[rlist.size()]));
+//		} else {
+//			return left;
+//		}
     }
     
 
