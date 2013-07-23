@@ -52,14 +52,35 @@ implements
         return new Expression(ExpressionTypes.LIKE, propertyName, expression);
     }
 
+    /** 
+     * adds like that is open towards to the end.
+     * 
+     * @param propertyName the property name
+     * @param expression liked string
+     * @return
+     */
     public static Restrictions likeEnd(String propertyName, String expression) {
         return new Expression(ExpressionTypes.LIKE_END, propertyName, expression);
     }
 
+    /** 
+     * adds like that is open towards to the begin.
+     * 
+     * @param propertyName the property name
+     * @param expression liked string
+     * @return
+     */
     public static Restrictions likeStart(String propertyName, String expression) {
         return new Expression(ExpressionTypes.LIKE_START, propertyName, expression);
     }
 
+    /** 
+     * adds like that is open axactly as typed.
+     * 
+     * @param propertyName the property name
+     * @param expression liked string
+     * @return
+     */
     public static Restrictions likeExact(String propertyName, String expression) {
         return new Expression(ExpressionTypes.LIKE_EXACT, propertyName, expression);
     }
@@ -72,19 +93,25 @@ implements
 		List<Restrictions> rlist = new ArrayList<Restrictions>();
 		String[] as = Texts.normalizeWhitespaces(str).split(" ");
 		for (int i = 0; i < as.length; i++) {
-			rlist.add(Restrictions.like(propertyName, as[i]));
+			rlist.add(toLike(propertyName, as[i]));
 		}
 		return toAnd(rlist);
-//		Restrictions left = rlist.get(0);
-//		rlist.remove(0);
-//		if(rlist.size() > 0) {
-//			return Restrictions.and(left, rlist.toArray(new Restrictions[rlist.size()]));
-//		} else {
-//			return left;
-//		}
     }
-    
-    /**
+
+    private static Restrictions toLike(String propertyName, String s) {
+    	if(s.length() > 2) {
+	    	if(s.startsWith("!") && s.endsWith("!")) {
+	    		return likeExact(propertyName, s.substring(1, s.length() - 1));
+	    	} else if(s.startsWith("!")) {
+	    		return likeStart(propertyName, s.substring(1));
+	    	} else if (s.endsWith("!")) {
+	    		return likeEnd(propertyName, s.substring(0, s.length() - 1));
+	    	}
+    	}
+		return Restrictions.like(propertyName, s);
+	}
+
+	/**
      * merges all restrictions in list by "OR".
      * 
      * @param rlist the list 
@@ -158,16 +185,9 @@ implements
 		List<Restrictions> rlist = new ArrayList<Restrictions>();
 		String[] as = Texts.normalizeWhitespaces(str).split(" ");
 		for (int i = 0; i < as.length; i++) {
-			rlist.add(Restrictions.like(propertyName, as[i]));
+			rlist.add(toLike(propertyName, as[i]));
 		}
 		return toOr(rlist);
-//		Restrictions left = rlist.get(0);
-//		rlist.remove(0);
-//		if(rlist.size() > 0) {
-//			return Restrictions.or(left, rlist.toArray(new Restrictions[rlist.size()]));
-//		} else {
-//			return left;
-//		}
     }
     
 
