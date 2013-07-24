@@ -7,9 +7,11 @@ import net.fishear.web.t5.annotations.ForZone;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Link;
 import org.apache.tapestry5.alerts.AlertManager;
+import org.apache.tapestry5.annotations.AfterRender;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.corelib.components.PageLink;
 import org.apache.tapestry5.corelib.components.Zone;
+import org.apache.tapestry5.dom.Element;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.runtime.Component;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -97,4 +99,19 @@ public class ComponentBase {
 		}
 	}
 
+	/**
+	 * renders informal parameters toi the given element. 
+	 * Can be used during any phase (usually {@link AfterRender}) to render those parameters to given (usually inner) element.
+	 * 
+	 * @param el
+	 */
+	protected void renderInformalParameters(Element el) {
+		if(el != null) {
+			for(String s : crsc.getInformalParameterNames()) {
+				el.attribute(s, crsc.getInformalParameter(s, String.class));
+			}
+		} else {
+			log.warn("Element for informal parameters writting is null");
+		}
+	}
 }
