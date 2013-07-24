@@ -85,19 +85,6 @@ implements
         return new Expression(ExpressionTypes.LIKE_EXACT, propertyName, expression);
     }
 
-    /** returns combined LIKE restriction with AND parts case the 'str' consist of more than one word (words are separated by whitespaces).
-     * Result must match all those restrictions.
-     * In case 'str' is one word only, behaves like the {@link #like(String, String)} method.
-     */
-    public static Restrictions likeAll(String propertyName, String str) {
-		List<Restrictions> rlist = new ArrayList<Restrictions>();
-		String[] as = Texts.normalizeWhitespaces(str).split(" ");
-		for (int i = 0; i < as.length; i++) {
-			rlist.add(toLike(propertyName, as[i]));
-		}
-		return toAnd(rlist);
-    }
-
     private static Restrictions toLike(String propertyName, String s) {
     	if(s.length() > 2) {
 	    	if(s.startsWith("!") && s.endsWith("!")) {
@@ -182,6 +169,9 @@ implements
      * In case 'str' is one word only, behaves like the {@link #like(String, String)} method.
      */
     public static Restrictions likeAny(String propertyName, String str) {
+    	if(str != null && str.trim().equals(".")) {
+    		return Restrictions.TRUE;
+    	}
 		List<Restrictions> rlist = new ArrayList<Restrictions>();
 		String[] as = Texts.normalizeWhitespaces(str).split(" ");
 		for (int i = 0; i < as.length; i++) {
@@ -189,8 +179,22 @@ implements
 		}
 		return toOr(rlist);
     }
-    
 
+    /** returns combined LIKE restriction with AND parts case the 'str' consist of more than one word (words are separated by whitespaces).
+     * Result must match all those restrictions.
+     * In case 'str' is one word only, behaves like the {@link #like(String, String)} method.
+     */
+    public static Restrictions likeAll(String propertyName, String str) {
+    	if(str != null && str.trim().equals(".")) {
+    		return Restrictions.TRUE;
+    	}
+		List<Restrictions> rlist = new ArrayList<Restrictions>();
+		String[] as = Texts.normalizeWhitespaces(str).split(" ");
+		for (int i = 0; i < as.length; i++) {
+			rlist.add(toLike(propertyName, as[i]));
+		}
+		return toAnd(rlist);
+    }
 
     public static Restrictions equal(String propertyName, Object value) {
         return new Expression(ExpressionTypes.EQUAL, propertyName, value);
