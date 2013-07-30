@@ -53,7 +53,7 @@ public class GenericMasterDetailComponentTest {
 	public static class Service_1 extends AbstractService<Entity_1> {
 	}
 
-	public static class MDCImpl_1 extends AbstractMasterDetailComponent<Entity_1> {
+	public static class MDCImpl_1 extends AbstractGridDetailComponent<Entity_1> {
 		Service_1 service;
 		@Override
 		public ServiceI<Entity_1> getService() { return service; }
@@ -61,7 +61,7 @@ public class GenericMasterDetailComponentTest {
 		protected void beforeSave(Entity_1 entity) { }
 	}
 	
-	public static class MDCImpl_2 extends AbstractMasterDetailComponent<Entity_2> {
+	public static class MDCImpl_2 extends AbstractGridDetailComponent<Entity_2> {
 		@Override
 		public ServiceI<Entity_2> getService() { return null; }
 		@Override

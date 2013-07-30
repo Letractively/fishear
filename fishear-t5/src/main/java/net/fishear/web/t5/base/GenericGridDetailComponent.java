@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class
-	GenericMasterDetailComponent<T extends EntityI<?>> 
+	GenericGridDetailComponent<T extends EntityI<?>> 
 extends 
 	ComponentBase
 implements 

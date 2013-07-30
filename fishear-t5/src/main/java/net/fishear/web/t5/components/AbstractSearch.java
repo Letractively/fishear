@@ -12,7 +12,7 @@ import net.fishear.exceptions.AppException;
 import net.fishear.utils.Classes;
 import net.fishear.utils.Globals;
 import net.fishear.web.t5.base.ComponentBase;
-import net.fishear.web.t5.base.GenericMasterDetailComponent;
+import net.fishear.web.t5.base.GenericGridDetailComponent;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -101,8 +101,8 @@ implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public ServiceI<T> getService() {
-		if(this.searchable != null && this.searchable instanceof GenericMasterDetailComponent<?>) {
-			return (ServiceI<T>) ((GenericMasterDetailComponent<?>)this.searchable).getService();
+		if(this.searchable != null && this.searchable instanceof GenericGridDetailComponent<?>) {
+			return (ServiceI<T>) ((GenericGridDetailComponent<?>)this.searchable).getService();
 		} else {
 			throw new IllegalStateException(String.format("The component that implements '%s' must be placed inside '%s' or must extend method 'getService()' to return propert service.", Classes.getShortClassName(AbstractSearch.class), Classes.getShortClassName(this)));
 		}
@@ -139,11 +139,11 @@ implements
 
 	private void resetEntity() {
 		if(clearEntity) {
-			log.trace("Flag 'reserEntity' is set = reseting {} entity to null ", Classes.getShortClassName(GenericMasterDetailComponent.class));
-			if(this.searchable != null && this.searchable instanceof GenericMasterDetailComponent<?>) {
-				((GenericMasterDetailComponent<?>)this.searchable).setEntity(null);
+			log.trace("Flag 'reserEntity' is set = reseting {} entity to null ", Classes.getShortClassName(GenericGridDetailComponent.class));
+			if(this.searchable != null && this.searchable instanceof GenericGridDetailComponent<?>) {
+				((GenericGridDetailComponent<?>)this.searchable).setEntity(null);
 			} else {
-				log.debug("Flag 'reserEntity' is set but the component is not inside {}", Classes.getShortClassName(GenericMasterDetailComponent.class));
+				log.debug("Flag 'reserEntity' is set but the component is not inside {}", Classes.getShortClassName(GenericGridDetailComponent.class));
 			}
 		} else {
 
