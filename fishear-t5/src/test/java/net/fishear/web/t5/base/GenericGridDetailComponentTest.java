@@ -11,7 +11,7 @@ import net.fishear.web.t5.internal.SearchableI;
 
 import org.testng.annotations.Test;
 
-public class GenericMasterDetailComponentTest {
+public class GenericGridDetailComponentTest {
 
 	
 	static {

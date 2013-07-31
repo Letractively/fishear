@@ -12,6 +12,7 @@ import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.corelib.components.PageLink;
 import org.apache.tapestry5.corelib.components.Zone;
 import org.apache.tapestry5.dom.Element;
+import org.apache.tapestry5.ioc.Messages;
 import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.runtime.Component;
 import org.apache.tapestry5.services.PageRenderLinkSource;
@@ -88,7 +89,18 @@ public class ComponentBase {
 	}
 	
 	public String translate(String key, Object... args) {
-		return crsc.getMessages().format(key, args);
+		
+		
+		ComponentResources crsc = this.crsc;
+
+		while(crsc != null && !crsc.getMessages().contains(key)) {
+			crsc = crsc.getContainerResources();
+		}
+		if(crsc == null) {
+			return this.crsc.getMessages().format(key, args);
+		} else {
+			return crsc.getMessages().format(key, args);
+		}
 	}
 	
 	protected Link createPageLing(Class<?> pageClass, Object... context) {
