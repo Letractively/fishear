@@ -1,6 +1,5 @@
 package net.fishear.web.t5.base;
 
-
 import java.lang.reflect.ParameterizedType;
 
 import net.fishear.data.generic.entities.EntityI;
@@ -15,7 +14,6 @@ import net.fishear.web.t5.internal.SearchableI;
 
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
-import org.apache.tapestry5.annotations.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,13 +26,13 @@ implements
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	private Class<T> entityType;
 
 	protected T row;
 
 	@Persist
-	protected T entity;
+	private T entity;
 	
 	private SearchFormI<T> searchComponent;
 
@@ -98,9 +96,15 @@ implements
 		try {
 			if(entity == null) {
 				log.trace("getEntity(): Entity variable is null => creating new entity instance");
-				entity = getService().newEntityInstance();
-				log.trace("Calling 'newEntityInstance' for entity {}", entity);
-				newEntityInstance(entity);
+				T e = getService().newEntityInstance();
+				log.trace("Calling 'newEntityInstance' for entity {}", e);
+				newEntityInstance(e);
+				try {
+					entity = e;
+				} catch(Exception ex) {
+					log.debug("Cannot set new entity instance persistent", ex);
+					return e;
+				}
 			} else if(entity.getId() != null) {
 				log.trace("getEntity(): Reading entity for ID '{}'", entity.getIdString());
 				entity = getService().syncRead(entity);
@@ -246,6 +250,20 @@ implements
 	 */
 	public void setRow(T row) {
 		this.row = row;
+	}
+	
+	/**
+	 * reads entity with given ID.
+	 * If entityId is null or entity with the ID does not exist, new entity instance is created.
+	 * 
+	 * @param entityId
+	 */
+	public void readEntity(Object entityId) {
+		if(entityId == null) {
+			entity = null;
+		} else {
+			entity = getService().read(entityId);
+		}
 	}
 
 	public Class<T> getEntityType() {

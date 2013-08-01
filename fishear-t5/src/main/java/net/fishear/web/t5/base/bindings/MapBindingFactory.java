@@ -2,6 +2,7 @@ package net.fishear.web.t5.base.bindings;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.tapestry5.Binding;
 import org.apache.tapestry5.BindingConstants;
@@ -73,14 +74,7 @@ implements
 		}
 	
 		public Object get() {
-			Map<String, Object> values = new HashMap<String, Object>(delegates
-					.size());
-	
-			for (Map.Entry<String, Binding> entry : delegates.entrySet()) {
-				values.put(entry.getKey(), entry.getValue().get());
-			}
-	
-			return values;
+			return new TreeMap<String, Object>(delegates);
 		}
 	
 		public boolean isInvariant() {

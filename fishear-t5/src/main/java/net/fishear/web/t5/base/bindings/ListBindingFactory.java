@@ -64,11 +64,7 @@ implements
 		}
 
 		public Object get() {
-			List<String> values = new ArrayList<String>(delegates.size());
-			for (String entry : delegates) {
-				values.add(entry);
-			}
-			return values;
+			return new ArrayList<String>(delegates);
 		}
 
 		public boolean isInvariant() {
