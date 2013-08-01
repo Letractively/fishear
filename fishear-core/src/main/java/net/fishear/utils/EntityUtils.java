@@ -39,6 +39,8 @@ public class
 
 	public static final Object[] EOA = new Object[0];
 	public static final Class<?> TOP_LEVEL_CLASS = Object.class;
+	
+	private static Object NO_OBJECT = new Object();
 
 	private static final Hashtable<Class<?>, Hashtable<String, FldDesc>> cache = new Hashtable<Class<?>, Hashtable<String, FldDesc>>();
 	
@@ -743,8 +745,7 @@ public class
 					setterType = this.fld.getType();
 				}
 				try {
-					this.setter = clazz.getMethod("set".concat(name),
-							setterType);
+					this.setter = clazz.getMethod("set".concat(name), setterType);
 				} catch (RuntimeException ex) {
 					throw ex;
 				} catch (Exception ex) {
@@ -773,6 +774,84 @@ public class
 			}
 			return this.fld;
 		}
+	}
+	
+	/**
+	 * calls getter method for the given property and returns its return value.
+	 * If any error ocurred, returns dftVal.
+	 * 
+	 * @param object the object that the property is searched for
+	 * @param propertyName the property name
+	 * @return value of getter or dftVal
+	 */
+	public static <T> Object getValue(T object, String propertyName, T dftVal) {
+		int ii;
+		Object reto = object;
+		while((ii = propertyName.indexOf('.')) > 0) {
+			reto = getValue_(reto, propertyName.substring(0, ii), NO_OBJECT);
+			if(reto == null) {
+				return null;
+			}
+			if(reto == NO_OBJECT) {
+				return dftVal;
+			}
+			propertyName = propertyName.substring(ii + 1);
+		}
+		return getValue_(reto, propertyName, dftVal);
+	}
+	
+	public static boolean setValue(Object object, String propertyName, Object value) {
+		if(value == null) {
+			throw new IllegalArgumentException("Cannot determine setzter type for null value. Use call with explicit type.");
+		}
+		return setValue(object, propertyName, value, value.getClass());
+	}
+
+	public static boolean setValue(Object object, String propertyName, Object value, Class<?> type) {
+		int ii;
+		Object reto = object;
+		while((ii = propertyName.indexOf('.')) > 0) {
+			reto = getValue_(reto, propertyName.substring(0, ii), NO_OBJECT);
+			if(reto == null) {
+				return false;
+			}
+			if(reto == NO_OBJECT) {
+				return false;
+			}
+			propertyName = propertyName.substring(ii + 1);
+		}
+		Class<?> clazz = reto.getClass();
+		String setterName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+		try {
+			clazz.getMethod(setterName, type).invoke(reto, value);
+			return true;
+		} catch(NoSuchMethodException ex) {
+			return false;
+		} catch(Exception ex) {
+			log.error("Cannot set value", ex);
+		}
+		return false;
+	}
+	
+	
+
+	private static <T> Object getValue_(T object, String name, T dft) {
+
+		Class<?> clazz = object.getClass();
+
+		String getterName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+		try {
+			Method met = null;
+			met = clazz.getMethod(getterName);
+			return met.invoke(object);
+		} catch(NoSuchMethodException ex) {
+			return dft;
+		} catch(Exception ex) {
+			if(log.isInfoEnabled()) {
+				log.debug("Cannot get value {} on object {}: " + ex);
+			}
+		}
+		return dft;
 	}
 
 	/**

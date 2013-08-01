@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 
 public class CoercionsTest
 {
-
+	
 	@Test(expectedExceptions = CoercerNotFoundException.class)
 	public void notfoundTets() {
 		Coercions.convertType("123456", Class.class);
@@ -62,4 +62,5 @@ public class CoercionsTest
 		Coercions.addCoercer(coercer);
 		Coercions.convertType(new Byte((byte) 10), String.class);
 	}
+	
 }
