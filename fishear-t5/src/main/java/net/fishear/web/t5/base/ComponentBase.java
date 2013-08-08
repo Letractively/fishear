@@ -87,7 +87,7 @@ public class ComponentBase {
 	public Object getReturn() {
 		return request.isXHR() ? getForZone() : getPageToRender();
 	}
-	
+
 	public String translate(String key, Object... args) {
 		
 		

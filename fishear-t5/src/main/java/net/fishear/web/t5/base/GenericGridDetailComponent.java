@@ -7,13 +7,16 @@ import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
+import net.fishear.exceptions.ValidationException;
 import net.fishear.utils.Classes;
+import net.fishear.utils.Exceptions;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
+import org.apache.tapestry5.runtime.ComponentEventException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,9 +171,6 @@ implements
 			if(ex.isRollback()) {
 				getService().getDao().rollback();
 			}
-		} catch(Exception ex) {
-			log.error(String.format("Error while saving entity %s", entity), ex);
-			alerts.error(translate("error-while-saving-entity-message", ex.toString()));
 		}
 		return getReturn();
 	}
@@ -288,5 +288,49 @@ implements
 			clazz = clazz.getSuperclass();
 		}
 		throw new AppException("Subclass does not parametrize generic superclass.");
+	}
+
+	public Object onException(Throwable causingEx) {
+		Throwable cause;
+		if(causingEx instanceof ComponentEventException) {
+			cause = Exceptions.getRootCause(((ComponentEventException)causingEx).getCause());
+		} else {
+			cause = Exceptions.getRootCause(causingEx);
+		}
+		String message;
+		if(!(cause instanceof BreakException)) {
+			if(cause instanceof ValidationException) {
+				ValidationException vex = (ValidationException) cause;
+				String msg = vex.getMessage();
+				if(msg != null) {
+					if(msg.regionMatches(0,	"localized:", 0, 10)) {
+						message = msg.substring(10);
+					} else {
+						message = translate(msg, vex.getParams() == null ? new Object[0] : vex.getParams());
+					}
+				} else {
+					String causeMsg = "(unknown)";
+cont1:
+					try {
+						StackTraceElement[] stt = cause.getStackTrace();
+						for(StackTraceElement st : stt) {
+							Class<?> cl = getClass().getClassLoader().loadClass(st.getClassName());
+							if(EntityI.class.isAssignableFrom(cl)) {
+								causeMsg = Classes.getShortClassName(cl);
+								break cont1;
+							}
+						}
+						causeMsg = Classes.getShortClassName(getClass().getClassLoader().loadClass(stt[1].getClassName()));
+					} catch(Exception ex) {}
+					message = translate("validation-failed-at", causeMsg);
+				}
+			} else {
+causingEx.printStackTrace();
+				log.debug("Applicatioon error occurred", causingEx);
+				message = translate("application-error-occurred", cause.toString());
+			}
+			alerts.error(message);
+		}
+		return getReturn();
 	}
 }

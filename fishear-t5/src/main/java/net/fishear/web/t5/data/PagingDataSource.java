@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 
 public class 
 	PagingDataSource
-implements 
+implements
 	GridDataSource
 {
 
