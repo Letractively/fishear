@@ -298,6 +298,8 @@ implements
 			cause = Exceptions.getRootCause(causingEx);
 		}
 		String message;
+		
+		// BreakException indicates that processing was stopped but it is not error
 		if(!(cause instanceof BreakException)) {
 			if(cause instanceof ValidationException) {
 				ValidationException vex = (ValidationException) cause;
@@ -325,7 +327,6 @@ cont1:
 					message = translate("validation-failed-at", causeMsg);
 				}
 			} else {
-causingEx.printStackTrace();
 				log.debug("Applicatioon error occurred", causingEx);
 				message = translate("application-error-occurred", cause.toString());
 			}
