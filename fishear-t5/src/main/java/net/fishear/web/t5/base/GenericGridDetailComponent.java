@@ -3,6 +3,7 @@ package net.fishear.web.t5.base;
 import java.lang.reflect.ParameterizedType;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
@@ -149,10 +150,21 @@ implements
 				pds.setConditions(cond);
 			}
 		}
+		modifyConstraints(pds.getQueryConstraint());
 		return pds;
 	}
 
-//	@CommitAfter
+	/**
+	 * <strong>USE WITH CARE</strong> - designed to allow change complete query constraints before it is used for data get.
+	 * Be aware that change of some part of it may cause application is broken. 
+	 * 
+	 * @param queryConstraint
+	 */
+	private void modifyConstraints(QueryConstraints queryConstraint) {
+
+	}
+
+	//	@CommitAfter
 	public Object onSuccess() {
 		log.debug("onSuccess() called");
 		try {
