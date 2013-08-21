@@ -38,6 +38,14 @@ implements
 		ENTITY2
 	}
 	
+	
+	/**
+	 * indicates whether should be automatically linked into grid.
+	 * If true, it is linked to {@link GenericGridDetailComponent} (if this component is placed inside it).
+	 */
+	@Parameter(value = "true")
+	private boolean autoLink;
+	
 	private static Logger log = Globals.getLogger();
 	
 	private Class<T> entityType;
@@ -58,7 +66,9 @@ implements
 
 	@SetupRender
 	public void pageLoaded() {
-		searchForGrid();
+		if(autoLink) {
+			searchForGrid();
+		}
 	}
 	
 	/**
