@@ -199,7 +199,6 @@ implements
 		return getReturn();
 	}
 
-//	@CommitAfter
 	protected Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
@@ -223,6 +222,9 @@ implements
 		return getReturn();
 	}
 
+	/**
+	 * In case entity is loaded from persistent storage, refreshes its state (from database).
+	 */
 	public void refreshEntity() {
 		log.debug("refreshEntity() called");
 		T e = getEntity();
@@ -339,8 +341,11 @@ cont1:
 					message = translate("validation-failed-at", causeMsg);
 				}
 			} else {
-				log.debug("Applicatioon error occurred", causingEx);
 				message = translate("application-error-occurred", cause.toString());
+				log.error("Applicatioon error occurred", causingEx);
+				if(message.startsWith("[[missing key:")) {
+					message = message + " :: " + cause.toString();
+				}
 			}
 			alerts.error(message);
 		}
