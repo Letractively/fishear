@@ -58,4 +58,9 @@ implements
 	public Object getRedirectPageAfterLogout() {
 		return null;
 	}
+
+	@Override
+	public UserInfoI checkUserData(String username) {
+		return null;
+	}
 }
