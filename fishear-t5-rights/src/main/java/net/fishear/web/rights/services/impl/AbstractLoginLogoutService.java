@@ -42,6 +42,9 @@ implements
 	CurrentStateSourceI
 {
 
+	
+	private static String DATA_HASH_CONSTANT = Math.random() + "~~" + System.currentTimeMillis();
+	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private static final String REMENBER_ME_SEPARATOR = "\u0000";
@@ -55,8 +58,24 @@ implements
 	@Inject
 	protected EnvironmentService gwEnv;
 
+	/**
+	 * starts login proccess. If succeeded, returns info about user.
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 * @throws Exception thrown in case any error occurred
+	 */
 	public abstract UserInfoI doLoginImpl(String username, String password) throws Exception;
 	
+	/**
+	 * verifies whether user with given ID exists. Returns its info.
+	 * 
+	 * @param username
+	 * @return {@link UserInfoI} ot null if user does not exist, is disabled ... ets
+	 */
+	public abstract UserInfoI checkUserData(String username);
+
 	private transient CurrentState currentState;
 
 	
@@ -107,18 +126,31 @@ implements
 		}
 	}
 	
-	public final void doLogin(String username, String password) {
+	public final void doLogin(String userId, String password) {
 		clearCookies();
 
 		Session ses = getSession();
 		ses.setAttribute(gesAtrLoggedInKey(), null);
 
-		if(username == null || username.trim().length() == 0) {
+		if(userId == null || userId.trim().length() == 0) {
 			throw new ValidationException("username-is-mandatory");
 		}
-
+		
 		try {
-			UserInfoI uinf = doLoginImpl(username, password);
+			UserInfoI uinf;
+Cont1:
+			{ 
+				if(rmmeRequired() && hashUserData(userId).equals(password)) {
+					log.trace("Remeneber me constant for userId {} fits. Getting userInfo.", userId);
+					uinf = checkUserData(userId);
+					if(uinf != null) {
+						break Cont1;
+					}
+					log.debug("User info is null for iserId {}. Continuing normal login.", userId);
+				}
+				uinf = doLoginImpl(userId, password);
+			}
+
 			ses.setAttribute(gesAtrLoggedInKey(), uinf);
 		} catch (ValidationException ex) {
 			throw ex;
@@ -138,10 +170,18 @@ implements
 		doLogin(username, password);
 		if(rememberMe) {
 			rgl.getRequest().getSession(true).setAttribute("gweb!rememberme!disabled", null);
-			String uncode = username + REMENBER_ME_SEPARATOR + password;
+			String uncode = username + REMENBER_ME_SEPARATOR + hashUserData(username);
 			String uncEnc = gwEnv.encode(uncode, gwEnv.getClientId(cookies));
 			cookies.writeCookieValue(Constants.REMEMBER_ME_COOKIE_CODE, uncEnc, getRememberMeUriBase());
 		}
+	}
+
+	private String hashUserData(String username) {
+		return Integer.toString(("*" + username + "~" + getHashConstant(username) + "*").hashCode(), 36);
+	}
+
+	protected String getHashConstant(String userId) {
+		return DATA_HASH_CONSTANT;
 	}
 
 	/**
