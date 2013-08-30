@@ -127,7 +127,7 @@ public class Select {
 		return null;
 	}
 
-	public Object getDataMap() {
+	public SelectModel getModel() {
 		return model;
 	}
 }

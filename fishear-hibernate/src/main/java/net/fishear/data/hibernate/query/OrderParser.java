@@ -7,6 +7,7 @@ import net.fishear.data.generic.query.order.SortedProperty;
 import net.fishear.utils.Globals;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.slf4j.Logger;
 
@@ -19,7 +20,7 @@ class OrderParser extends AbstractQueryParser<OrderBy, Criteria> {
     	if(order != null) {
 
 	        for (SortedProperty sp : order.getSortedProperties()) {
-	
+
 	            String propertyName = sp.getPropertyName();
 	            Property property = Property.forName(propertyName);
 	
@@ -32,7 +33,7 @@ class OrderParser extends AbstractQueryParser<OrderBy, Criteria> {
 	                    output.addOrder(property.desc());
 	                    break;
 	                default:
-	                    String message = "Cannot recognize sorting direction!";
+	                    String message = String.format("Unknown sorting direction '%s'", direction);
 	                    LOG.error(message);
 	                    throw new IllegalStateException(message);
 	            }

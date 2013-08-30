@@ -66,9 +66,9 @@ extends
 
 		criteria.setResultTransformer( transformer );
 
-        orderParser.parse( qc.getOrderBy(), criteria );
         whereParser.parse( qc.where(), criteria );
         resultsParser.parse( qc.getResults(), criteria );
+        orderParser.parse( qc.getOrderBy(), criteria );
     }
 
 	private Projection prepareProjection(QueryConstraints qc) {
