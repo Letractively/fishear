@@ -8,11 +8,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.services.GenericService;
 
 /**
- * Used at entity class, tells which properties should be loaded eagerly.
- * Alternatively each getter may be annotated by {@link Eager} annotation, or eagerly loaded properties list ma be set for each query 
- * using {@link QueryConstraints}. 
+ * Class level annotation that instructs {@link GenericService} to eagerly load properties in its value.
+ * 
+ * Alternatively each getter may be annotated by {@link Eager} annotation, 
+ * or eagerly loaded properties list may be set for each query using {@link QueryConstraints} (which overrides both annotations). 
  * 
  * @author terber
  * 

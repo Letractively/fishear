@@ -4,16 +4,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import java.util.Collection;
 
-import javax.persistence.Embedded;
-
-import net.fishear.data.generic.query.restrictions.Restrictions;
+import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.services.GenericService;
 
 /**
- * marks {@link Embedded} couple of properties inside entity or {@link Embedded} value as an interval
- * If marked, descendant of AbstractSearch generates overlapping search for such fields (see {@link Restrictions#overlap(String, String, Object, Object)} ).
-
- * On class level it can tie couple of properties as an interval. If more intervals is required, {@link Intervals} annotation is used instead.
+ * getter annotation, that instructs {@link GenericService} to load field's content programmatically after entity is loaded (aither in list method or read methos).
+ * This is done by access of this field's value, in case {@link Collection} calls {@link Collection#size()} method.
+ * Another way to set eagerly loaded fields is class level annotation {@link EagerLoads}.
+ * Eagerly loaded properties list may also be set for each query using {@link QueryConstraints} (which overrides both annotations - uf you use empty list or array for the query, no eager loading will be applied).
  * 
  * @author terber
  *
