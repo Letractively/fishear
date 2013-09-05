@@ -189,6 +189,7 @@ public class Texts {
 	
 	/**
 	 * trims all strings in array. In cayse any item is null, sets 'dft' value (without change).
+	 * Always returns copy of the original string.
 	 * 
 	 * @param as
 	 * @param dft default value that is set in case array element is null
@@ -198,10 +199,68 @@ public class Texts {
 		if(as == null) {
 			return null;
 		}
+		String[] nas = new String[as.length];
 		for(int i = 0; i < as.length; i++) {
-			as[i] = as[i] == null ? dft : as[i].trim();
+			nas[i] = as[i] == null ? dft : as[i].trim();
 		}
-		return as;
+		return nas;
+	}
+
+	/**
+	 * sets all elements that are empty (nulls or strings that contains only whitespaces) to given value.
+	 * All vales are trimmed, the 'dft' is set without change.
+	 * Always returns copy of the original string.
+	 * 
+	 * @param as the array
+	 * @param dft default value that is set in case array element is null or empty
+	 * @return trimmed values. If 'as' is null, returns null.
+	 */
+	public static String[] setAllEmpty(String[] as, String dft) {
+		if(as == null) {
+			return null;
+		}
+		String[] nas = new String[as.length];
+		String s;
+		for(int i = 0; i < as.length; i++) {
+			if(as[i] == null || (s = as[i].trim()).length() == 0) {
+				s = dft;
+			}
+			nas[i] = s;
+		}
+		return nas;
+	}
+
+	/**
+	 * removes all elements from the array that are null values.
+	 * Always returns copy of the original array.
+	 * 
+	 * @param as the array
+	 * @return copy of the array with no null elements.
+	 */
+	public static String[] removeNulls(String[] as) {
+		if(as == null) {
+			return null;
+		}
+		int okCnt = 0;
+		for(int i = 0; i < as.length; i++) {
+			if(as[i] != null) {
+				as[okCnt++] = as[i];
+			}
+		}
+		String[] nas = new String[okCnt];
+		System.arraycopy(as, 0, nas, 0, okCnt);
+		return nas;
+	}
+
+	/**
+	 * removes all empty elements (nulls and that containing only whitespaces) from the array.
+	 * Always returns copy of the original array.
+	 * 
+	 * @param as
+	 * @return
+	 */
+	public static String[] removeEmpty(String[] as) {
+		return Texts.removeNulls(Texts.setAllEmpty(as, null));
 	}
 	
 }

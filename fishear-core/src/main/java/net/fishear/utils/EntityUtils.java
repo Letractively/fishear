@@ -1100,8 +1100,9 @@ public class
 		try {
 			if(entity == null) {
 				return null;
+			} else {
+				return (T) BeanUtilsBean.getInstance().getPropertyUtils().getNestedProperty(entity, attrName);
 			}
-			return (T) BeanUtilsBean.getInstance().getPropertyUtils().getNestedProperty(entity, attrName);
 		} catch (Exception ex) {
 			log.debug("exception during value getting", ex);
 			return defaultValue;

@@ -141,7 +141,6 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 		public int compare(OptionModel o1, OptionModel o2) {
 			return cmp((Comparable)o1.getValue(), (Comparable)o2.getValue());
 		}
-		
 	}
 
 	private class LabelComparator implements Comparator<OptionModel> {
