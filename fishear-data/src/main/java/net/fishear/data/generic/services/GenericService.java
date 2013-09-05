@@ -1,16 +1,19 @@
 package net.fishear.data.generic.services;
 
-
-
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.fishear.data.generic.annotations.Eager;
+import net.fishear.data.generic.annotations.EagerLoads;
 import net.fishear.data.generic.dao.DaoSourceI;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.dao.GenericDaoI;
@@ -67,6 +70,8 @@ implements
 
     protected final Logger log = LoggerFactory.getLogger(getClass());
 
+	private List<String> eagerProps;
+
     public GenericService(GenericDaoI<K> genericDao) {
         this.thisDao = genericDao;
         log.debug("Service instance created with DAO '{}'", this.thisDao);
@@ -85,7 +90,7 @@ implements
 
 	@Override
     public K read(Object id) {
-		return modifyEntity(read_(id));
+		return modifyEntity(read_(id), getEagerProps(null));
 	}
 
     private K read_(Object id) {
@@ -222,7 +227,7 @@ implements
 	public <Q> List<Q> query(QueryConstraints constraints) {
 		log.debug("Querying data for QueryConstraints={}", constraints);
     	GenericDaoI<K> dao = getDao();
-    	List<Q> result = (List<Q>) dao.query(constraints == null ? QueryFactory.createDefault() : constraints);
+    	List<Q> result = (List<Q>) dao.query(constraints == null ? QueryFactory.create() : constraints);
         return result;
     }
 
@@ -230,9 +235,9 @@ implements
     public long queryCount(QueryConstraints constraints) {
 		log.debug("Querying data count for QueryConstraints={}", constraints);
     	QueryConstraints qc = QueryFactory.copyOrCreate(constraints);
-        qc.results().addRowCount();
-        List<Object> list = query(qc);
-        return list.size() == 0 ? 0L : ((Number)list.get(0)).intValue();
+		qc.results().addRowCount();
+		List<Object> list = query(qc);
+		return list.size() == 0 ? 0L : ((Number)list.get(0)).intValue();
     }
 
     public GenericDaoI<K> getDao() {
@@ -252,20 +257,92 @@ implements
 	@Override
 	public List<K> list(QueryConstraints constraints) {
     	List<K> list = query(constraints == null ? QueryFactory.create() : constraints);
-    	return modifyList(list == null ? new ArrayList<K>() : list);
+    	List<K> list2 = modifyList(list == null ? new ArrayList<K>() : list, constraints);
+    	return list2;
     }
 
-    private List<K> modifyList(List<K> list) {
+    private List<K> modifyList(List<K> list, QueryConstraints qc) {
+    	List<String> lazy = getEagerProps(qc);
     	for(K entity : list) {
-    		modifyEntity(entity);
+    		modifyEntity(entity, lazy);
     	}
 		return list;
 	}
 
-	private K modifyEntity(K entity) {
-		if(entity != null && entity instanceof InitialStateI && isAuditable(entity) ) {
-			log.trace("Initial state of entity {} stored");
-			((InitialStateI)entity).saveInitialState();
+	private List<String> getEagerProps(QueryConstraints qc) {
+
+		if(this.eagerProps == null) {
+			synchronized(this) {
+				if(this.eagerProps == null) {
+					List<String> eagerProps;
+					if(qc == null || (eagerProps = qc.getEagerLoad()) == null) {
+						eagerProps = getEagerAnnotated();
+						if(eagerProps == null && getEntityType().getAnnotation(EagerLoads.class) != null) {
+							eagerProps = Arrays.asList(Texts.removeEmpty(getEntityType().getAnnotation(EagerLoads.class).value()));
+						}
+					}
+					if(eagerProps == null) {
+						eagerProps = Collections.emptyList();
+					}
+					this.eagerProps = eagerProps;
+				}
+			}
+		}
+		return this.eagerProps;
+	}
+
+	/**
+	 * @return list of property names that are annotated by {@link Eager} annotation => should be loaded eagerly.
+	 */
+	private List<String> getEagerAnnotated() {
+		Method[] ma = getEntityType().getMethods();
+
+		List<String> list = null;
+
+		for(Method m : ma) {
+			if(m.getName().startsWith("get") && m.getParameterTypes().length == 0) {
+				if(m.getAnnotation(Eager.class) != null) {
+					if(list == null) {
+						list = new ArrayList<String>();
+					}
+					list.add(EntityUtils.toFieldName(m.getName()));
+				}
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * @param entity
+	 * @param qc
+	 * @param eagerProps 
+	 * @return
+	 */
+	private K modifyEntity(K entity, List<String> eagerProps) {
+		if(entity != null) {
+			if(entity instanceof InitialStateI && isAuditable(entity) ) {
+				log.trace("Initial state of entity {} stored");
+				((InitialStateI)entity).saveInitialState();
+			}
+			
+			// loads lazily loaded properties 
+			try {
+				if(eagerProps != null) {
+					for(String propName : eagerProps) {
+						log.trace("Loading lazy property {}", propName);
+						if(propName != null) {
+							Object val = EntityUtils.getRawValue(propName, entity, Collections.EMPTY_LIST);
+							if(val != null) {
+								if(val instanceof Collection<?>) {
+									((Collection<?>)val).size();
+								}
+							}
+						}
+					}
+				}
+			} catch(Exception ex) {
+				throw new IllegalStateException(ex);
+			}
 		}
 		return entity;
  	}
@@ -288,7 +365,7 @@ implements
     		return entity;
     	}
     	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
-    	return modifyEntity(nent);
+    	return modifyEntity(nent, getEagerProps(null));
     }
 
 	@Override
@@ -303,7 +380,7 @@ implements
 			throw new TooManyRecordsException("only-one-record-expected-but-more-found", list.size(), getDao().type(), qc.toString());
 		}
 		
-		return modifyEntity(list.get(0));
+		return modifyEntity(list.get(0), getEagerProps(qc));
     }
 
 	@Override
@@ -362,7 +439,7 @@ implements
 		} else {
 			K e1 = read_(entity.getId());
 			EntityUtils.fillDestination(entity, e1);
-			return modifyEntity(e1);
+			return modifyEntity(e1, getEagerProps(null));
 		}
 	}
 

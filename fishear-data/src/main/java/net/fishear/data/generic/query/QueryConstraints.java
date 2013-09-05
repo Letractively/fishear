@@ -1,5 +1,8 @@
 package net.fishear.data.generic.query;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.conditions.Join;
 import net.fishear.data.generic.query.conditions.Where;
@@ -9,6 +12,7 @@ import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.query.results.Projection;
 import net.fishear.data.generic.query.results.Results;
 import net.fishear.exceptions.AppException;
+import net.fishear.utils.Texts;
 
 
 
@@ -26,6 +30,8 @@ implements
 	private Where where;
 	private Projection projection;
 	private Results results;
+	
+	private List<String> eagerLoad;
 
 	/**
 	 * The constructor.
@@ -47,16 +53,24 @@ implements
 
 		QueryConstraints that = (QueryConstraints) o;
 
-		if (eq(orderBy, that.orderBy)) {
+		if (!eq(orderBy, that.orderBy)) {
 			return false;
 		}
-		if (eq(results, that.results)) {
+		if (!eq(results, that.results)) {
 			return false;
 		}
-		if (eq(where, that.where)) {
+		if (!eq(where, that.where)) {
 			return false;
 		}
-
+		if (!eq(eagerLoad, that.eagerLoad)) {
+			return false;
+		}
+		if (!eq(projection, that.projection)) {
+			return false;
+		}
+		if (!eq(alias, that.alias)) {
+			return false;
+		}
 		return true;
 	}
 
@@ -297,6 +311,32 @@ implements
 		this.alias = alias;
 		return this;
 	}
+
+	/**
+	 * @return the eagerLoad
+	 */
+	public List<String> getEagerLoad() {
+		return eagerLoad;
+	}
+
+	/**
+	 * sets list of properties of basic entity that should be loaded after query is performed.
+	 * 
+	 * @param eagerLoad the eagerLoad to set
+	 */
+	public void setEagerLoad(List<String> eagerLoad) {
+		this.eagerLoad = eagerLoad;
+	}
+
+	public void eager(String... eagerLoad) {
+		if(eagerLoad != null) {
+			String[] as = Texts.removeEmpty(eagerLoad);
+			if(as.length > 0) {
+				setEagerLoad(Arrays.asList(as));
+			}
+		}
+	}
 	
+
 
 }
