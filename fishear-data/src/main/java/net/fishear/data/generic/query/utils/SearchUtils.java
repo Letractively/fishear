@@ -128,8 +128,8 @@ public class SearchUtils
 				if(startval != null || endval != null) {
 					cond.add(Restrictions.overlap(ano.start(), ano.end(), startval, endval));
 					anyOk = true;
-					done.add(EntityUtils.toMethodName(ano.start(), "get"));
-					done.add(EntityUtils.toMethodName(ano.end(), "get"));
+					done.add(clazz.getName() + "|" + EntityUtils.toMethodName(ano.start(), "get"));
+					done.add(clazz.getName() + "|" + EntityUtils.toMethodName(ano.end(), "get"));
 				}
 			}
 		}

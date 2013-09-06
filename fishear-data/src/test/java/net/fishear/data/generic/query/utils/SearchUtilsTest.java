@@ -7,7 +7,7 @@ import net.fishear.data.generic.annotations.Interval;
 import net.fishear.data.generic.annotations.Intervals;
 import net.fishear.data.generic.query.conditions.Conditions;
 
-public class SearcUtilsTest {
+public class SearchUtilsTest {
 
 	
 	@Test
