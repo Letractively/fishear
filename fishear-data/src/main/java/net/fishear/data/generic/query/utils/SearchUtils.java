@@ -1,5 +1,6 @@
 package net.fishear.data.generic.query.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -80,10 +81,13 @@ public class SearchUtils
 	 * @return
 	 */
 	private static Conditions createSearchConditions(Object entity1, Object entity2, String innerName, Vector<String> done, int level) {
+
 		Conditions cond = new Conditions();
 		boolean anyOk = false;
 		Class<?> clazz = entity1.getClass();
-		Method[] met = clazz.getMethods();
+
+		log.debug("Creating serarch conditions for entity '{}' ({})", clazz, entity1);
+
 		if (level == 0 && !EntityUtils.isNew(entity1)) {
 			if(entity2 != null) {
 				throw new IllegalStateException("In case first entity is loaded from DB, the second one must be null.");
@@ -99,6 +103,7 @@ public class SearchUtils
 		
 		// creates interval when class is annotated first
 		if(clazz.getAnnotation(Interval.class) != null || clazz.getAnnotation(Intervals.class) != null) {
+			log.trace("Proccesdsing interval annotated as 'Interval' at class level");
 			Interval[] inta;
 			if(clazz.getAnnotation(Interval.class) != null) {
 				if(clazz.getAnnotation(Intervals.class) != null) {
@@ -129,19 +134,23 @@ public class SearchUtils
 			}
 		}
 		
+		Method[] met = clazz.getMethods();
 		for (int i = 0; i < met.length; i++) {
 			Method m = met[i];
 			String metName = m.getName();
-			if (done.contains(metName)) {
+			String uniMn = clazz.getName() + "|" + metName;
+			if (done.contains(uniMn)) {
 				continue;
 			}
-			done.add(metName);
+			done.add(uniMn);
 
 			// Has the method name the convenience 'getSomething' form, or is
 			// marked as searchable ?
 			if ((metName.startsWith("get") && metName.length() > 4 && Character.isUpperCase(metName.charAt(3)) && m.getParameterTypes().length == 0)) {
 				// method is not annotated as any known 'nonvalue' type
-				if ((m.getAnnotation(Id.class) != null || m.getAnnotation(GeneratedValue.class) != null || m.getAnnotation(Transient.class) != null)) {
+				Class<? extends Annotation> anoCl = Id.class;
+				if ((m.getAnnotation(anoCl = Id.class) != null || m.getAnnotation(anoCl = GeneratedValue.class) != null || m.getAnnotation(anoCl = Transient.class) != null)) {
+					log.trace("Getter '{}' is annotated by {}, ignored", m.getName(), anoCl);
 					continue;
 				}
 
@@ -154,6 +163,7 @@ public class SearchUtils
 						String fldName;
 						fldName = innerName.concat(metName.substring(3, 4).toLowerCase().concat(metName.substring(4)));
 
+						log.debug("Analyzing property '{}'", fldName);
 						if(m.getAnnotation(Embedded.class) != null) {
 							if(m.getAnnotation(Interval.class) != null) {
 								log.debug("Embedded property '{}' is annotated as Interval", fldName);
@@ -191,24 +201,24 @@ public class SearchUtils
 
 						if (CharSequence.class.isAssignableFrom(retvalType)) {
 							CharSequence chs = (CharSequence) m.invoke(entity1, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'CharSequence' and value {}", fldName, chs);
+							log.trace("Property '{}' of type 'CharSequence', value {}", fldName, chs);
 							anyOk |= cond.addLikeNotEmpty(fldName, chs == null ? null : chs.toString());
 						} else if (retvalType == char[].class) {
 							char[] chs = (char[]) m.invoke(entity1, EntityUtils.EOA);
 							if(chs != null) {
 								String str = new StringBuilder(chs.length).append(chs).toString();
-								log.trace("Adding propety {} of type 'char[]' and value {}", fldName, str);
+								log.trace("Property '{}' of type 'char[]', value {}", fldName, str);
 								anyOk |= cond.addLikeNotEmpty(fldName, str);
 							} else {
-								log.trace("Adding propety {} of type 'char[]' and value {}", fldName, chs);
+								log.trace("Property '{}' of type 'char[]', value {}", fldName, chs);
 							}
 						} else if (retvalType == Character.class || retvalType == Character.TYPE) {
 							Character ch = (Character) m.invoke(entity1, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Character' and value {}", fldName, ch);
+							log.trace("Property '{}' of type 'Character', value {}", fldName, ch);
 							anyOk |= cond.addLikeNotEmpty(fldName, ch == null ? null : ch.toString());
 						} else if (retvalType == Boolean.class || retvalType == Boolean.TYPE) {
 							Boolean fl = (Boolean) m.invoke(entity1, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Boolean' and value {}", fldName, fl);
+							log.trace("Property '{}' of type 'Boolean', value {}", fldName, fl);
 							if (fl != null) {
 								cond.add(Restrictions.equal(fldName, fl));
 								anyOk |= true;
@@ -216,7 +226,7 @@ public class SearchUtils
 						} else if (Date.class.isAssignableFrom(retvalType)) {
 							Date date1 = entity1 == null ? null : (Date) m.invoke(entity1, EntityUtils.EOA);
 							Date date2 = entity2 == null ? null : (Date) m.invoke(entity2, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Date' and value {}", fldName, date1);
+							log.trace("Property '{}' of type 'Date', value {}", fldName, date1);
 							if (date1 != null && date2 != null) {
 								cond.add(Restrictions.interval(fldName, date1, date2));
 								anyOk |= true;
@@ -227,7 +237,7 @@ public class SearchUtils
 						} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
 							Number n1 = entity1 == null ? null : (Number) m.invoke(entity1, EntityUtils.EOA);
 							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Number' and value {}", fldName, n1);
+							log.trace("Property '{}' of type 'Number', value {}", fldName, n1);
 							if(n1 != null) {
 								boolean localOk = false;
 								if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
@@ -257,31 +267,32 @@ public class SearchUtils
 								}
 								if(localOk) {
 									anyOk |= true;
-									log.trace("Numeric property {} with value {} hes been added", fldName, n1);
+									log.trace("Numeric property '{}' with value {} hes been added", fldName, n1);
 								} else {
-									log.trace("Numeric property {} with value {} hes NOT been added", fldName, n1);
+									log.trace("Numeric property '{}' with value {} hes NOT been added", fldName, n1);
 								}
 							} else {
-								log.trace("Numeric property {} ommitted since value is null", fldName);
+								log.trace("Numeric property '{}' ommitted since value is null", fldName);
 							}
 						} else if (retvalType == Class.class) {
 							Class<?> cl = (Class<?>) m.invoke(entity1, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Class' and value {}", fldName, cl);
+							log.trace("Property '{}' of type 'Class', value {}", fldName, cl);
 							anyOk |= cond.addLikeNotEmpty(fldName, cl.getName());
 						} else if (Enum.class.isAssignableFrom(retvalType)) {
 							Enum<?> en = (Enum<?>) m.invoke(entity1, EntityUtils.EOA);
-							log.trace("Adding propety {} of type 'Enum' and value {}", fldName, en);
+							log.trace("Property '{}' of type 'Enum', value {}", fldName, en);
 							if(en != null) {
 								cond.addEquals(fldName, en);
 								anyOk = true;
 							}
 						} else if (EntityI.class.isAssignableFrom(retvalType)) {
+							log.trace("Field '{}' is type of EntityI, analysing entity", fldName);
 							EntityI<?> e1 = entity1 == null ? null : (EntityI<?>) m.invoke(entity1, EntityUtils.EOA);
 							EntityI<?> e2 = entity2 == null ? null : (EntityI<?>) m.invoke(entity2, EntityUtils.EOA);
 							if (e1 != null || e2 != null) {
-								log.trace("Field {} is type of EntityI, analysing entity", fldName, EntityI.class);
+								log.trace("Field '{}': 'e1' or 'e2' value is not null. Analyzing.", fldName, e1);
 								if(e1.isNew()) {
-									log.trace("Field {} is non-persistent instance, assuming deep analysis", fldName);
+									log.trace("Field '{}' is non-persistent instance, assuming deep analysis", fldName);
 //										Conditions cond1 = createSearchConditions(e1, fldName.concat("."), vec, true);
 									Conditions cond1 = createSearchConditions(e1, e2, "", done, level + 1);
 									if (cond1 != null) {
@@ -289,18 +300,24 @@ public class SearchUtils
 										anyOk = true;
 									}
 								} else {
-									log.trace("Field {} is existing persistent instance, assuming equals entity", fldName);
+									log.trace("Field '{}' is existing persistent instance, assuming equals entity", fldName);
 									cond.addEquals(fldName, e1);
 									anyOk = true;
 								}
+							} else {
+								log.trace("Field '{}': both 'e1' and 'e2' values are nuill, do not analyze", fldName);
 							}
 						} else {
 							Object o = m.invoke(entity1, EntityUtils.EOA);
 							if(o != null) {
-								log.warn("Field {} is unsupported type {}; ignored", fldName, retvalType.getName());
+								log.warn("Field '{}' is unsupported type {}; ignored", fldName, retvalType.getName());
 							} else {
-								log.debug("Field {} is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
+								log.debug("Field '{}' is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
 							}
+						}
+					} else {
+						if(log.isTraceEnabled()) {
+							log.trace("Setter with type '{}' does not exist fo Getter '{}'. Ignored", m.getReturnType(), m.getName());
 						}
 					}
 				} catch (Exception ex) {
@@ -312,6 +329,8 @@ public class SearchUtils
 				}
 			}
 		}
-		return anyOk ? cond : null;
+		Conditions rcond = anyOk ? cond : null;
+		log.debug("Serarch conditions for entity '{}' is {}", clazz, rcond);
+		return rcond;
 	}
 }

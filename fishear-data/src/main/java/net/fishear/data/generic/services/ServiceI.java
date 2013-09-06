@@ -177,8 +177,17 @@ public interface
 	 */
 	K syncRead(K entity);
 
+	/**
+	 * Reads entity with given ID ore (if such one does not exist in underlying storage) creates new instance.
+	 * 
+	 * @param id ID of entity. May be null.
+	 * @return read or newly created entity instance. You can uyse "isNew()" method call to decide which type is returned.
+	 */
+	K readOrCreate(Object id);
+
 	/** returns map containing entityID as String  and as key and single string as value.
 	 * Behaves the same way as {@link #getIdValueMap(QueryConstraints, String...)}, but keys are as strings.
 	 */
 	Map<String, String> getIdStringValueMap(QueryConstraints qc, String... attrNames);
+
 }

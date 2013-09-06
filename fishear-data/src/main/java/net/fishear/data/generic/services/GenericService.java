@@ -93,6 +93,20 @@ implements
 		return modifyEntity(read_(id), getEagerProps(null));
 	}
 
+	@Override
+    public K readOrCreate(Object id) {
+		K entity = null;
+		if(id != null) {
+			log.trace("readOrCreate: ID is null");
+			entity = read_(id);
+		}
+		if(entity == null) {
+			log.trace("Entity for id {} is null. Creating new instance.", id);
+			entity = newEntityInstance();
+		}
+		return modifyEntity(entity, getEagerProps(null));
+	}
+
     private K read_(Object id) {
         return (K)getDao().read(id);
     }
