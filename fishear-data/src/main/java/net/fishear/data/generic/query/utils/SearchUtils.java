@@ -216,7 +216,7 @@ public class SearchUtils
 							Character ch = (Character) m.invoke(entity1, EntityUtils.EOA);
 							log.trace("Property '{}' of type 'Character', value {}", fldName, ch);
 							anyOk |= cond.addLikeNotEmpty(fldName, ch == null ? null : ch.toString());
-						} else if (retvalType == Boolean.class || retvalType == Boolean.TYPE) {
+						} else if (retvalType == Boolean.class /*|| retvalType == Boolean.TYPE*/) {	// "small" boolean disabled since "not presented" state cannot be defined
 							Boolean fl = (Boolean) m.invoke(entity1, EntityUtils.EOA);
 							log.trace("Property '{}' of type 'Boolean', value {}", fldName, fl);
 							if (fl != null) {
