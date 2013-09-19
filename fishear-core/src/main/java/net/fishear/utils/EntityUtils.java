@@ -1,11 +1,14 @@
 package net.fishear.utils;
 
+import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -13,6 +16,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -1107,6 +1111,89 @@ public class
 			log.debug("exception during value getting", ex);
 			return defaultValue;
 		}
+	}
+	
+	static PropertyDescriptor getPd(PropertyDescriptor[] pda, String name) {
+		for(PropertyDescriptor pd : pda) {
+			if(pd.getName().equals(name)) {
+				return pd;
+			}
+		}
+		return null;
+	}
+
+	public static <T> Comparator<T> getComparator(Class<T> entityType, String propertyName) {
+
+		final Method[] ma;
+		
+		try {
+
+			String[] as = propertyName.split("\\.");
+
+			if(as.length == 0) {
+				as = new String[] {propertyName};
+			}
+			
+
+			Class<?> type = entityType;
+
+			ma = new Method[as.length];
+			
+			
+			PropertyUtilsBean pu = BeanUtilsBean.getInstance().getPropertyUtils();
+
+			int i = 0;
+			for(String s : as) {
+				PropertyDescriptor pd = getPd(pu.getPropertyDescriptors(type), s);
+
+				ma[i] = pu.getReadMethod(pd);
+				type = ma[i].getReturnType();
+				i++;
+			}
+
+		} catch(Exception ex) {
+			throw new IllegalArgumentException(String.format("Entity class '%s' does not contain property '%s'", entityType.getName(), propertyName));
+		}
+
+		if(!Comparable.class.isAssignableFrom(ma[ma.length - 1].getReturnType())) {
+			throw new IllegalArgumentException(String.format("Property value '%s' of entity '%s' must implement 'java.lang.Comparable' interface", propertyName, entityType.getName()));
+		}
+
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Comparator<T> cmp = new Comparator() {
+			
+			
+			Object val(Object o) {
+				Object val = o;
+				for(Method m : ma) {
+					try {
+						val = m.invoke(val);
+						if(val == null) {
+							return null;
+						}
+					} catch (Exception ex) {
+						throw new IllegalStateException(ex);
+					}
+				}
+				return val;
+			}
+			
+			@SuppressWarnings("unchecked")
+			@Override
+			public int compare(Object o1, Object o2) {
+				Object v1 = val(o1);
+				Object v2 = val(o2);
+
+				if(v1 == null) {
+					return v2 == null ? 0 : -1;
+				} else if(v2 == null) {
+					return v1 == null ? 0 : 1;
+				} else {
+					return ((Comparable)v1).compareTo(v2);
+				}
+			}
+		};
+		return cmp;
 	}
 	
 }

@@ -20,6 +20,8 @@ public class TestEntity {
 	
 	private boolean bool1;
 	
+	private Boolean bool2;
+	
 	private TestEntity2 testEntity2;
 
 	/**
@@ -147,6 +149,20 @@ public class TestEntity {
 	 */
 	public void setNum3(Long num3) {
 		this.num3 = num3;
+	}
+
+	/**
+	 * @return the bool2
+	 */
+	public Boolean getBool2() {
+		return bool2;
+	}
+
+	/**
+	 * @param bool2 the bool2 to set
+	 */
+	public void setBool2(Boolean bool2) {
+		this.bool2 = bool2;
 	} 
 	
 
