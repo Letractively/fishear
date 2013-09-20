@@ -1112,7 +1112,7 @@ public class
 			return defaultValue;
 		}
 	}
-	
+
 	static PropertyDescriptor getPd(PropertyDescriptor[] pda, String name) {
 		for(PropertyDescriptor pd : pda) {
 			if(pd.getName().equals(name)) {
@@ -1121,7 +1121,7 @@ public class
 		}
 		return null;
 	}
-
+	
 	public static <T> Comparator<T> getComparator(Class<T> entityType, String propertyName) {
 
 		final Method[] ma;
@@ -1159,40 +1159,7 @@ public class
 			throw new IllegalArgumentException(String.format("Property value '%s' of entity '%s' must implement 'java.lang.Comparable' interface", propertyName, entityType.getName()));
 		}
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		Comparator<T> cmp = new Comparator() {
-			
-			
-			Object val(Object o) {
-				Object val = o;
-				for(Method m : ma) {
-					try {
-						val = m.invoke(val);
-						if(val == null) {
-							return null;
-						}
-					} catch (Exception ex) {
-						throw new IllegalStateException(ex);
-					}
-				}
-				return val;
-			}
-			
-			@SuppressWarnings("unchecked")
-			@Override
-			public int compare(Object o1, Object o2) {
-				Object v1 = val(o1);
-				Object v2 = val(o2);
-
-				if(v1 == null) {
-					return v2 == null ? 0 : -1;
-				} else if(v2 == null) {
-					return v1 == null ? 0 : 1;
-				} else {
-					return ((Comparable)v1).compareTo(v2);
-				}
-			}
-		};
+		Comparator<T> cmp = new EntityComparator<T>(ma);
 		return cmp;
 	}
 	

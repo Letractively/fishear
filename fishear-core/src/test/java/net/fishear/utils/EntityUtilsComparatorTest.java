@@ -8,7 +8,7 @@ import static org.testng.Assert.*;
 
 import org.testng.annotations.Test;
 
-public class EntityUtilsTestComparator {
+public class EntityUtilsComparatorTest {
 
 	
 	@Test
@@ -88,5 +88,22 @@ public class EntityUtilsTestComparator {
 		te1.getTestEntity2().setCode("CCC");
 
 		assertEquals(cmp.compare(te1, te2), 1);
+	}
+
+	@Test
+	public void valNulNotnullTest() {
+		TestEntity te1 = new TestEntity();
+		TestEntity te2 = new TestEntity();
+
+		te1.setTestEntity2(new TestEntity2());
+
+		Comparator<TestEntity> cmp = EntityUtils.getComparator(TestEntity.class, "testEntity2.code");
+		assertEquals(cmp.compare(te1, te2), 1);
+		
+		te2.setTestEntity2(new TestEntity2());
+		assertEquals(cmp.compare(te1, te2), 0);
+
+		te2.getTestEntity2().setCode("AAA");
+		assertEquals(cmp.compare(te1, te2), -1);
 	}
 }
