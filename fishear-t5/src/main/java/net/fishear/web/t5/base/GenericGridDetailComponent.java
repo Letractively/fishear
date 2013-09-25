@@ -160,7 +160,7 @@ implements
 	 * 
 	 * @param queryConstraint
 	 */
-	private void modifyConstraints(QueryConstraints queryConstraint) {
+	protected void modifyConstraints(QueryConstraints queryConstraint) {
 
 	}
 
