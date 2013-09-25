@@ -141,8 +141,9 @@ implements
 		PagingDataSource pds = new PagingDataSource(getService());
 		if(searchComponent != null) {
 			Conditions cond = searchComponent.getSearchConstraints();
-			modifyConditions(cond);
-			pds.setConditions(cond);
+			Conditions cond2 = cond == null ? new Conditions() : cond;
+			modifyConditions(cond2);
+			pds.setConditions(cond2.isEmpty() ? cond : cond2);
 		} else {
 			Conditions cond = new Conditions();
 			modifyConditions(cond);
