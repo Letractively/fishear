@@ -66,10 +66,12 @@ implements
 	}
 
     public Conditions add(NestedRestriction nestedRestriction) {
-        if (nestedRestrictions == null) {
-			nestedRestrictions = new ArrayList<NestedRestriction>();
-        }
-        nestedRestrictions.add(nestedRestriction);
+    	if(nestedRestriction != null) {
+	        if (nestedRestrictions == null) {
+				nestedRestrictions = new ArrayList<NestedRestriction>();
+	        }
+	        nestedRestrictions.add(nestedRestriction);
+    	}
 		return this;
     }
 
@@ -80,10 +82,12 @@ implements
 	 * @return Return this for method chaining.
 	 */
 	public Conditions add(Restrictions restriction) {
-		if (rootRestriction != null) {
-			rootRestriction = Restrictions.and(rootRestriction, restriction);
-		} else {
-			rootRestriction = restriction;
+		if(restriction != null) {
+			if (rootRestriction != null) {
+				rootRestriction = Restrictions.and(rootRestriction, restriction);
+			} else {
+				rootRestriction = restriction;
+			}
 		}
 		return this;
 	}
