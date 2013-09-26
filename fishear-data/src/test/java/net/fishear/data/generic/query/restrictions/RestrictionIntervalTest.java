@@ -1,9 +1,5 @@
 package net.fishear.data.generic.query.restrictions;
 
-import java.util.Date;
-
-import net.fishear.data.generic.data.EntityWithInterval;
-
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
