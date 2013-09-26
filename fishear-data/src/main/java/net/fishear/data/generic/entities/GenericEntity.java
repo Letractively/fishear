@@ -71,8 +71,9 @@ implements
 		setId(EntityUtils.convertType(idStr, idType));
 	}
 
-	@SuppressWarnings("unchecked")
-	public void setId(Object id) {
+//	@SuppressWarnings("unchecked")
+	@Override
+	public void setId(T id) {
 		// as ion Oracle DB - empty string is treated as null
 		if (id != null && id instanceof CharSequence && ((CharSequence)id).length() == 0) {
 			this.id = null;
