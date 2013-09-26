@@ -11,9 +11,7 @@ import net.fishear.utils.Globals;
 import org.slf4j.Logger;
 
 
-/**
- * @author liso
- */
+@SuppressWarnings("unused")
 class ResultsParser extends AbstractQueryParser<Results, InMemoryCriteria> {
 
     private static Logger LOG = Globals.getLogger();

@@ -236,7 +236,7 @@ public class SearchUtils
 							}
 						} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
 							Number n1 = entity1 == null ? null : (Number) m.invoke(entity1, EntityUtils.EOA);
-							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
+//							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
 							log.trace("Property '{}' of type 'Number', value {}", fldName, n1);
 							if(n1 != null) {
 								boolean localOk = false;

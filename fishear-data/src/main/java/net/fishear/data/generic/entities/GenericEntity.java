@@ -4,10 +4,8 @@ package net.fishear.data.generic.entities;
 import java.lang.reflect.ParameterizedType;
 
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PostLoad;
 import javax.persistence.Transient;
 
-import net.fishear.data.generic.services.GenericService;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Classes;
 import net.fishear.utils.EntityUtils;
@@ -16,7 +14,6 @@ import net.fishear.utils.ListFilter;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Basic entity is superclass for all entity classes. It implements necessary

@@ -1,15 +1,10 @@
 package net.fishear.data.inmemory.query;
 
 
-import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.AbstractQueryParser;
 import net.fishear.data.generic.query.conditions.*;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.inmemory.InMemoryCriteria;
-import net.fishear.utils.Texts;
-
-
-import java.util.List;
 
 class WhereParser extends AbstractQueryParser<Where, InMemoryCriteria> {
 

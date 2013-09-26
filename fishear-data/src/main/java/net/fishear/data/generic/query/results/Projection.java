@@ -102,6 +102,8 @@ implements
 					}
 					isProperty = true;
 					break;
+				default:
+					throw new IllegalArgumentException(String.format("Unsupported projection %s type: %s ", pi.getType()));
 				}
 			}
 		}

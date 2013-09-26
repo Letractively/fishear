@@ -2,7 +2,6 @@ package net.fishear.data.generic.entities;
 
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
 /**

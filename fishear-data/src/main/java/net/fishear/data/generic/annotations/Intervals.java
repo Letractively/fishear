@@ -5,8 +5,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 
-import javax.persistence.Embedded;
-
 /**
  * at entity class level allows mark more intervals.
  * 

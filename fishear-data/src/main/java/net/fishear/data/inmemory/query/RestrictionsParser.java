@@ -8,6 +8,7 @@ import net.fishear.data.generic.query.restrictions.ExpressionTypes;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.inmemory.InMemoryCriteria;
 
+@SuppressWarnings("unused")
 class 
 	RestrictionsParser
 extends 
@@ -48,7 +49,7 @@ extends
 //        return null;
     }
 
-    private InMemoryCriteria parseConjuction(Conjunction conjunction) {
+	private InMemoryCriteria parseConjuction(Conjunction conjunction) {
     	return null;
 //        Criterion leftRestricitions = parseRestriction(conjunction.getLeft());
 //        Restrictions[] restrictions = conjunction.getRight();

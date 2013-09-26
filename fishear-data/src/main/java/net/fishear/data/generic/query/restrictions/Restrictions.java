@@ -3,7 +3,6 @@ package net.fishear.data.generic.query.restrictions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import net.fishear.data.generic.query.AbstractQueryPart;

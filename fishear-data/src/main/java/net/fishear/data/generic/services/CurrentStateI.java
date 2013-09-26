@@ -1,7 +1,5 @@
 package net.fishear.data.generic.services;
 
-import net.fishear.data.generic.entities.EntityI;
-
 /** Interface provides basic information about running system and environment.
  * 
  * @author terber
