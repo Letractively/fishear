@@ -230,12 +230,14 @@ public class EncoderSelectModel<T extends EntityI<?>> implements ValueEncoder<T>
 		
 	}
 
+	@SuppressWarnings("rawtypes") 
 	public static EncoderSelectModel<EntityI<?>> create(ServiceI service, QueryConstraints qc, String... attrNames) {
 		EncoderSelectModel<EntityI<?>> em = create(service, attrNames);
 		em.constraints = qc;
 		return em;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" }) 
 	public static EncoderSelectModel<EntityI<?>> create(ServiceI service, String... attrNames) {
 		try {
 			EncoderSelectModel<EntityI<?>> em = new EncoderSelectModel<EntityI<?>>();

@@ -6,6 +6,7 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
+import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
@@ -22,7 +23,6 @@ import org.apache.tapestry5.annotations.Persist;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.runtime.Component;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public abstract class 
@@ -253,6 +253,18 @@ implements
 	 */
 	protected void setSearchable(SearchableI<T> searchable) {
 		this.searchable = searchable;
+	}
+	
+	/**
+	 * @return root restriction of querz constraints created bz this class, or null if no constraints / no restrictions.
+	 */
+	public Restrictions getRootRestrictions() {
+		Conditions qc = getSearchConstraints();
+		if (qc != null) {
+			return qc.getRootRestriction();
+		} else {
+			return null;
+		}
 	}
 
 }
