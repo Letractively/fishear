@@ -3,8 +3,6 @@ package net.fishear.utils;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -1113,6 +1111,9 @@ public class
 		}
 	}
 
+	/**
+	 * returns descriptor for given property 
+	 */
 	static PropertyDescriptor getPd(PropertyDescriptor[] pda, String name) {
 		for(PropertyDescriptor pd : pda) {
 			if(pd.getName().equals(name)) {
@@ -1122,7 +1123,25 @@ public class
 		return null;
 	}
 	
-	public static <T> Comparator<T> getComparator(Class<T> entityType, String propertyName) {
+	/** returns comparator that compares certain property value from given entity.
+	 * The property value must be implementation of {@link Comparable} interface, otherwise exception is thrown.
+	 * Nested properties are allowed. In such case tip values are compared (they must implement comparable), 
+	 * the intermediate values need not. If some of intermediate values are null, comparison ends and such value is treated as "less".
+	 * <br />
+	 * <b>Ecample</b>
+	 * We have this entity value: Department.employee.name
+	 * <ul>
+	 * <li>: Department1.employeee == null && Depatrment2.employee != null => result is -1</li>
+	 * <li>: Department1.employeee == null && Depatrment2.employee == null => result is 0</li>
+	 * <li>: Department1.employeee != null && Depatrment2.employee == null => result is 1</li>
+	 * <li>: Department1.employeee != null && Depatrment2.employee != null => 'employee.name' is compared and returned</li>
+	 * </ul>
+	 * @param entityType entity class
+	 * @param propertyName name of property that will be compared. Nested properties (separated by dot) are allowed.
+	 * @return the {@link EntityComparator} 
+	 * @throws IllegalArgumentException in case any error occurs
+	 */
+	public static <T> EntityComparator<T> getComparator(Class<T> entityType, String propertyName) {
 
 		final Method[] ma;
 		
@@ -1151,6 +1170,8 @@ public class
 				i++;
 			}
 
+		} catch(RuntimeException ex) {
+			throw ex;
 		} catch(Exception ex) {
 			throw new IllegalArgumentException(String.format("Entity class '%s' does not contain property '%s'", entityType.getName(), propertyName));
 		}
@@ -1159,7 +1180,7 @@ public class
 			throw new IllegalArgumentException(String.format("Property value '%s' of entity '%s' must implement 'java.lang.Comparable' interface", propertyName, entityType.getName()));
 		}
 
-		Comparator<T> cmp = new EntityComparator<T>(ma);
+		EntityComparator<T> cmp = new EntityComparator<T>(ma);
 		return cmp;
 	}
 	
