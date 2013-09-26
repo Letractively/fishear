@@ -169,14 +169,26 @@ implements
 	public Object onSuccess() {
 		log.debug("onSuccess() called");
 		try {
+			ServiceI<T> service = getService();
 			T entity = getEntity();
-			log.trace("beforeSave(entity) called fofr entity {}", entity);
+			
+			log.debug("onSuccess procedure for entity {} and service {}", entity, service);
+			log.trace("call beforeSave(entity) ");
 			beforeSave(entity);
-			getService().save(entity);
-			log.trace("afterSave(entity) called fofr entity {}", entity);
+			
+			log.trace("call service.validate(entity) for entity {} ", entity);
+			service.validate(entity);
+			
+			log.trace("call service.save(entity) for entity {}", entity);
+			service.save(entity);
+			
+			log.trace("call afterSave(entity) for entity {}", entity);
 			afterSave(entity);
-			getService().getDao().commit();
+			
+			log.trace("call service.commit()", entity);
+			service.getDao().commit();
 			alerts.success(translate("record-has-been-saved-message"));
+			
 		} catch(BreakException ex) {
 			if(log.isDebugEnabled()) {
 				log.debug("Saving is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
