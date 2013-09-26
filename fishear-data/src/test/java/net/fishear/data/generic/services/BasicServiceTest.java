@@ -1,27 +1,19 @@
 package net.fishear.data.generic.services;
 
-import java.util.ArrayList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
 import java.util.List;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import net.fishear.data.generic.Utils;
+import net.fishear.data.generic.entities.AbstractEntity;
+import net.fishear.data.generic.query.QueryConstraints;
+import net.fishear.data.generic.query.QueryFactory;
+import net.fishear.data.inmemory.InMemoryDaoSource;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import net.fishear.data.generic.Utils;
-import net.fishear.data.generic.dao.DaoSourceI;
-import net.fishear.data.generic.dao.DaoSourceManager;
-import net.fishear.data.generic.dao.GenericDaoI;
-import net.fishear.data.generic.entities.AbstractEntity;
-import net.fishear.data.generic.entities.EntityI;
-import net.fishear.data.generic.query.QueryConstraints;
-import net.fishear.data.generic.query.QueryFactory;
-import net.fishear.data.generic.services.BasicServiceTest.SampleEntity;
-import net.fishear.data.inmemory.InMemoryDaoSource;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
-
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class BasicServiceTest
 {
 
@@ -35,6 +27,7 @@ public class BasicServiceTest
 	}
 	
 	@Test
+	@SuppressWarnings("unused")
 	public void test() {
 
 		GenericService<SampleEntity> svc = new GenericService<SampleEntity>() {
