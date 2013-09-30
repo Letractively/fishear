@@ -104,7 +104,8 @@ implements
 					isProperty = true;
 					break;
 				default:
-					throw new IllegalArgumentException(String.format("Unsupported projection type: '%s'. Only those types are allowed: %s ", pi.getType(), Arrays.asList(ProjectionItem.Type.GROUP, ProjectionItem.Type.PROPERTY)));
+					break;
+//					throw new IllegalArgumentException(String.format("Unsupported projection type: '%s'. Only those types are allowed: %s ", pi.getType(), Arrays.asList(ProjectionItem.Type.GROUP, ProjectionItem.Type.PROPERTY)));
 				}
 			}
 		}
