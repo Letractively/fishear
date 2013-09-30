@@ -1,6 +1,7 @@
 package net.fishear.data.generic.query.results;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.fishear.data.generic.query.results.ProjectionItem.Type;
@@ -103,7 +104,7 @@ implements
 					isProperty = true;
 					break;
 				default:
-					throw new IllegalArgumentException(String.format("Unsupported projection %s type: %s ", pi.getType()));
+					throw new IllegalArgumentException(String.format("Unsupported projection type: '%s'. Only those types are allowed: %s ", pi.getType(), Arrays.asList(ProjectionItem.Type.GROUP, ProjectionItem.Type.PROPERTY)));
 				}
 			}
 		}
