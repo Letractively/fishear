@@ -503,4 +503,8 @@ implements
 			return null;
 		}
 	}
+
+	public K refresh(K entity) {
+		return modifyEntity(getDao().refresh(entity), getEagerProps(null));
+	}
 }

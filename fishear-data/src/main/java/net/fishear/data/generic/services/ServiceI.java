@@ -164,6 +164,13 @@ public interface
 	 */
 	CurrentStateI getCurrentState();
 
+	/**
+	 * reads fresh state from the persistent storage. 
+	 * @param entity the entity
+	 * @return the same entity with current state (it may, or may not be the same entity instance, but must have the same ID)
+	 */
+	K refresh(K entity);
+
     /**
      * @return DAO instance for this service.
      */
@@ -173,7 +180,7 @@ public interface
 	 * If the 'entity' exists in the persistent storage, reads it and synchronize read one with 'entity'. 
 	 * Otherwise ('entity' is null, no ID, does not exist...), returns original entity or new instance. 
 	 * @param entity the "source" entity
-	 * @return entity instance
+	 * @return entity instance (never returns null)
 	 */
 	K syncRead(K entity);
 
