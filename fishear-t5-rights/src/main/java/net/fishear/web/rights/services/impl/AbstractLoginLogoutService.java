@@ -216,8 +216,8 @@ Cont1:
 
 	@Override
 	public UserInfoI getUserInfo() {
-		Session ses = getSession();
-		if(ses == null) {
+		Session ses;
+		if(rgl.getRequest() == null || (ses = getSession()) == null) {
 			return null;
 		}
 		if(isLoggedIn()) {
