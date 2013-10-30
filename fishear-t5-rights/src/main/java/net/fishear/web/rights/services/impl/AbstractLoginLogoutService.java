@@ -216,8 +216,11 @@ Cont1:
 
 	@Override
 	public UserInfoI getUserInfo() {
+		Session ses = getSession();
+		if(ses == null) {
+			return null;
+		}
 		if(isLoggedIn()) {
-			Session ses = getSession();
 			UserInfoI uinf = (UserInfoI) ses.getAttribute(gesAtrLoggedInKey());
 			return uinf;
 		} else {
