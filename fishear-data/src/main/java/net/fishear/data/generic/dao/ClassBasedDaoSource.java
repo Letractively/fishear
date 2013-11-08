@@ -62,9 +62,15 @@ public class ClassBasedDaoSource implements DaoSourceI
 	}
 
 	@Override
-	public void registerEntity(Class<EntityI<?>> entity) {
+	public void registerEntity(Class<?> entity) {
 		throw new EntityRegistrationNotSupportedException(String.format("Required entity: %s", entity.getClass().getName()));
 	}
+	
+	@Override
+	public void registerEntityName(String entityClassName) {
+		throw new EntityRegistrationNotSupportedException(String.format("Required entity: %s", entityClassName));
+	}
+
 
 	@Override
 	public void registerPackage(String packageName) {

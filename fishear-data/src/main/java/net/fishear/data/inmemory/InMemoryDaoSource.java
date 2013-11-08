@@ -3,6 +3,7 @@ package net.fishear.data.inmemory;
 import net.fishear.data.generic.dao.ClassBasedDaoSource;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
 
 public class InMemoryDaoSource extends ClassBasedDaoSource
 {
@@ -27,8 +28,13 @@ public class InMemoryDaoSource extends ClassBasedDaoSource
 	}
 
 	@Override
-	public void registerEntity(Class<EntityI<?>> entity) {
+	public void registerEntity(Class<?> entity) {
 		
+	}
+
+	@Override
+	public void registerEntityName(String entityClassName) {
+
 	}
 
 	@Override

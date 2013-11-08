@@ -22,7 +22,14 @@ public interface DaoSourceI
 	 * throws {@link EntityRegistrationNotSupportedException} in case operation is not permitted.
 	 * @param entity the entity class
 	 */
-	void registerEntity(Class<EntityI<?>> entity);
+	void registerEntity(Class<?> entity);
+
+	/**
+	 * adds single {@link Entity} annotated entity to entity list.
+	 * throws {@link EntityRegistrationNotSupportedException} in case operation is not permitted.
+	 * @param entityClassName fully qualified entity class name 
+	 */
+	void registerEntityName(String entityClassName);
 
 	/** if the DAO source supports automaticall entity registration, adds all {@link Entity} annotated entities to list of available entities.
 	 * throws {@link EntityRegistrationNotSupportedException} in case operation is not permitted.

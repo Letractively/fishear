@@ -3,6 +3,7 @@ package net.fishear.data.hibernate.dao;
 import net.fishear.data.generic.dao.ClassBasedDaoSource;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
 import net.fishear.data.hibernate.HibernateConfigurationSourceI;
 import net.fishear.utils.Exceptions;
 
@@ -36,11 +37,20 @@ public class HibernateDaoSource extends ClassBasedDaoSource
 	}
 
 	@Override
-	public void registerEntity(Class<EntityI<?>> entity) {
+	public void registerEntity(Class<?> entity) {
 		if(configurationSource == null) {
 			throw new IllegalStateException("'configurationSource' is null; autoregistration is not supported");
 		}
 		configurationSource.getConfiguration().addAnnotatedClass(entity);
+	}
+
+	@Override
+	public void registerEntityName(String entityClassName) {
+		try {
+			registerEntity(getClass().getClassLoader().loadClass(entityClassName));
+		} catch (ClassNotFoundException ex) {
+			throw new IllegalStateException(ex);
+		}
 	}
 
 	@Override
