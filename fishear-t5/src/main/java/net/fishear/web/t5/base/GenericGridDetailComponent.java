@@ -208,8 +208,16 @@ implements
 
 	protected Object onDetail(Object id) {
 		log.debug("onDetail({}) called", id);
-		entity = id == null ? null : getService().read(id);
+		readEntity(id);
 		return getReturn();
+	}
+
+	/**
+	 * called after entity is read from database.
+	 * The entity variable may be null during this call. Call of {@link #getEntity()} method guarantee not null return instead.
+	 */
+	protected void afterLoad() {
+		// does nothing - suit for successors 
 	}
 
 	protected Object onDelete(Object id) {
@@ -291,6 +299,7 @@ implements
 		} else {
 			entity = getService().read(entityId);
 		}
+		afterLoad();
 	}
 
 	public Class<T> getEntityType() {
