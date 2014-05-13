@@ -440,6 +440,10 @@ public class
 			}
 		}
 		
+		if(e1 == null || e2 == null) {
+			throw new IllegalStateException(String.format("Both objects to compare must be not null (e1=%s, e2=%s)", e1, e2));
+		}
+
 		Set<String> done = new HashSet<String>();
 
 		List<Property> list = new ArrayList<EntityUtils.Property>();

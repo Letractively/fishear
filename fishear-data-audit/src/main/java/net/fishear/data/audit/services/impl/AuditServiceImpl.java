@@ -39,6 +39,12 @@ implements
 	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
 
 		log.debug("Auditing: action {}", action);
+		
+		if(e1 == null && e2 == null) {
+			log.warn("Borh entities are null, potential application error");
+			return null;
+		}
+		
 		List<Property> diflist;
 		boolean forceSave = false;
 		switch(action) {
@@ -53,8 +59,12 @@ implements
 			diflist = EntityUtils.fillDifferencies(e2, true);
 			break;
 		case UPDATE:
+			if(e2 == null) {
+				log.warn("UPDATE is performed but main entity ('e2') is null. Skipping.");
+				return null;
+			}
 			if(e1 == null) {
-				log.warn("UPDATE is performed but source entity ('e1') is null. Full log is performed.");
+				log.warn("UPDATE is performed but previous state ('e1') is null. Full log is performed.");
 				diflist = EntityUtils.listDifferencies(e2, true);
 			} else {
 				diflist = EntityUtils.listDifferencies(e1, e2);
