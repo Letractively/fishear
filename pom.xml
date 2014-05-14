@@ -26,8 +26,8 @@
 	</licenses>
 	<scm>
 		<url>https://code.google.com/p/fishear</url>
-		<connection>https://code.google.com/p/fishear</connection>
-		<developerConnection>https://code.google.com/p/fishear</developerConnection>
+		<connection>scm:hg:https://code.google.com/p/fishear</connection>
+		<developerConnection>scm:hg:https://code.google.com/p/fishear</developerConnection>
 	</scm>
 
 	<modules>
