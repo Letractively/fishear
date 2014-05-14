@@ -90,7 +90,9 @@ implements
 
 	@Override
     public K read(Object id) {
-		return modifyEntity(read_(id), getEagerProps(null));
+		K e = read_(id);
+		loadEager(e, getEagerProps(null));
+		return modifyEntity(e);
 	}
 
 	@Override
@@ -104,7 +106,8 @@ implements
 			log.trace("Entity for id {} is null. Creating new instance.", id);
 			entity = newEntityInstance();
 		}
-		return modifyEntity(entity, getEagerProps(null));
+		loadEager(entity, getEagerProps(null));
+		return modifyEntity(entity);
 	}
 
     private K read_(Object id) {
@@ -278,7 +281,8 @@ implements
     private List<K> modifyList(List<K> list, QueryConstraints qc) {
     	List<String> lazy = getEagerProps(qc);
     	for(K entity : list) {
-    		modifyEntity(entity, lazy);
+    		loadEager(entity, lazy);
+    		modifyEntity(entity);
     	}
 		return list;
 	}
@@ -332,14 +336,13 @@ implements
 	 * @param eagerProps 
 	 * @return
 	 */
-	private K modifyEntity(K entity, List<String> eagerProps) {
+	private K modifyEntity(K entity) {
 		if(entity != null) {
 			if(entity instanceof InitialStateI && isAuditable(entity) ) {
 				log.trace("Initial state of entity {} stored");
 				((InitialStateI)entity).saveInitialState();
 			}
 		}
-		loadEager(entity, eagerProps);
 		return entity;
  	}
 
@@ -381,7 +384,7 @@ implements
     	}
 		loadEager(entity, getEagerProps(null));
     	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
-    	return modifyEntity(nent, getEagerProps(null));
+    	return modifyEntity(nent);
     }
 
 	@Override
@@ -396,7 +399,10 @@ implements
 			throw new TooManyRecordsException("only-one-record-expected-but-more-found", list.size(), getDao().type(), qc.toString());
 		}
 		
-		return modifyEntity(list.get(0), getEagerProps(qc));
+		K e = list.get(0);
+		
+		loadEager(e, getEagerProps(qc));
+		return modifyEntity(e);
     }
 
 	@Override
@@ -454,8 +460,9 @@ implements
 			return entity;
 		} else {
 			K e1 = read_(entity.getId());
+			loadEager(entity, getEagerProps(null));
 			EntityUtils.fillDestination(entity, e1);
-			return modifyEntity(e1, getEagerProps(null));
+			return modifyEntity(e1);
 		}
 	}
 
@@ -507,6 +514,8 @@ implements
 	}
 
 	public K refresh(K entity) {
-		return modifyEntity(getDao().refresh(entity), getEagerProps(null));
+		K e = getDao().refresh(entity);
+		loadEager(e, getEagerProps(null));
+		return modifyEntity(e);
 	}
 }
