@@ -24,17 +24,17 @@
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-hibernate</artifactId>
-			<version>${parent.version}</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-t5</artifactId>
-			<version>${parent.version}</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-testsupport</artifactId>
-			<version>${parent.version}</version>
+			<version>1.0.2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

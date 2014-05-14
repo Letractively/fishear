@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-core</artifactId>
-			<version>${parent.version}</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-data</artifactId>
-			<version>${parent.version}</version>
+			<version>1.0.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
