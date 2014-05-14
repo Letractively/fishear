@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>net.fishear</groupId>
 		<artifactId>fishear-all</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 
 	<description>Common Tapestry / Hibernate Libraries</description>
@@ -20,17 +20,17 @@
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-hibernate</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-t5</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.fishear</groupId>
 			<artifactId>fishear-testsupport</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
