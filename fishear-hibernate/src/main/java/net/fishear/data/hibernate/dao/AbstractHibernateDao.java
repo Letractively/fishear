@@ -2,6 +2,7 @@ package net.fishear.data.hibernate.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import net.fishear.data.generic.query.QueryParser;
 import net.fishear.data.hibernate.HibernateContext;
 import net.fishear.data.hibernate.query.HibernateQueryParser;
 import net.fishear.exceptions.AppException;
+import net.fishear.utils.EntityUtils;
 import net.fishear.utils.Maps;
 
 import org.hibernate.Criteria;
@@ -92,8 +94,13 @@ implements
 	}
 
 	@Override
-	public boolean isLazyLoaded(Object entity, String propertyName) {
+	public boolean isLazyLoaded(K entity, String propertyName) {
 		return Hibernate.isPropertyInitialized(entity, propertyName);
+	}
+
+	@Override
+	public void loadLazy(K entity, String propertyName) {
+		Hibernate.initialize(EntityUtils.getRawValue(propertyName, entity, null));
 	}
 
 	@Override

@@ -338,19 +338,21 @@ implements
 				log.trace("Initial state of entity {} stored");
 				((InitialStateI)entity).saveInitialState();
 			}
-			
+		}
+		loadEager(entity, eagerProps);
+		return entity;
+ 	}
+
+	private void loadEager(K entity, List<String> eagerProps) {
+		log.trace("Loading eagerliy: entity {}, eagerProps: {}", entity, eagerProps);
+		if(entity != null) {
 			// loads lazily loaded properties 
 			try {
 				if(eagerProps != null) {
 					for(String propName : eagerProps) {
 						log.trace("Loading lazy property {}", propName);
 						if(propName != null) {
-							Object val = EntityUtils.getRawValue(propName, entity, Collections.EMPTY_LIST);
-							if(val != null) {
-								if(val instanceof Collection<?>) {
-									((Collection<?>)val).size();
-								}
-							}
+							getDao().loadLazy(entity, propName);
 						}
 					}
 				}
@@ -358,8 +360,7 @@ implements
 				throw new IllegalStateException(ex);
 			}
 		}
-		return entity;
- 	}
+	}
 
 	@Override
     public K newEntityInstance() {
@@ -378,6 +379,7 @@ implements
     	if(nent == null) {
     		return entity;
     	}
+		loadEager(entity, getEagerProps(null));
     	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
     	return modifyEntity(nent, getEagerProps(null));
     }

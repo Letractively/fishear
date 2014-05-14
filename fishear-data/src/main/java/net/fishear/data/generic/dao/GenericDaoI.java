@@ -34,7 +34,16 @@ public interface GenericDaoI<K extends EntityI<?>> {
 	 * @param propertyName the name
 	 * @return true or false
 	 */
-	boolean isLazyLoaded(Object entity, String propertyName);
+	boolean isLazyLoaded(K entity, String propertyName);
+	
+	/** 
+	 * forces underlying layer to load lazily initialized object.
+	 * If property is not lazily initialized or is already initialized, does nothing.
+	 * @param entity the entity
+	 * @param propertyName the property
+	 * @return property's value
+	 */
+	void loadLazy(K entity, String propertyName);
 
 	/**
 	 * creates new entity instance, but MUST NOT connect persistent layer.

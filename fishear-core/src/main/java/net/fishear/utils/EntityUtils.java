@@ -967,6 +967,7 @@ public class
 		if( !srcE.getClass().isAssignableFrom(dstE.getClass())) {
 			throw new IllegalArgumentException("The target entitiy must be assignable from the source.");
 		}
+		String getterName = "(unknown)";
 		try {
 			boolean fillEmptyOnly = false;
 			boolean fillAll = false;
@@ -982,17 +983,19 @@ public class
 			}
 
 			while(clazz != TOP_LEVEL_CLASS) {
+				getterName = "(unknown)";
 				Method[] met = clazz.getMethods();
 				for (int i = 0; i < met.length; i++) {
+					getterName = "(unknown)";
 					Method m = met[i];
-					String metName = m.getName();
-					if(metName.startsWith("get")) {
-						if(isId(m) || metName.equalsIgnoreCase("getId")) {
+					getterName = m.getName();
+					if(getterName.startsWith("get")) {
+						if(isId(m) || getterName.equalsIgnoreCase("getId")) {
 							continue;
 						}
 						Class<?> vtyp = m.getReturnType();
 						try {
-							Method setter = clazz.getMethod("set"+metName.substring(3), vtyp);
+							Method setter = clazz.getMethod("set"+getterName.substring(3), vtyp);
 							if(
 									!isTransient(m) && 
 									!isTransient(setter) &&
@@ -1017,7 +1020,8 @@ public class
 				clazz = clazz.getSuperclass();
 			}
 		} catch (Exception ex) {
-			throw new RuntimeException(ex);
+			log.error("Exception during proccessing getter '{}'", getterName);
+			throw new IllegalStateException(ex);
 		}
 		return (T) dstE;
 	}

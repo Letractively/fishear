@@ -46,4 +46,5 @@ extends
 			this.tx = getSession().beginTransaction();
 		}
 	}
+
 }

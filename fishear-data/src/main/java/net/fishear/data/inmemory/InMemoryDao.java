@@ -87,8 +87,13 @@ implements
 	}
 
 	@Override
-	public boolean isLazyLoaded(Object entity, String propertyName) {
+	public boolean isLazyLoaded(K entity, String propertyName) {
 		return false;
+	}
+	
+	@Override
+	public void loadLazy(K entity, String propertyName) {
+		
 	}
 
 	@Override
