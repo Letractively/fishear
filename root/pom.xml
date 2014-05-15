@@ -50,17 +50,15 @@
 
 	<distributionManagement>
 		<snapshotRepository>
-			<id>jvnet-nexus-snapshots</id>
-			<name>Java.net Nexus Snapshots Repository</name>
+			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 		<repository>
-			<id>jvnet-nexus-staging</id>
-			<name>Java.net Nexus Staging Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
-	
+
 	<build>
 		<plugins>
 			<plugin>
