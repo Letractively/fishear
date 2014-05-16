@@ -174,6 +174,7 @@ implements
 	@Override
 	public void clearSearchForm() {
 		entity = null;
+		entity2 = null;
 	}
 
 	@Override
