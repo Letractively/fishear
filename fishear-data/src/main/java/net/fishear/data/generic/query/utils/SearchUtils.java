@@ -227,52 +227,67 @@ public class SearchUtils
 							Date date1 = entity1 == null ? null : (Date) m.invoke(entity1, EntityUtils.EOA);
 							Date date2 = entity2 == null ? null : (Date) m.invoke(entity2, EntityUtils.EOA);
 							log.trace("Property '{}' of type 'Date', value {}", fldName, date1);
-							if (date1 != null && date2 != null) {
-								cond.add(Restrictions.interval(fldName, date1, date2));
-								anyOk |= true;
-							} else if (date1 != null) {
-								cond.add(Restrictions.equal(fldName, date1));
-								anyOk |= true;
+							if(entity2 == null) {
+								if (date1 != null) {
+									cond.add(Restrictions.equal(fldName, date1));
+									anyOk |= true;
+								}
+							} else {
+								if (date1 != null || date2 != null) {
+									cond.add(Restrictions.interval(fldName, date1, date2));
+									anyOk |= true;
+								}
 							}
 						} else if (Number.class.isAssignableFrom(retvalType) || retvalType.isPrimitive()) {
 							Number n1 = entity1 == null ? null : (Number) m.invoke(entity1, EntityUtils.EOA);
-//							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
-							log.trace("Property '{}' of type 'Number', value {}", fldName, n1);
-							if(n1 != null) {
-								boolean localOk = false;
-								if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
-									localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
-								} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
-									localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
-								} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
-									if(retvalType.isPrimitive() ? n1.intValue() != 0 : true) {
-										cond.addEquals(fldName, n1.intValue());
-										localOk = true;
+							Number n2 = entity2 == null ? null : (Number) m.invoke(entity2, EntityUtils.EOA);
+							if(log.isTraceEnabled()) {
+								log.trace(String.format("Property '%s' of type 'Number', value1 %s, value2 %s", fldName, n1, n2));
+							}
+							if(entity2 == null) {
+								if(n1 != null) {
+									boolean localOk = false;
+									if (Double.class == retvalType || Float.class == retvalType || BigDecimal.class == retvalType) {
+										localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
+									} else if (Globals.doubleClass == retvalType || Globals.floatClass == retvalType) {
+										localOk = cond.addNan(fldName, n1 == null ? Double.NaN : n1.doubleValue());
+									} else if (Integer.class == retvalType || Integer.TYPE == retvalType) {
+										if(retvalType.isPrimitive() ? n1.intValue() != 0 : true) {
+											cond.addEquals(fldName, n1.intValue());
+											localOk = true;
+										}
+									} else if (Short.class == retvalType || Short.TYPE == retvalType) {
+										if(retvalType.isPrimitive() ? n1.shortValue() != 0 : true) {
+											cond.addEquals(fldName, n1.shortValue());
+											localOk = true;
+										}
+									} else if (Byte.class == retvalType || Byte.TYPE == retvalType) {
+										if(retvalType.isPrimitive() ? n1.byteValue() != 0 : true) {
+											cond.addEquals(fldName, n1.byteValue());
+											localOk = true;
+										}
+									} else {
+										if(retvalType.isPrimitive() ? n1.longValue() != 0 : true) {
+											cond.addEquals(fldName, n1.longValue());
+											localOk = true;
+										}
 									}
-								} else if (Short.class == retvalType || Short.TYPE == retvalType) {
-									if(retvalType.isPrimitive() ? n1.shortValue() != 0 : true) {
-										cond.addEquals(fldName, n1.shortValue());
-										localOk = true;
-									}
-								} else if (Byte.class == retvalType || Byte.TYPE == retvalType) {
-									if(retvalType.isPrimitive() ? n1.byteValue() != 0 : true) {
-										cond.addEquals(fldName, n1.byteValue());
-										localOk = true;
+									if(localOk) {
+										anyOk |= true;
+										log.trace("Numeric property '{}' with value {} hes been added", fldName, n1);
+									} else {
+										log.trace("Numeric property '{}' with value {} hes NOT been added", fldName, n1);
 									}
 								} else {
-									if(retvalType.isPrimitive() ? n1.longValue() != 0 : true) {
-										cond.addEquals(fldName, n1.longValue());
-										localOk = true;
-									}
-								}
-								if(localOk) {
-									anyOk |= true;
-									log.trace("Numeric property '{}' with value {} hes been added", fldName, n1);
-								} else {
-									log.trace("Numeric property '{}' with value {} hes NOT been added", fldName, n1);
+									log.trace("Numeric property '{}' ommitted since value is null", fldName);
 								}
 							} else {
-								log.trace("Numeric property '{}' ommitted since value is null", fldName);
+								if(n1 != null || n2 != null) {
+									cond.add(Restrictions.interval(fldName, n1, n2));
+									if(log.isTraceEnabled()) {
+										log.trace(String.format("Numeric interval '%s' with value1 %s and value2 %s has been added", fldName, n1, n2));
+									}
+								}
 							}
 						} else if (retvalType == Class.class) {
 							Class<?> cl = (Class<?>) m.invoke(entity1, EntityUtils.EOA);
