@@ -284,6 +284,7 @@ public class SearchUtils
 							} else {
 								if(n1 != null || n2 != null) {
 									cond.add(Restrictions.interval(fldName, n1, n2));
+									anyOk |= true;
 									if(log.isTraceEnabled()) {
 										log.trace(String.format("Numeric interval '%s' with value1 %s and value2 %s has been added", fldName, n1, n2));
 									}
