@@ -8,8 +8,14 @@
 
 	<packaging>pom</packaging>
 	<version>1.0</version>
+	
+	<name>The root parent for all FishEar libraries</name>
 
 	<url>http://code.google.com/p/fishear/</url>
+
+	<scm>
+		<url>https://code.google.com/p/fishear</url>
+	</scm>
 
 	<licenses>
 		<license>
