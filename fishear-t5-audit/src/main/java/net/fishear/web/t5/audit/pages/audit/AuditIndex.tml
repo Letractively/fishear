@@ -1,0 +1,78 @@
+<html 
+	t:type="layout" 
+	t:title="Database Audit"
+	t:loginRequired="false"
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+>
+
+<t:alerts />
+
+<div id="auditSearch">
+	<t:form t:id="search">
+		<t:hidden t:id="changeFrom" />
+		<table>
+		<tr>
+		<td>
+			<label>Entity:</label><t:select t:model="Entities" title="Main entity type which instance was changed" t:id="entityHash" onchange="form.changeFrom.value='ENTITY';form.submit(); " />
+			<t:select t:model="Actions" value="selectedAction" title="Action that was performed on given object" onchange="form.changeFrom.value='ACTION';form.submit(); " />
+			<label>&#160;Date:</label><t:datefield t:id="changedFrom" size="7"/>-<t:datefield t:id="changedTo" size="7"/>
+		</td>
+		<td></td>
+		</tr>
+		<tr>
+		<td>
+			<span title="Selects only concrete instance of entity">
+			<label>ObjID:</label><t:textfield t:id="selectedObjectId" size="8" t:mixins="jquery/Autocomplete" /><t:eventlink t:event="clrObjId" title="Clear object ID">(x)</t:eventlink>
+			</span>
+			<span title="Selects only versions that this property was changed in">
+			<label>&#160;Property:</label><t:select t:model="AvailableProperies" t:id="selectedProperty" onchange="form.changeFrom.value='PROPERTY';form.submit(); " />
+			</span>
+			<span title="If property is selected, adds additional filter to target value">
+			<label>&#160;Contains:</label><t:textfield t:id="searchpropertyValue" size="14"/>
+			</span>
+			&#160; &#160; <t:submit value="Search"/>
+			&#160; <t:eventlink t:event="clearSearch">Clear Search</t:eventlink>
+		</td>
+		</tr>
+		<tr><td colspan="99">
+		<hr />
+		<h5 class="selectedEntityHeader" style="display: inline; ">${getEntityShortName(AudiedEntity)}</h5> 
+		&#160; <t:checkbox t:id="simpleList" onclick="form.changeFrom.value='SELONLY';form.submit()"/><t:label for="simpleList">Only object list</t:label>
+		<t:if t:test="selectedObjectId">
+			&#160; <t:eventlink t:event="clrObjId" title="Displays all objects (with all IDs)">Display All Object</t:eventlink> 
+		</t:if>
+		</td></tr>
+		</table>
+	</t:form>
+</div>
+<div id="auditResultGrid">
+	<t:if t:test="entityHash">
+		<t:grid 
+			t:source="Audits"
+			t:row="row"
+			include="action,actionDate,actionUser,objectId,changeNumber"
+			add="latest,detail"
+			reorder="objectId,action,actionDate,actionUser,latest,changeNumber,detail"
+		>
+		<p:auditedEntityCell>${getEntityShortName(row.auditedEntity)}</p:auditedEntityCell>
+		<p:detailCell><t:eventlink t:event="detail" t:context="LastForRow.id" >Detail</t:eventlink></p:detailCell>
+		<p:objectIdCell><t:eventlink t:event="selectObjectId" t:context="row.objectId">${row.objectId}</t:eventlink></p:objectIdCell>
+		<p:actionDateCell>${formatDate(LastForRow.actionDate)}</p:actionDateCell>
+		<p:changeNumberCell>${LastForRow.changeNumber}</p:changeNumberCell>
+		<p:actionCell>${LastForRow.action}</p:actionCell>
+		<p:actionUserCell>${LastForRow.actionUser}</p:actionUserCell>
+
+		<p:ChangeNumberHeader>Change</p:ChangeNumberHeader>		
+		</t:grid>
+	<p:else>
+		<h2>Please select an entity first</h2>
+	</p:else>
+	</t:if>
+</div>
+<div id="auditDetail">
+	<t:if t:test="detail">
+		<t:component t:id="auditDetail" />
+	</t:if>
+</div>	
+</html>

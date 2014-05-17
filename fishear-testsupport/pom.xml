@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<artifactId>fishear-testsupport</artifactId>
+
+	<parent>
+		<groupId>net.fishear</groupId>
+		<artifactId>fishear-all</artifactId>
+		<version>1.0.3-SNAPSHOT</version>
+	</parent>
+
+	<description>Common Tapestry / Hibernate Libraries</description>
+
+	<dependencies>
+		<dependency>
+			<version>1.0.3-SNAPSHOT</version>
+			<groupId>net.fishear</groupId>
+			<artifactId>fishear-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		    <groupId>net.sourceforge.tapestrytestify</groupId>
+		    <artifactId>tapestry-testify</artifactId>
+		    <version>1.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.5</version>
+		</dependency>
+		<dependency>
+		    <groupId>net.sourceforge.tapestryxpath</groupId>
+		    <artifactId>tapestry-xpath</artifactId>
+		    <version>1.0.1</version>
+		</dependency>
+	</dependencies>
+
+	<modelVersion>4.0.0</modelVersion>
+</project>

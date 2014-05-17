@@ -1,0 +1,14 @@
+
+#loginFormDialog #loginFormDiv label.ui-form-label {
+	display:block;
+	float:left;
+	width: 190px;
+}
+
+#loginFormDiv div.error {
+	border:red 2px solid;
+	padding:4px;
+	background-color: #FFC0C0;
+	color: #E01010;
+	font-weight: bold;
+}

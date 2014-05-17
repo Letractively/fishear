@@ -1,0 +1,6 @@
+<html
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+>
+<t:select t:model="model" t:value="key" t:mixins="renderInformals" t:blankOption="prop:blankOption" t:blankLabel="prop:blankLabel" t:onchange="prop:onchange" />
+</html>

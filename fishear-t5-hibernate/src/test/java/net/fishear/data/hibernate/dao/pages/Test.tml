@@ -1,0 +1,14 @@
+<html 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+	t:type="Layout"
+	t:pageTitle="pageTitle"
+>
+<head></head>
+<body>
+<div>
+<h1 class="pageClass">pageTitle</h1>
+AAAAAAAAA
+</div>
+</body>
+</html>

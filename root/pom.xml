@@ -1,0 +1,88 @@
+<project 
+	xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+	<groupId>net.fishear</groupId>
+	<artifactId>fishear-root</artifactId>
+
+	<packaging>pom</packaging>
+	<version>1.0</version>
+
+	<url>http://code.google.com/p/fishear/</url>
+
+	<licenses>
+		<license>
+			<name>Eclipse Public License 1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<repositories>
+		<repository>
+			<id>sonatype-releases</id>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases />
+		</repository>
+		<repository>
+			<id>sonatype-staging</id>
+			<url>http://oss.sonatype.org/content/groups/staging</url>
+			<releases />
+			<snapshots />
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype-releases-plugins</id>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases />
+		</pluginRepository>
+		<pluginRepository>
+			<id>sonatype-staging-plugins</id>
+			<url>http://oss.sonatype.org/content/groups/staging</url>
+			<releases />
+			<snapshots />
+		</pluginRepository>
+	</pluginRepositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>ch.elca.el4j.maven.plugins</groupId>
+				<artifactId>maven-depgraph-plugin</artifactId>
+				<version>3.1</version>
+			</plugin>
+		</plugins>
+		<finalName>${project.artifactId}</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/test/java</directory>
+				<targetPath>../test-classes</targetPath>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+
+	<modelVersion>4.0.0</modelVersion>
+
+</project>

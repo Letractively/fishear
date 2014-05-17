@@ -1,0 +1,59 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<artifactId>fishear-hibernate</artifactId>
+
+	<parent>
+		<groupId>net.fishear</groupId>
+		<artifactId>fishear-all</artifactId>
+		<version>1.0.3-SNAPSHOT</version>
+	</parent>
+
+	<description>Common Tapestry / Hibernate Libraries</description>
+	<properties>
+	</properties>
+
+	<dependencies>
+		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.fishear</groupId>
+			<artifactId>fishear-core</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.fishear</groupId>
+			<artifactId>fishear-data</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.158</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<modelVersion>4.0.0</modelVersion>
+</project>

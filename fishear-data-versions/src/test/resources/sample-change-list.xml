@@ -1,0 +1,81 @@
+
+<change-list>
+
+	<!-- optional initialization -->
+	<initialization> <![CDATA[
+		// groovy fragment that can initialize variables used globally during update and do some pre-update tasks 
+	]]></initialization>
+
+	<versions>
+		<version number="0.0.0" name="Initial data load">
+		
+			<!-- optional version-specific initialization -->
+			<initialization> <![CDATA[
+				// groovy fragment that can initialize version-specific things 
+			]]></initialization>
+			<changes>
+
+				<sql-data table="SOME_TABLE" columns="ID, NAME, SOME_NUM, DOME_DATE" name="Other Name">
+					<dataFile path="${exportDir}/someTableExp.xml" />
+				</sql-data>
+
+				<!-- The service is used for new entity instance creation (by calling "newEntityInstance()" method). Then properties will be filled out and instance is saved. -->
+				<entity-data service="personService" properties="name,age,joinedAt">
+					<dataFile path="${exportDir}/someTableExp.xml" />
+				</entity-data>
+
+				<groovy><![CDATA[
+					def personUpdater = new com.mycompany.myapp.helpers.PersonUpdater(context.getSercive("personService"))
+					personUpdater.updateTo(${version});
+				]]></groovy>
+	
+			</changes>
+
+			<!-- optional version-specific finalization -->
+			<finalization> <![CDATA[
+				// groovy fragment that can clean up version-specific data 
+			]]></finalization>
+		</version>
+	
+		<version number="1.0.1">
+		
+			<!-- optional version-specific initialization -->
+			<initialization> <![CDATA[
+				// groovy fragment that can initialize version-specific things 
+			]]></initialization>
+			<changes>
+				<sql name="some change">
+					<database="oracle">
+						ALTER TABLE BLABLA DISABLE CONSTRAINT ANY_CSTR;
+					</database>
+					ALTER TABLE BLABLA DROP CONSTRAINT ANY_CSTR;
+				</sql>
+				<sql-data columns="ID, NAME, SOME_NUM, DOME_DATE" name="Other Name">
+					<row>1, 'Name 1', 1001, '2013-07-01 15:33:04.120'</row>
+					<row>2, 'Name 2', 1002, '2013-07-01 14:10:30.055'</row>
+					<row>3, 'Name 3', 1003, '2013-08-11 18:27:15.480'</row>
+				</sql-data>
+				<entity-data service="personService" properties="name,age,joinedAt">
+					<row>'Antony Blah', 45, '2013-01-07'</row>
+					<row>'Antony Blah', 45, '2013-01-07'</row>
+				</entity-data>
+	
+				<groovy><![CDATA[
+					def personUpdater = new com.mycompany.myapp.helpers.PersonUpdater(context.getSercive("personService"))
+					personUpdater.updateTo(${version});
+				]]></groovy>
+	
+			</changes>
+
+			<!-- optional version-specific finalization -->
+			<finalization> <![CDATA[
+				// groovy fragment that can clean up version-specific data 
+			]]></finalization>
+		</version>
+	</versions>
+
+	<!-- optional finalization -->
+	<finalization> <![CDATA[
+		// groovy fragment that can clean up variables, drop helper tables ... etc
+	]]></finalization>
+</change-list>

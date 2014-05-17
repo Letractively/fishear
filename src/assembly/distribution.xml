@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+	<id>bin</id>
+	<formats>
+<!--    <format>tar.gz</format>-->
+<!--    <format>tar.bz2</format>-->
+		<format>zip</format>
+	</formats>
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>README*</include>
+				<include>LICENSE*</include>
+				<include>NOTICE*</include>
+			</includes>
+		</fileSet>
+		<!-- TODO: docs? -->
+		<fileSet>
+			<directory>target</directory>
+			<outputDirectory>${releases-dir}</outputDirectory>
+			<includes>
+				<include>*.jar</include>
+			</includes>
+			<excludes>
+				<exclude>*-sources.jar</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
+			<directory>target/${dependency-lib-dir}</directory>
+			<outputDirectory>${releases-dir}</outputDirectory>
+			<includes>
+				<include>*.jar</include>
+			</includes>			
+		</fileSet>
+	</fileSets>
+</assembly>

@@ -1,0 +1,49 @@
+<div 
+	class="t-data-grid" 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter" 
+>
+    <div t:id="pagerTop"></div>
+    <table t:id="table">
+        <thead t:id="columns"/>
+        <tbody>
+            <tr t:id="rows"/>
+        </tbody>
+    </table>
+
+    <div t:id="pagerBottom"></div>
+
+    <t:block>
+        <div t:id="pager"></div>
+    </t:block>
+
+	<t:block t:id="empty">
+		<div style="padding:5px 0 5px 0;">
+			<div class="gtable-empty-block">
+				<br />
+				${message:no-matching-record-found}
+				<br />
+				<br />
+				</div>
+			</div>
+	</t:block>
+
+	<t:block t:id="edit">
+		<t:if test="InGrid">
+			<t:if test="editZone">
+				<t:fe.linkFor component="ParentGrid" t:type="edit" t:context="rowId(row)" t:zone="${editZone}" >${message:edit-row-label}</t:fe.linkFor>
+				<p:else>
+				<t:fe.linkFor component="ParentGrid" t:type="edit" t:context="rowId(row)">${message:edit-row-label}</t:fe.linkFor>
+				</p:else>
+			</t:if>
+			<p:else><span>${message:edit-row-label}</span></p:else>
+		</t:if>
+	</t:block>
+	<t:block t:id="delete">
+		<t:if test="InGrid">
+			<t:fe.linkFor component="ParentGrid" t:type="delete" t:context="rowId(row)" t:mixins="fe/confirm" t:confirmMessage="deleteConfirmMessage(row)" >${message:delete-row-label}</t:fe.linkFor>
+			<p:else><span>${message:delete-row-label}</span></p:else>
+		</t:if>
+	</t:block>
+
+</div>
