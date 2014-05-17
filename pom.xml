@@ -12,6 +12,7 @@
 	</parent>
 
 	<url>http://code.google.com/p/fishear/</url>
+	<description>Library set for data access and Tapestry 5</description>
 
 	<licenses>
 		<license>
@@ -26,8 +27,6 @@
 		<developerConnection>scm:hg:https://code.google.com/p/fishear</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-
-	<developers>Radek Terber, Jan Fryblik</developers>
 
 	<modules>
 		<module>fishear-core</module>
@@ -240,19 +239,6 @@
 				<configuration>
 
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 

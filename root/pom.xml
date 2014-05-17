@@ -8,14 +8,34 @@
 
 	<packaging>pom</packaging>
 	<version>1.0</version>
-	
-	<name>The root parent for all FishEar libraries</name>
+
+	<name>Main Fishear Root</name>
+	<description>The root parent for all FishEar libraries</description>
 
 	<url>http://code.google.com/p/fishear/</url>
 
 	<scm>
 		<url>https://code.google.com/p/fishear</url>
 	</scm>
+
+	<developers>
+		 <developer>
+		 	<id>RT</id>
+		 	<name>Radek</name>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		 </developer>
+		 <developer>
+		 	<id>JF</id>
+		 	<name>Jan</name>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		 </developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -69,6 +89,19 @@
 				<groupId>ch.elca.el4j.maven.plugins</groupId>
 				<artifactId>maven-depgraph-plugin</artifactId>
 				<version>3.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<finalName>${project.artifactId}</finalName>
