@@ -72,6 +72,7 @@ extends
     }
 
 	private Projection prepareProjection(QueryConstraints qc) {
+System.err.println("\n(0)HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH " + qc);
 		net.fishear.data.generic.query.results.Projection be2p = qc.getProjection();
 		if(be2p != null && be2p.getProjections() != null) {
 			ProjectionList pList = Projections.projectionList();
@@ -89,6 +90,7 @@ extends
 					pList.add(Projections.sqlProjection(sqi.getSql(), sqi.getAliases(), transformTypes(sqi.getTypes())));
 					break;
 				case GROUP:
+System.err.println("\n(1)HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH " + p.getPropertyName());
 					pList.add(Projections.groupProperty(p.getPropertyName()));
 					break;
 				case COUNT:
