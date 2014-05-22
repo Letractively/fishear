@@ -5,6 +5,7 @@ import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.results.ProjectionItem;
 import net.fishear.data.generic.query.results.ProjectionType;
 import net.fishear.data.generic.query.results.SqlProjectionItem;
+import net.fishear.utils.Texts;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -72,47 +73,55 @@ extends
     }
 
 	private Projection prepareProjection(QueryConstraints qc) {
-System.err.println("\n(0)HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH " + qc);
 		net.fishear.data.generic.query.results.Projection be2p = qc.getProjection();
-		if(be2p != null && be2p.getProjections() != null) {
+		if(be2p != null && be2p.getProjections() != null && be2p.getProjections().size() > 0) {
 			ProjectionList pList = Projections.projectionList();
 			for (ProjectionItem p : be2p.getProjections()) {
+				Projection px;
 				switch(p.getType()) {
 				case DISTINCT:
-					pList.add(Projections.distinct(Projections.property(p.getPropertyName())));
+					px = Projections.distinct(Projections.property(p.getPropertyName()));
 					break;
 				case PROPERTY:
-					pList.add(Projections.property(p.getPropertyName()));
+					px = Projections.property(p.getPropertyName());
 					break;
 				case SQL:
 					SqlProjectionItem sqi = (SqlProjectionItem) p;
-					//pList.add(Projections.sqlProjection(sql, columnAliases, types);
-					pList.add(Projections.sqlProjection(sqi.getSql(), sqi.getAliases(), transformTypes(sqi.getTypes())));
+					//px = Projections.sqlProjection(sql, columnAliases, types);
+					px = Projections.sqlProjection(sqi.getSql(), sqi.getAliases(), transformTypes(sqi.getTypes()));
 					break;
 				case GROUP:
-System.err.println("\n(1)HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH " + p.getPropertyName());
-					pList.add(Projections.groupProperty(p.getPropertyName()));
+					px = Projections.groupProperty(p.getPropertyName());
 					break;
 				case COUNT:
-					pList.add(Projections.count(p.getPropertyName()));
+					px = Projections.count(p.getPropertyName());
 					break;
 				case MAX:
-					pList.add(Projections.max(p.getPropertyName()));
+					px = Projections.max(p.getPropertyName());
 					break;
 				case MIN:
-					pList.add(Projections.min(p.getPropertyName()));
+					px = Projections.min(p.getPropertyName());
 					break;
 				case SUM:
-					pList.add(Projections.sum(p.getPropertyName()));
+					px = Projections.sum(p.getPropertyName());
 					break;
 				case COUNTDISTINCT:
-					pList.add(Projections.countDistinct(p.getPropertyName()));
+					px = Projections.countDistinct(p.getPropertyName());
 					break;
 				case AVG:
-					pList.add(Projections.avg(p.getPropertyName()));
+					px = Projections.avg(p.getPropertyName());
+					break;
+				case ROWCOUNT:
+					px = Projections.rowCount();
 					break;
 				default:
 					throw new IllegalStateException("Unknown projection type: " + p.getType());
+				}
+				String alias = Texts.tos(p.getAlias());
+				if(alias.length() > 0) {
+					pList.add(Projections.alias(px, alias), alias);
+				} else {
+					pList.add(px);
 				}
 			}
 			return pList;
