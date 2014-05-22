@@ -24,12 +24,15 @@ implements
 		SUM,
 		COUNT,
 		COUNTDISTINCT,
-		AVG
+		AVG,
+		ROWCOUNT
 	}
 
 	private String propertyName;
 	
 	private final Type type;
+	
+	private String alias;
 
 	protected ProjectionItem(Type type) {
 		this.type = type;
@@ -41,7 +44,7 @@ implements
 		return pIt;
 	}
 
-	static ProjectionItem create(String propertyName, Type type) {
+	public static ProjectionItem create(String propertyName, Type type) {
 		if(type == Type.SQL) {
 			throw new IllegalArgumentException(String.format("Projection type %s cannot be created by this call. ", type));
 		}
@@ -62,7 +65,26 @@ implements
 		return type;
 	}
 
+	public ProjectionItem as(String alias) {
+		setAlias(alias);
+		return this;
+	}
+
 	public String toString() {
 		return type + " " + propertyName;
+	}
+
+	/**
+	 * @return the alias
+	 */
+	public String getAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias the alias to set
+	 */
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 }

@@ -1,7 +1,6 @@
 package net.fishear.data.generic.query.results;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.fishear.data.generic.query.results.ProjectionItem.Type;
@@ -67,6 +66,10 @@ implements
 		return add(propertyName, Type.AVG);
 	}
 
+	public Projection rowCount() {
+		return add(null, Type.ROWCOUNT);
+	}
+
 	/**
 	 * adds the property projection type to the result.
 	 * @param propertyName
@@ -75,14 +78,18 @@ implements
 	public Projection group(String propertyName) {
 		return add(propertyName, Type.GROUP);
 	}
-
-	public Projection add(String propertyName, Type type) {
-		check(type);
+	
+	public Projection add(ProjectionItem item) {
+		check(item.getType());
 		if(projections == null) {
 			projections = new ArrayList<ProjectionItem>();
 		}
-		projections.add(ProjectionItem.create(propertyName, type));
+		projections.add(item);
 		return this;
+	}
+
+	public Projection add(String propertyName, Type type) {
+		return add(ProjectionItem.create(propertyName, type));
 	}
 	
 	protected void check(Type forType) {
