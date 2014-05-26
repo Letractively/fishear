@@ -2,6 +2,7 @@ package net.fishear.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.*;
 
 import net.fishear.exceptions.AppException;
@@ -149,4 +150,51 @@ public class Lists {
 		}
 		return list;
 	}
+	
+	/**
+	 * sums all not null values in given numeric property.
+	 * Null or not numeric values are ignored without error.
+	 * 
+	 * @param list the entity list 
+	 * @param propertyName summed property name
+	 * @return 
+	 */
+	public static BigDecimal sum(List<?> list, String propertyName) {
+		
+		BigDecimal ret = BigDecimal.ZERO;
+
+		for(Object it : list) {
+			Number num = (Number)EntityUtils.getValue(it, propertyName, null);
+			if(num != null) {
+				ret = ret.add(new BigDecimal(num.doubleValue()));
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * creates map from given value from each entity in the list as key and and the entity as value. 
+	 * 
+	 * @param list the entity list
+	 * @param keyPropertyName property name (from the entity) that's value is set as a key
+	 * @return map with the key and entity
+	 */
+	public static <K, T> Map<K, T> toKeyEntityMap(List<T> list, String keyPropertyName) {
+		Map<K, T> map = new HashMap<K, T>();
+
+		for(T it : list) {
+			@SuppressWarnings("unchecked")
+			K key = (K) EntityUtils.getValue(it, keyPropertyName, null);
+			if(key == null) {
+				throw new IllegalStateException(String.format("The key's value must not be null. The key is '%s'", keyPropertyName));
+			} else {
+				if(map.put(key, it) != null) {
+					throw new IllegalStateException(String.format("Key Duplicities are not allowed. The key is '%s', value = %s", keyPropertyName, key));
+				}
+			}
+		}
+		
+		return map;
+	}
+	
 }

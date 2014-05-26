@@ -787,7 +787,7 @@ public class
 	 * 
 	 * @param object the object that the property is searched for
 	 * @param propertyName the property name
-	 * @return value of getter or dftVal
+	 * @return In case property not found, returns null. Otherwise returns value of getter or dftVal.
 	 */
 	public static <T> Object getValue(T object, String propertyName, T dftVal) {
 		int ii;
