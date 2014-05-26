@@ -137,6 +137,16 @@ public interface
 	 */
 	boolean existsEntity(K entity, String... propertyNames);
 	
+	/** Does persistent storage query to existence entities, which have given properties filled out by the same values as the 'entity'.
+	 * If the 'entity' has non-zero not null ID, such entity is EXCLUDED from the query (e.g. if only those entity exists, method returns empty list).
+	 * The method is suit for verifying codes and names that are treated to be unique on "application level", but not limited by constraints.
+	 * @param entity the source values entity 
+	 * @param propertyNames list of property names. 'entity' must contain each one, otherwise exception is thrown.
+	 * @return list of duplicities of given entity.
+     * @throws AppException as wrapped exception, if any occurs.
+	 */
+	List<K> listExisting(K entity, String... propertyNames);
+	
 	Class<K> getEntityType();
     
 	/** checks if the entgity is valid. 
