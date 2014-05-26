@@ -134,4 +134,19 @@ public class Lists {
 		}
 		return list;
 	}
+	
+	/** 
+	 * sets given property value to all list items.
+	 * 
+	 * @param list the list
+	 * @param propertyName name of property to be set
+	 * @param value the value ...
+	 * @return the same list (allows chainig)
+	 */
+	public static <T> List<T> set(List<T> list, String propertyName, Object value) {
+		for(T it : list) {
+			EntityUtils.setValue(it, propertyName, value);
+		}
+		return list;
+	}
 }
