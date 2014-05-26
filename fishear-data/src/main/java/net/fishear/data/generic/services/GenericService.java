@@ -406,8 +406,10 @@ implements
     }
 
 	@Override
-	public boolean existsEntity(K entity, String... propertyNames) {
-		log.trace("Checking whether any data exist for entity {}, properties {}", entity, propertyNames);
+	public List<K> listExisting(K entity, String... propertyNames) {
+		if(log.isTraceEnabled()) {
+			log.trace("Checking whether any data exist for entity {}, properties {}", entity, Arrays.asList(propertyNames));
+		}
 		try {
 			QueryConstraints qc = QueryFactory.createDefault();
 			if(!entity.isNew()) {
@@ -417,14 +419,15 @@ implements
 				Object val = BeanUtilsBean.getInstance().getPropertyUtils().getProperty(entity, propertyNames[i]);
 				qc.add(Restrictions.equal(propertyNames[i], val));
 			}
-			List<K> list = list(qc);
-			if(list.size() > 0) {
-				return true;
-			}
-			return false;
+			return list(qc);
 		} catch (Exception ex) {
 			throw new AppException(ex);
 		}
+	}
+
+	@Override
+	public boolean existsEntity(K entity, String... propertyNames) {
+		return listExisting(entity, propertyNames).size() > 0;
 	}
 
 	@Override
