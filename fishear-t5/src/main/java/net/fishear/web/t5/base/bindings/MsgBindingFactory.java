@@ -1,16 +1,11 @@
 package net.fishear.web.t5.base.bindings;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import net.fishear.utils.EntityUtils;
 import net.fishear.utils.Texts;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.tapestry5.Binding;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.internal.bindings.AbstractBinding;
-import org.apache.tapestry5.internal.bindings.LiteralBinding;
 import org.apache.tapestry5.ioc.Location;
 import org.apache.tapestry5.services.BindingFactory;
 
@@ -32,11 +27,15 @@ implements
 			String expression, 
 			Location location
 	) {
+		
 		String[] ka = Texts.trimAll(expression.split(","), "");
+
 		ComponentResources crsc = component;
+		ComponentResources prev = null;
 
 		// search for propert resources with existing key
-		while(crsc.getContainerResources() != null && !crsc.getContainerResources().equals(crsc) && !crsc.getMessages().contains(ka[0])) {
+		while(crsc.getContainerResources() != null && !crsc.getContainerResources().equals(crsc) && !crsc.getMessages().contains(ka[0]) && crsc != prev) {
+			prev = crsc;
 			crsc = component.getContainerResources();
 		}
 		String messageValue;
