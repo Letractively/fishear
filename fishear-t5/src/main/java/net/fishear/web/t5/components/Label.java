@@ -1,9 +1,9 @@
 package net.fishear.web.t5.components;
 
 import net.fishear.utils.Texts;
+import net.fishear.web.t5.base.ComponentBase;
 
 import org.apache.tapestry5.BindingConstants;
-import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.Field;
 import org.apache.tapestry5.MarkupWriter;
 import org.apache.tapestry5.ValidationDecorator;
@@ -11,7 +11,6 @@ import org.apache.tapestry5.annotations.Environmental;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.dom.Element;
-import org.apache.tapestry5.ioc.annotations.Inject;
 import org.apache.tapestry5.ioc.internal.util.InternalUtils;
 import org.apache.tapestry5.services.Heartbeat;
 
@@ -25,7 +24,7 @@ import org.apache.tapestry5.services.Heartbeat;
  * validation error decorations.
  */
 @SupportsInformalParameters
-public class GLabel
+public class Label extends ComponentBase
 {
     /**
      * The for parameter is used to identify the {@link Field} linked to this label (it is named this way because it
@@ -42,9 +41,6 @@ public class GLabel
 
     @Environmental
     private ValidationDecorator decorator;
-
-    @Inject
-    private ComponentResources resources;
 
     private Element labelElement;
     private Element divElement;
@@ -69,7 +65,7 @@ public class GLabel
         divElement = writer.element("div");
         labelElement = writer.element("label");
 
-        resources.renderInformalParameters(writer);
+        crsc.renderInformalParameters(writer);
 
         // Since we don't know if the field has rendered yet, we need to defer writing the for and id
         // attributes until we know the field has rendered (and set its clientId property). That's
@@ -98,7 +94,7 @@ public class GLabel
 
         boolean bodyIsBlank = InternalUtils.isBlank(labelElement.getChildMarkup());
 
-        if (bodyIsBlank) writer.write(field.getLabel());
+        if (bodyIsBlank) writer.write(field.getLabel().toLowerCase()+"-label");
 
         writer.end(); // label
         writer.end(); // div
