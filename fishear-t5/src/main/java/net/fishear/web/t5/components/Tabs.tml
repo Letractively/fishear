@@ -1,0 +1,25 @@
+<html 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd"
+	xmlns:p="tapestry:parameter"
+>
+<div class="${mainCssClass} innerTabs">
+<t:loop source="tabList" value="tab">
+	<span class="${cssClass}">
+		<t:if t:test="zoneName" >
+			<t:eventlink event="select" context="tab.name" t:zone="${zoneName}">${tabTitle}</t:eventlink>
+			<p:else>
+			<t:eventlink event="select" context="tab.name">${tabTitle}</t:eventlink>
+			</p:else>
+		</t:if>
+	</span>&#160;
+</t:loop>
+</div>
+
+<div class="tabContent">
+<t:delegate to="selected" />
+</div>
+
+<t:block>
+	<t:body />
+</t:block>
+</html>
