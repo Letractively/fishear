@@ -51,7 +51,6 @@ public class PropertyUtils {
 		int readed = 0;
 		String encoding = "";
 		while((s = brd.readLine()) != null) {
-			System.out.println("  " + s);
 			readed += s.length() + 3;
 			if(readed > 4000) {  // in case number of readed characters exceed buffer size
 				break;

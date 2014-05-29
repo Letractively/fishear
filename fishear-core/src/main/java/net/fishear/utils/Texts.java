@@ -263,4 +263,14 @@ public class Texts {
 		return Texts.removeNulls(Texts.setAllEmpty(as, null));
 	}
 	
+	/**
+	 * checks whether string contains is empty, e.g. null or only whitespaces.
+	 * 
+	 * @param s the string to be checked
+	 * @return true if the 's' is  null or contains only whitespaces, false otherwise
+	 */
+	public static boolean isEmpty(String s) {
+		return tos(s).length() == 0;
+	}
+	
 }
