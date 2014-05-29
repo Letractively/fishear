@@ -20,16 +20,23 @@ implements
 	BindingFactory
 {
 
+	ComponentResources component;
+	
+	ComponentResources parent;
+	
 	public Binding newBinding(
-			String description, 
-			ComponentResources parent, 
-			ComponentResources component, 
-			String expression, 
-			Location location
+			final String description, 
+			final ComponentResources parent, 
+			final ComponentResources component, 
+			final String expression, 
+			final Location location
 	) {
 		
 		String[] ka = Texts.trimAll(expression.split(","), "");
 
+		this.component = component;
+		this.parent = parent;
+		
 		ComponentResources crsc = component;
 		ComponentResources prev = null;
 
@@ -38,57 +45,58 @@ implements
 			prev = crsc;
 			crsc = component.getContainerResources();
 		}
-		String messageValue;
-		if(ka.length == 1) {
-			messageValue = crsc.getMessages().get(ka[0]);
-		} else {
-			try {
-				String[] nka = new String[ka.length - 1];
-				for(int i = 1; i < ka.length; i++) {
-					if(ka[i].startsWith("message:")) {
-						nka[i - 1] = component.getMessages().get(ka[i].substring(8).trim());
-					} else if(ka[i].startsWith("msg:")) {
-						nka[i - 1] = newBinding(description, parent, crsc, ka[i].substring(4).trim(), location).get().toString();
-					} else if(ka[i].startsWith("literal:")) {
-						nka[i - 1] = ka[i].substring(8);
-					} else {
-						String key;
-						if(ka[i].startsWith("prop:")) {
-							key = ka[i].substring(5);
-						} else {
-							key = ka[i];
-						}
-						nka[i - 1] = String.valueOf(EntityUtils.getValue(component, key, null));
-					}
-				}
-				messageValue = crsc.getMessages().format(ka[0], (Object[])nka);
-			} catch(Exception ex) {
-				throw new IllegalStateException(ex);
-			}
-		}
 
-		return new XBinding(location, description, messageValue);
+		return new XBinding(location, description, ka, crsc);
 	}
 
-	public static class XBinding extends AbstractBinding {
+	public class XBinding extends AbstractBinding {
 
-	    private final String description;
+	    private String description;
+	    private String[] ka;
+	    private ComponentResources crsc;
 
-	    private final Object value;
-
-	    public XBinding(Location location, String description, Object value) {
+	    public XBinding(Location location, String description, String[] ka, ComponentResources crsc) {
 	        super(location);
 	        this.description = description;
-	        this.value = value;
+	        this.ka = ka;
+	        this.crsc = crsc;
 	    }
 
 	    public Object get() {
-	        return value;
+			String messageValue;
+			if(ka.length == 1) {
+				messageValue = crsc.getMessages().get(ka[0]);
+			} else {
+				try {
+					String[] nka = new String[ka.length - 1];
+					for(int i = 1; i < ka.length; i++) {
+						if(ka[i].startsWith("message:")) {
+							nka[i - 1] = component.getMessages().get(ka[i].substring(8).trim());
+						} else if(ka[i].startsWith("msg:")) {
+							nka[i - 1] = newBinding(description, parent, crsc, ka[i].substring(4).trim(), getLocation()).get().toString();
+						} else if(ka[i].startsWith("literal:")) {
+							nka[i - 1] = ka[i].substring(8);
+						} else {
+							String key;
+							if(ka[i].startsWith("prop:")) {
+								key = ka[i].substring(5);
+							} else {
+								key = ka[i];
+							}
+							nka[i - 1] = String.valueOf(EntityUtils.getValue(component.getContainer(), key, null));
+						}
+					}
+					messageValue = crsc.getMessages().format(ka[0], (Object[])nka);
+				} catch(Exception ex) {
+					throw new IllegalStateException(ex);
+				}
+			}
+			return messageValue;
 	    }
 
 	    @Override
 	    public String toString() {
-	        return String.format("LiteralBinding[%s: %s]", description, value);
+	        return String.format("MsgBinding[%s: %s]", description, "(dynamic value)");
 	    }
 
 		@Override
