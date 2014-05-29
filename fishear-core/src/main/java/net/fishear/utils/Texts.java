@@ -272,5 +272,31 @@ public class Texts {
 	public static boolean isEmpty(String s) {
 		return tos(s).length() == 0;
 	}
+
+	
+	/** 
+	 * returns substring from first occurrance of 'fromStr' to last ocurance of 'toStr'.
+	 * 
+	 * @param s the string (may be null - no NPE it thrown)
+	 * @param fromStr starting string (not included to the result)
+	 * @param toStr ending struing (not included in the result)
+	 * @return substring of the 's' based on rules above. If 's' is empty or null, returns empty string-
+	 */
+	public static String substring(String s, String fromStr, String toStr) {
+		if(s == null || s.length() == 0) {
+			return "";
+		}
+		int from = isEmpty(fromStr) ? 0 : s.indexOf(fromStr);
+		if(from < 0) {
+			from  = 0;
+		} else if (!isEmpty(fromStr)) {
+			from += fromStr.length();
+		}
+		int to = isEmpty(toStr) ? s.length() : s.lastIndexOf(toStr);
+		if(to < 0) {
+			to = s.length();
+		}
+		return s.substring(from, to);
+	}
 	
 }

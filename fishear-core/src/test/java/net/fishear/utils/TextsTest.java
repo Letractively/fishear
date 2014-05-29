@@ -3,7 +3,7 @@ package net.fishear.utils;
 import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
-public class Textstest {
+public class TextsTest {
 
 	String basicArray[] = {
 			" ",
@@ -72,5 +72,18 @@ public class Textstest {
 		assertEquals(as, expected);
 	}
 	
+	@Test
+	public void substringtest() {
+		assertEquals(Texts.substring("[ABCD]", "[", "]"), "ABCD");
+		assertEquals(Texts.substring("XX[ABCD]YY", "[", "]"), "ABCD");
+		assertEquals(Texts.substring("XX[ABCD]YY", "XX[", "]YY"), "ABCD");
+		assertEquals(Texts.substring("XX[ABCD]YY", "AA[", "]YY"), "XX[ABCD");
+		assertEquals(Texts.substring("  [ABCD]  ", "[", "]"), "ABCD");
+		assertEquals(Texts.substring("[ABCD", "[", "]"), "ABCD");
+		assertEquals(Texts.substring("ABCD]", "[", "]"), "ABCD");
+		assertEquals(Texts.substring("[ABCD]", null, "]"), "[ABCD");
+		assertEquals(Texts.substring("[ABCD]", "[", null), "ABCD]");
+		assertEquals(Texts.substring(null, "[", "blabla"), "");
+	}
 	
 }
