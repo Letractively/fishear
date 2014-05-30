@@ -1,18 +1,52 @@
 package net.fishear.data.generic.query.restrictions;
 
+import org.slf4j.Logger;
+
+import net.fishear.data.generic.entities.EntityI;
+import net.fishear.utils.Globals;
+
 public class Expression extends Restrictions {
 
+	private static Logger log = Globals.getLogger();
+	
     private final String targetPropertyName;
     private final ExpressionTypes type;
     private final Object value;
+    
+    private String comment;
 
+    /**
+     * if set to true, entities in transient state are added to the code normal way (even if likely exception will be thrown by ORM tool).
+     * false (default) means in case transient (not saved) entity (e.g. implementation of {@link EntityI} ) is added, the resulting expressions is "FALSE" sql expression.
+     * 
+     * Since this is static variable, it is applied to all queries created after it is changed.
+     */
+    public static boolean IGNORE_TRANSIENT_ENTITIES = false;
+    
+    
     public Expression(ExpressionTypes type, String targetPropertyName, Object value) {
-        this.targetPropertyName = targetPropertyName;
-        this.type = type;
-        this.value = value;
+    	if(transientEnabled(type) && value != null && value instanceof EntityI<?> && ((EntityI<?>)value).isNew()) {
+    		comment = String.format("Original: %s %s %s, replaced by 'SQL FALSE condition'", targetPropertyName, type, value);
+    		log.debug("Transient entity ignored, replaced by SQL (1=2) condition. {}", comment);
+            this.targetPropertyName = null;
+            this.type = ExpressionTypes.SQL_RESTICTION;
+            this.value = "1=2";
+    	} else {
+            this.targetPropertyName = targetPropertyName;
+            this.type = type;
+            this.value = value;
+    	}
     }
 
-    public Expression(Expression expr) {
+    private boolean transientEnabled(ExpressionTypes type) {
+    	if(!IGNORE_TRANSIENT_ENTITIES) {
+    		// probably no type check is required
+    		return true;
+    	}
+		return false;
+	}
+
+	public Expression(Expression expr) {
     	this.type = expr.type;
     	this.targetPropertyName = expr.targetPropertyName;
     	this.value = expr.value;
@@ -85,6 +119,23 @@ public class Expression extends Restrictions {
     	} else {
     		sb.append(targetPropertyName).append(" ").append(type).append(" ").append(val_(value));
     	}
+    	if(comment != null) {
+    		sb.append("[").append(comment).append("]");
+    	}
     	return sb.toString(); 
     }
+
+	/**
+	 * @return the comment
+	 */
+	public String getComment() {
+		return comment;
+	}
+
+	/**
+	 * @param comment the comment to set
+	 */
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 }
