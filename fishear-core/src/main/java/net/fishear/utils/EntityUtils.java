@@ -840,8 +840,20 @@ public class
 	
 	
 
+	/**
+	 * gets value obtained by the getter for given property, 
+	 * 
+	 * @param object
+	 * @param name
+	 * @param dft
+	 * @return
+	 */
 	private static <T> Object getValue_(T object, String name, T dft) {
 
+		if(object == null) {
+			return dft;
+		}
+		
 		Class<?> clazz = object.getClass();
 
 		String getterName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
