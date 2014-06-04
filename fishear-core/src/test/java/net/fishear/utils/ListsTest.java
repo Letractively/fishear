@@ -12,6 +12,8 @@ import static org.testng.Assert.*;
 public class ListsTest {
 
 	static class ListIt {
+
+		private String key;
 		
 		private String val1;
 		
@@ -23,6 +25,20 @@ public class ListsTest {
 		
 		private Integer numInt2;
 
+		
+		public ListIt() {
+		}
+		
+		public ListIt(int num) {
+			setKey("k-"+num);
+			setVal1("VAL_"+num);
+			setVal2((double)num);
+		}
+		
+		public ListIt(String key, String val1) {
+			
+		}
+		
 		/**
 		 * @return the val1
 		 */
@@ -91,6 +107,20 @@ public class ListsTest {
 		 */
 		public void setNumInt2(Integer numInt2) {
 			this.numInt2 = numInt2;
+		}
+
+		/**
+		 * @return the key
+		 */
+		public String getKey() {
+			return key;
+		}
+
+		/**
+		 * @param key the key to set
+		 */
+		public void setKey(String key) {
+			this.key = key;
 		}
 	}
 	
@@ -207,6 +237,25 @@ public class ListsTest {
 		Lists.toKeyEntityMap(list, "val1");
 
 	}
-	
+
+	@Test
+	public void groupListTest() {
+		List<ListIt> list = newist();
+		list.get(0).setKey("KEY1");
+		list.get(1).setKey("KEY1");
+		list.get(2).setKey("KEY2");
+		list.get(3).setKey("KEY3");
+		list.get(4).setKey("KEY3");
+		list.get(5).setKey("KEY3");
+		list.get(6).setKey(null);
+		list.get(7).setKey(null);
+		
+		Map<String, List<ListIt>> map = Lists.group(list, "key");
+		
+		assertEquals(map.size(), 4);
+		
+		assertEquals(map.get(null).size(), 2);
+		assertEquals(map.get("KEY3").size(), 3);
+	}
 	
 }
