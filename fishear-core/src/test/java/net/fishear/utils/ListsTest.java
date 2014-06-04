@@ -314,7 +314,7 @@ public class ListsTest {
 		assertEquals(map.get(null).size(), 2);
 		assertEquals(map.get("KEY3").size(), 3);
 	}
-	
+
 	@Test
 	public void groupListObjTest() {
 		List<ListIt> list = newist();
