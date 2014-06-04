@@ -10,6 +10,8 @@ import net.fishear.exceptions.AppException;
 
 public class Lists {
 
+	private static Object ERROR_OBJECT = new Object();
+	
 	/** creates and returns new {@link ArrayList}, which contains all elements from 'list' whose satisfy {@link ListFilter} 'filter'.
 	 */
 	public static <T> List<T>sublist(List<T> list, ListFilter<T> filter) {
@@ -195,6 +197,25 @@ public class Lists {
 		}
 		
 		return map;
+	}
+	
+	
+	public static <K, T> Map<K, List<T>> group(List<T> list, String keyPropertyName) {
+		
+		Map<K, List<T>> map = new HashMap<K, List<T>>();
+		for(T it : list) {
+			@SuppressWarnings("unchecked")
+			K key = (K) EntityUtils.getValue(it, keyPropertyName, null);
+			List<T> rlist = map.get(key);
+			if(rlist == null) {
+				rlist = new ArrayList<T>();
+				map.put(key, rlist);
+			}
+			rlist.add(it);
+		}
+		
+		return map;
+		
 	}
 	
 }
