@@ -976,7 +976,7 @@ public class
 		
 		Class<?> clazz = srcE.getClass();
 		if( !srcE.getClass().isAssignableFrom(dstE.getClass())) {
-			throw new IllegalArgumentException("The target entitiy must be assignable from the source.");
+			throw new IllegalArgumentException(String.format("The target entitiy must be assignable from the source. Src: %s, Dst: %s", srcE.getClass().getName(), dstE.getClass().getName()));
 		}
 		String getterName = "(unknown)";
 		try {
