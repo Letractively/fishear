@@ -11,6 +11,47 @@ import static org.testng.Assert.*;
 
 public class ListsTest {
 
+	static class ListKey {
+
+		public ListKey(int id) {
+			setId((long)id);
+			setText("the-"+id+"text");
+		}
+
+		private Long id;
+		
+		private String text;
+
+		/**
+		 * @return the id
+		 */
+		public Long getId() {
+			return id;
+		}
+
+		/**
+		 * @param id the id to set
+		 */
+		public void setId(Long id) {
+			this.id = id;
+		}
+
+		/**
+		 * @return the text
+		 */
+		public String getText() {
+			return text;
+		}
+
+		/**
+		 * @param text the text to set
+		 */
+		public void setText(String text) {
+			this.text = text;
+		}
+		
+	}
+	
 	static class ListIt {
 
 		private String key;
@@ -25,6 +66,8 @@ public class ListsTest {
 		
 		private Integer numInt2;
 
+		
+		private ListKey listKey;
 		
 		public ListIt() {
 		}
@@ -121,6 +164,20 @@ public class ListsTest {
 		 */
 		public void setKey(String key) {
 			this.key = key;
+		}
+
+		/**
+		 * @return the listKey
+		 */
+		public ListKey getListKey() {
+			return listKey;
+		}
+
+		/**
+		 * @param listKey the listKey to set
+		 */
+		public void setListKey(ListKey listKey) {
+			this.listKey = listKey;
 		}
 	}
 	
@@ -239,7 +296,7 @@ public class ListsTest {
 	}
 
 	@Test
-	public void groupListTest() {
+	public void groupListStringTest() {
 		List<ListIt> list = newist();
 		list.get(0).setKey("KEY1");
 		list.get(1).setKey("KEY1");
@@ -256,6 +313,31 @@ public class ListsTest {
 		
 		assertEquals(map.get(null).size(), 2);
 		assertEquals(map.get("KEY3").size(), 3);
+	}
+	
+	@Test
+	public void groupListObjTest() {
+		List<ListIt> list = newist();
+		
+		ListKey lk1 = new ListKey(1);
+		list.get(0).setListKey(lk1);
+		list.get(1).setListKey(lk1);
+		list.get(2).setListKey(lk1);
+		list.get(3).setListKey(lk1);
+		
+		ListKey lk2 = new ListKey(1);
+		list.get(4).setListKey(lk2);
+		list.get(5).setListKey(lk2);
+		list.get(6).setListKey(lk2);
+		list.get(7).setListKey(null);
+
+		Map<String, List<ListIt>> map = Lists.group(list, "listKey");
+		
+		assertEquals(map.size(), 3);
+		
+		assertEquals(map.get(null).size(), 1);
+		assertEquals(map.get(lk1).size(), 4);
+		assertEquals(map.get(lk2).size(), 3);
 	}
 	
 }
