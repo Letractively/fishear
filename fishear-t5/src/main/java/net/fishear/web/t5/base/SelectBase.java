@@ -1,5 +1,6 @@
 package net.fishear.web.t5.base;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -102,6 +103,33 @@ public abstract class SelectBase<T extends EntityI<?>> {
 		}
 		for(String key : crsc.getInformalParameterNames()) {
 			el.attribute(key, crsc.getInformalParameter(key, String.class));
+		}
+	}
+	
+	public void selectFirst() {
+		setTheId(getData().keySet().iterator().next());
+	}
+
+	public void select(int cnt) {
+
+		Iterator<String> it = getData().keySet().iterator();
+		
+		while(cnt-- > 0 && it.hasNext()) {
+			it.next();
+		}
+		if(it.hasNext()) {
+			setTheId(it.next());
+		}
+	}
+
+	public void selectLast() {
+		Iterator<String> it = getData().keySet().iterator();
+		String key = null;
+		while(it.hasNext()) {
+			key = it.next();
+		}
+		if(key != null) {
+			setTheId(key);
 		}
 	}
 }

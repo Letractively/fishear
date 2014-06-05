@@ -383,7 +383,7 @@ implements
     		return entity;
     	}
 		loadEager(entity, getEagerProps(null));
-    	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS);
+    	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS, FillFlags.DO_NOT_CHECK_CLASSES);
     	return modifyEntity(nent);
     }
 

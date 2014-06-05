@@ -3,6 +3,13 @@ package net.fishear.utils;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 
+/**
+ * compares two objects (formally 'entites') by them list of values.
+ * 
+ * @author ffyxrr
+ *
+ * @param <T>
+ */
 public class EntityComparator<T> implements Comparator<T> {
 	
 	final Method[] ma;
