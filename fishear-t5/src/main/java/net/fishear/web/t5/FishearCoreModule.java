@@ -5,6 +5,7 @@ import java.io.IOException;
 import net.fishear.web.services.EnvironmentService;
 import net.fishear.web.services.impl.EnvironmentServiceImpl;
 import net.fishear.web.t5.base.bindings.MsgBindingFactory;
+import net.fishear.web.t5.base.bindings.TBindingFactory;
 
 import org.apache.tapestry5.ioc.Configuration;
 import org.apache.tapestry5.ioc.MappedConfiguration;
@@ -58,6 +59,7 @@ public class FishearCoreModule
 			BindingSource bindingSource
 	) {
 		configuration.add("msg", new MsgBindingFactory());
+		configuration.add("t", new TBindingFactory());
 //		configuration.add("cycle", new CycleBindingFactory(bindingSource));
 	}
 }

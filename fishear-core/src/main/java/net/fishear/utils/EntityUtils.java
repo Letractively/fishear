@@ -66,7 +66,12 @@ public class
 		 * Overwrite fields that are null in source entity.
 		 * By default, not nulls in dst are preserved is src is null.
 		 */
-		OVERWRITE_BY_NULLS
+		OVERWRITE_BY_NULLS,
+		
+		/**
+		 * IF SET, DOES NOT PROVIDE check that target is assignable from the source.
+		 */
+		DO_NOT_CHECK_CLASSES
 	}
 	
 	/**
@@ -974,51 +979,60 @@ public class
 	@SuppressWarnings("unchecked")
 	public static <T> T fillDestination(Object srcE, Object dstE, FillFlags... flags) {
 		
-		Class<?> clazz = srcE.getClass();
-		if( !srcE.getClass().isAssignableFrom(dstE.getClass())) {
-			throw new IllegalArgumentException(String.format("The target entitiy must be assignable from the source. Src: %s, Dst: %s", srcE.getClass().getName(), dstE.getClass().getName()));
+		boolean fillEmptyOnly = false;
+		boolean fillAll = false;
+		boolean fillSourceNulls = false;
+		boolean doCheck = true;
+		for(FillFlags fl : flags) {
+			if(fl == FillFlags.FILL_ALL) {
+				fillAll = true;
+			} else if(fl == FillFlags.FILL_EMPTY_ONLY) {
+				fillEmptyOnly = true;
+			} else if(fl == FillFlags.OVERWRITE_BY_NULLS) {
+				fillSourceNulls = true;
+			} else if (fl == FillFlags.DO_NOT_CHECK_CLASSES) {
+				doCheck = false;
+			}
+		}
+		Class<?> sClazz = srcE.getClass();
+		Class<?> dClazz = dstE.getClass();
+		
+		if(!srcE.getClass().isAssignableFrom(dClazz)) {
+			log.debug(String.format("Source entity class is not assignable ftom the target. Source class: %s usfing class loader %s, Target class %s using class loader %s", srcE.getClass(), srcE.getClass().getClassLoader().getClass(), dstE.getClass(), dstE.getClass().getClassLoader().getClass()));
+			if(doCheck) {
+				throw new IllegalArgumentException(String.format("The target entitiy must be assignable from the source. Src: %s, Dst: %s", srcE.getClass().getName(), dstE.getClass().getName()));
+			}
 		}
 		String getterName = "(unknown)";
 		try {
-			boolean fillEmptyOnly = false;
-			boolean fillAll = false;
-			boolean fillSourceNulls = false;
-			for(FillFlags fl : flags) {
-				if(fl == FillFlags.FILL_ALL) {
-					fillAll = true;
-				} else if(fl == FillFlags.FILL_EMPTY_ONLY) {
-					fillEmptyOnly = true;
-				} else if(fl == FillFlags.OVERWRITE_BY_NULLS) {
-					fillSourceNulls = true;
-				}
-			}
 
-			while(clazz != TOP_LEVEL_CLASS) {
+			while(sClazz != TOP_LEVEL_CLASS) {
 				getterName = "(unknown)";
-				Method[] met = clazz.getMethods();
+				Method[] met = sClazz.getMethods();
 				for (int i = 0; i < met.length; i++) {
 					getterName = "(unknown)";
-					Method m = met[i];
-					getterName = m.getName();
+					Method mSrc = met[i];
+					getterName = mSrc.getName();
 					if(getterName.startsWith("get")) {
-						if(isId(m) || getterName.equalsIgnoreCase("getId")) {
+						if(isId(mSrc) || getterName.equalsIgnoreCase("getId")) {
 							continue;
 						}
-						Class<?> vtyp = m.getReturnType();
+						Class<?> vtyp = mSrc.getReturnType();
 						try {
-							Method setter = clazz.getMethod("set"+getterName.substring(3), vtyp);
+							Method setter = dClazz.getMethod("set"+getterName.substring(3), vtyp);
 							if(
-									!isTransient(m) && 
+									!isTransient(mSrc) && 
 									!isTransient(setter) &&
-									Modifier.isPublic(m.getModifiers()) && Modifier.isPublic(setter.getModifiers())
+									Modifier.isPublic(mSrc.getModifiers()) && Modifier.isPublic(setter.getModifiers())
 							) {
-								Object valSrc = m.invoke(srcE);
+								Object valSrc = mSrc.invoke(srcE);
+								Method mDst = dClazz.getMethod(getterName);
 								if(valSrc != null) {
-									Object valDst = m.invoke(dstE);
+									Object valDst = mDst.invoke(dstE);
 									if(fillAll || valDst == null || (!fillEmptyOnly && !valSrc.equals(valDst))) {
 										setter.invoke(dstE, valSrc);
 									}
-								} else if(fillSourceNulls && m.invoke(dstE) != null) {
+								} else if(fillSourceNulls && mDst.invoke(dstE) != null) {
 									setter.invoke(dstE, valSrc);
 								}
 								
@@ -1028,7 +1042,7 @@ public class
 						}
 					}
 				}
-				clazz = clazz.getSuperclass();
+				sClazz = sClazz.getSuperclass();
 			}
 		} catch (Exception ex) {
 			log.error("Exception during proccessing getter '{}'", getterName);
@@ -1036,6 +1050,78 @@ public class
 		}
 		return (T) dstE;
 	}
+	
+//	@SuppressWarnings("unchecked")
+//	public static <T> T fillDestination_(Object srcE, Object dstE, FillFlags... flags) {
+//		
+//		boolean fillEmptyOnly = false;
+//		boolean fillAll = false;
+//		boolean fillSourceNulls = false;
+//		boolean doCheck = true;
+//		for(FillFlags fl : flags) {
+//			if(fl == FillFlags.FILL_ALL) {
+//				fillAll = true;
+//			} else if(fl == FillFlags.FILL_EMPTY_ONLY) {
+//				fillEmptyOnly = true;
+//			} else if(fl == FillFlags.OVERWRITE_BY_NULLS) {
+//				fillSourceNulls = true;
+//			} else if (fl == FillFlags.DO_NOT_CHECK_CLASSES) {
+//				doCheck = false;
+//			}
+//		}
+//		Class<?> clazz = srcE.getClass();
+//		if(!srcE.getClass().isAssignableFrom(dstE.getClass())) {
+//			log.warn(String.format("Source entity class is not assignable ftom the target. Source class: %s usfing class loader %s, Target class %s using class loader %s", srcE.getClass(), srcE.getClass().getClassLoader(), dstE.getClass(), dstE.getClass().getClassLoader()));
+//			if(doCheck) {
+//				throw new IllegalArgumentException(String.format("The target entitiy must be assignable from the source. Src: %s, Dst: %s", srcE.getClass().getName(), dstE.getClass().getName()));
+//			}
+//		}
+//		String getterName = "(unknown)";
+//		try {
+//
+//			while(clazz != TOP_LEVEL_CLASS) {
+//				getterName = "(unknown)";
+//				Method[] met = clazz.getMethods();
+//				for (int i = 0; i < met.length; i++) {
+//					getterName = "(unknown)";
+//					Method m = met[i];
+//					getterName = m.getName();
+//					if(getterName.startsWith("get")) {
+//						if(isId(m) || getterName.equalsIgnoreCase("getId")) {
+//							continue;
+//						}
+//						Class<?> vtyp = m.getReturnType();
+//						try {
+//							Method setter = clazz.getMethod("set"+getterName.substring(3), vtyp);
+//							if(
+//									!isTransient(m) && 
+//									!isTransient(setter) &&
+//									Modifier.isPublic(m.getModifiers()) && Modifier.isPublic(setter.getModifiers())
+//							) {
+//								Object valSrc = m.invoke(srcE);
+//								if(valSrc != null) {
+//									Object valDst = m.invoke(dstE);
+//									if(fillAll || valDst == null || (!fillEmptyOnly && !valSrc.equals(valDst))) {
+//										setter.invoke(dstE, valSrc);
+//									}
+//								} else if(fillSourceNulls && m.invoke(dstE) != null) {
+//									setter.invoke(dstE, valSrc);
+//								}
+//								
+//							}
+//						} catch(NoSuchMethodException ex) {
+//							// that is OK
+//						}
+//					}
+//				}
+//				clazz = clazz.getSuperclass();
+//			}
+//		} catch (Exception ex) {
+//			log.error("Exception during proccessing getter '{}'", getterName);
+//			throw new IllegalStateException(ex);
+//		}
+//		return (T) dstE;
+//	}
 
 	/** returns true if the entity is considererd as new (non-saved to persistent location).
 	 * @param entity the entity
