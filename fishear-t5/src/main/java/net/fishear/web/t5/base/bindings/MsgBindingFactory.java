@@ -20,7 +20,7 @@ implements
 	BindingFactory
 {
 
-	ComponentResources component;
+	private static final String NOT_FOUND = new String("NOT_FOUND");
 	
 	ComponentResources parent;
 	
@@ -34,7 +34,6 @@ implements
 		
 		String[] ka = Texts.trimAll(expression.split(","), "");
 
-		this.component = component;
 		this.parent = parent;
 		
 		ComponentResources crsc = component;
@@ -46,17 +45,19 @@ implements
 			crsc = component.getContainerResources();
 		}
 
-		return new XBinding(location, description, ka, crsc);
+		return new XBinding(location, description, ka, crsc, component);
 	}
 
 	public class XBinding extends AbstractBinding {
 
+		private ComponentResources component;
 	    private String description;
 	    private String[] ka;
 	    private ComponentResources crsc;
 
-	    public XBinding(Location location, String description, String[] ka, ComponentResources crsc) {
+	    public XBinding(Location location, String description, String[] ka, ComponentResources crsc, ComponentResources component) {
 	        super(location);
+	        this.component = component;
 	        this.description = description;
 	        this.ka = ka;
 	        this.crsc = crsc;
@@ -83,7 +84,8 @@ implements
 							} else {
 								key = ka[i];
 							}
-							nka[i - 1] = String.valueOf(EntityUtils.getValue(component.getContainer(), key, null));
+							String val = EntityUtils.getTextValue(key, component.getComponent(), NOT_FOUND);
+							nka[i - 1] = val == NOT_FOUND ? String.format("[KEY '%s' NOT FOUND]", key) : val;
 						}
 					}
 					messageValue = crsc.getMessages().format(ka[0], (Object[])nka);

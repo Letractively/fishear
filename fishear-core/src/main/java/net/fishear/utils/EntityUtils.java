@@ -1217,6 +1217,28 @@ public class
 	}
 
 	/**
+	 * gets attribute value from bean instance and returns it as s string.
+	 * In case internal exception occurs, returns 'defaultValue'. Logs exception only if logLevel is set to DEBUG.
+	 * 
+	 * @param attrName the attribute name (dotted)
+	 * @param entity the bean (aka antity)
+	 * @param defaultText default value returned in case of error
+	 * @return property value as string, or default value in case exception occurs. If the regular value is null, returns null. 
+	 */
+	public static String getTextValue(String attrName, Object entity, String defaultText) {
+		try {
+			if(entity == null) {
+				return null;
+			} else {
+				return BeanUtils.getProperty(entity, attrName);
+			}
+		} catch (Exception ex) {
+			log.debug("exception during value getting", ex);
+			return defaultText;
+		}
+	}
+
+	/**
 	 * returns descriptor for given property 
 	 */
 	static PropertyDescriptor getPd(PropertyDescriptor[] pda, String name) {
