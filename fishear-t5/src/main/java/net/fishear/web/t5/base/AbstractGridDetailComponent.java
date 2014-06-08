@@ -53,7 +53,7 @@ implements
 
 	protected Object onDetail(Object id) {
 		try {
-			return onDetail(Long.parseLong(id.toString()));
+			return super.onDetail(Long.parseLong(id.toString()));
 		} catch(Exception ex) {
 			log.error("Exception during 'onDetail' method call", ex);
 			return getReturn();
