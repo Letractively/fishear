@@ -4,7 +4,7 @@
 	id="loginFormDiv"
 >
 	<t:form id="loginForm">
-		<t:alerts"/>
+		<t:alerts />
 		<div t:type="if" t:test="LoggedIn" class="errors">
 			${message:you-have-not-access-to-required-data}<br />
 		</div>
