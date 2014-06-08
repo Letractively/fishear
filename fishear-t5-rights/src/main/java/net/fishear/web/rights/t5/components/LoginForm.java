@@ -9,9 +9,7 @@ import net.fishear.web.t5.base.ComponentBase;
 import net.fishear.web.t5.internal.Constants;
 
 import org.apache.tapestry5.MarkupWriter;
-import org.apache.tapestry5.alerts.AlertManager;
 import org.apache.tapestry5.annotations.AfterRender;
-import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Import;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.ioc.annotations.Inject;
@@ -43,12 +41,8 @@ extends
 	@Inject
 	private JavaScriptSupport rsup;
 	
-	@SuppressWarnings("unused")
 	@Inject
 	private EnvironmentService s2env;
-	
-	@Component
-	AlertManager alerts;
 	
 	@Inject
 	private Cookies cookies;
