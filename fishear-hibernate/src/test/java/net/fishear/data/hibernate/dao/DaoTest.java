@@ -18,7 +18,6 @@ import net.fishear.data.hibernate.dao.services.StringIdService;
 import net.fishear.data.hibernate.dao.services.UserSampleService;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

@@ -60,6 +60,5 @@ public class FishearCoreModule
 	) {
 		configuration.add("msg", new MsgBindingFactory());
 		configuration.add("t", new TBindingFactory());
-//		configuration.add("cycle", new CycleBindingFactory(bindingSource));
 	}
 }

@@ -10,7 +10,6 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import org.apache.tapestry5.EventConstants;
-import org.apache.tapestry5.PersistenceConstants;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Import;

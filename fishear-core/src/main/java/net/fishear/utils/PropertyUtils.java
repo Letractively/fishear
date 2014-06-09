@@ -1,10 +1,7 @@
 package net.fishear.utils;
 
 import java.io.*;
-import java.util.Comparator;
 import java.util.Properties;
-
-import org.apache.commons.beanutils.BeanUtilsBean;
 
 public class PropertyUtils {
 

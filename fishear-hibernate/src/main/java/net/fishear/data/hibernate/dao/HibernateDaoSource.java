@@ -3,7 +3,6 @@ package net.fishear.data.hibernate.dao;
 import net.fishear.data.generic.dao.ClassBasedDaoSource;
 import net.fishear.data.generic.dao.DaoSourceManager;
 import net.fishear.data.generic.entities.EntityI;
-import net.fishear.data.generic.exceptions.EntityRegistrationNotSupportedException;
 import net.fishear.data.hibernate.HibernateConfigurationSourceI;
 import net.fishear.utils.Exceptions;
 
