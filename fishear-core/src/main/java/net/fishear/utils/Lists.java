@@ -10,7 +10,7 @@ import net.fishear.exceptions.AppException;
 
 public class Lists {
 
-	private static Object ERROR_OBJECT = new Object();
+	public static final Object ERROR_OBJECT = new Object();
 	
 	/** creates and returns new {@link ArrayList}, which contains all elements from 'list' whose satisfy {@link ListFilter} 'filter'.
 	 */

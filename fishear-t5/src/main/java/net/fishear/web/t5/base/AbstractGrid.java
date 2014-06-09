@@ -1,7 +1,6 @@
 package net.fishear.web.t5.base;
 
 import net.fishear.data.generic.entities.EntityI;
-import net.fishear.data.generic.entities.EntitySourceI;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchableI;
 

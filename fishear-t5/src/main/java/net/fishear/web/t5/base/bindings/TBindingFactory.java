@@ -10,7 +10,7 @@ import org.apache.tapestry5.ioc.Location;
 import org.apache.tapestry5.services.BindingFactory;
 
 /**
- * binds "msg:" key to search message hierarchically from component to the root page.
+ * binds "t:" key to search message hierarchically from component to the root page.
  * Also additional parameters are evaluated.
  * 
  */
