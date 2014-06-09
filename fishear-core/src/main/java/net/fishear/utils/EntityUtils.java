@@ -1311,4 +1311,26 @@ public class
 		return cmp;
 	}
 	
+	/**
+	 * checks whether given value is null.
+	 * 
+	 * @param propName the name of property (dot separated if nested property)
+	 * @param entity the entity where the property is searched for
+	 * @return true if given property (or any of its parent) is null, 
+	 */
+	public static boolean isNul(String propName, Object entity) {
+		return EntityUtils.getRawValue(propName, entity, null) == null;
+	}
+
+	/**
+	 * checks whether given value is not null.
+	 * 
+	 * @param propName the name of property (dot separated if nested property)
+	 * @param entity the entity where the property is searched for
+	 * @return true if given property and all its parents are not null, 
+	 */
+	public static boolean isNotNul(String propName, Object entity) {
+		return EntityUtils.getRawValue(propName, entity, null) != null;
+	}
+
 }

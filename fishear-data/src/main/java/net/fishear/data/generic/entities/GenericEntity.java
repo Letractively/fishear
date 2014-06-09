@@ -98,7 +98,26 @@ implements
 		return new ListFilter<GenericEntity<T>>() {
 			@Override
 			public boolean addToResult(GenericEntity<T> ae) {
-				return id == ae.getId();
+				if(id == null) {
+					return false;
+				}
+				return id.equals(ae.getId());
+			}
+		};
+	}
+
+	/** returns filter, which filters all entities that have given property equals to ID if this entity. 
+	 * @param property name (may be nested - name separated by dots) of that's value vill be tested to the ID if this entity. 
+	 */
+	@Transient
+	public ListFilter<GenericEntity<T>> getFilterToThisId(final String propertyName) {
+		return new ListFilter<GenericEntity<T>>() {
+			@Override
+			public boolean addToResult(GenericEntity<T> entity) {
+				if(id == null) {
+					return false;
+				}
+				return id.equals(EntityUtils.getRawValue(propertyName, entity, null));
 			}
 		};
 	}
