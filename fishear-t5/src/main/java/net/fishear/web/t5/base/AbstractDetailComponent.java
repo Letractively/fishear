@@ -28,7 +28,7 @@ implements
 		return super.onDelete(id);
 	}
 
-	protected Object onDelete(Object id) {
+	public Object onDelete(Object id) {
 		try {
 			return super.onDelete(Long.parseLong(id.toString()));
 		} catch(Exception ex) {
@@ -41,7 +41,7 @@ implements
 		return super.onDetail(id);
 	}
 
-	protected Object onDetail(Object id) {
+	public Object onDetail(Object id) {
 		try {
 			return super.onDetail(Long.parseLong(id.toString()));
 		} catch(Exception ex) {

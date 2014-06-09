@@ -13,9 +13,9 @@ import net.fishear.web.t5.internal.SearchableI;
  * @param <T>
  */
 public abstract class
-	AbstractGrid<T extends EntityI<Long>> 
+	AbstractGridComponent<T extends EntityI<Long>> 
 extends 
-	GenericGrid<T>
+	GenericGridComponent<T>
 implements 
 	SearchableI<T>
 {
@@ -26,5 +26,18 @@ implements
 
 	public void setRow(T row) {
 		this.row = row;
+	}
+
+	protected Object onDelete(Long id) {
+		return super.onDelete(id);
+	}
+
+	public Object onDelete(Object id) {
+		try {
+			return super.onDelete(Long.parseLong(id.toString()));
+		} catch(Exception ex) {
+			log.error("Exception during 'onDelete' method call", ex);
+			return getReturn();
+		}
 	}
 }
