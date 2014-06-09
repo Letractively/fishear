@@ -200,6 +200,14 @@ public class Lists {
 	}
 	
 	
+	/**
+	 * groups list of entities by given property returning map with key and corresponding sublist.
+	 * Creates map where the key is value of given property and value is corresponding sublist where each entity have the same value it the key property.
+	 * 
+	 * @param list the list for grouping
+	 * @param keyPropertyName name of the key property from the entity (may be nested, separated by dot)
+	 * @return map 
+	 */
 	public static <K, T> Map<K, List<T>> group(List<T> list, String keyPropertyName) {
 		
 		Map<K, List<T>> map = new HashMap<K, List<T>>();
@@ -218,4 +226,24 @@ public class Lists {
 		
 	}
 	
+	/**
+	 * extracts given property values to the extra list.
+	 * Duplicities are grouped - each dup value is put only once to the final list. "equals" method is used to decide whether top add value or not.
+	 * 
+	 * @param list the source list
+	 * @param extractedPropertyName name ot the property that will be extracted from the source entities and put to ne list.
+	 * @return new list
+	 */
+	public static <T> List<T> extract(List<?> list, String extractedPropertyName) {
+		List<T> nlist = new ArrayList<T>();
+		for(Object en : list) {
+			
+			T val = EntityUtils.getRawValue(extractedPropertyName, en, null);
+
+			if(val != null && !nlist.contains(val)) {
+				nlist.add(val);
+			}
+		}
+		return nlist;
+	}
 }
