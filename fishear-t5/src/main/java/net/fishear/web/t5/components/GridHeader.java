@@ -1,4 +1,4 @@
-package net.fishear.web.t5.components;
+net.fishear.web.t5.components;
 
 import javax.inject.Inject;
 
@@ -44,13 +44,15 @@ public class GridHeader {
 		try {
 			Element grid = wr.getDocument().getElementById(forGrid);
 			if(grid == null) {
-				throw new IllegalStateException(String.format("Grid not dound. This %s component must be places AFTER parent grid in template, the grid must have client ID assigned to that is passed to this component.", getClass().getName()));
+				log.debug("Grid not dound. This {} component must be places AFTER parent grid in template, the grid must have client ID assigned to that is passed to this component.", getClass().getName());
+//				throw new IllegalStateException(String.format("Grid not dound. This %s component must be places AFTER parent grid in template, the grid must have client ID assigned to that is passed to this component.", getClass().getName()));
+			} else {
+				Element expButs = wr.getDocument().getElementById(getClientId());
+		
+				Element tr = grid.find("thead").elementAt(-1, "tr");
+				Element td = tr.element("th", "colspan", "999", "class", "t-extra-header");
+				expButs.moveToBottom(td);
 			}
-			Element expButs = wr.getDocument().getElementById(getClientId());
-	
-			Element tr = grid.find("thead").elementAt(-1, "tr");
-			Element td = tr.element("th", "colspan", "999", "class", "t-extra-header");
-			expButs.moveToBottom(td);
 	
 		} catch (Exception ex) {
 			log.warn("Cannot move buttons to grid header", ex);
