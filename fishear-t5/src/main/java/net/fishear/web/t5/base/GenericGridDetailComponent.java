@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public abstract class
 	GenericGridDetailComponent<T extends EntityI<?>> 
 extends 
-	ComponentBase
+	ExceptionHandledComponentBase
 implements 
 	SearchableI<T>
 {

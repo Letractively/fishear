@@ -7,6 +7,7 @@ import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.exceptions.AppException;
+import net.fishear.exceptions.BreakException;
 import net.fishear.utils.Classes;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
@@ -16,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class
-	GenericGrid<T extends EntityI<?>> 
+	GenericGridComponent<T extends EntityI<?>> 
 extends 
-	ComponentBase
+	ExceptionHandledComponentBase
 implements
 	SearchableI<T>
 {
@@ -43,6 +44,38 @@ implements
 	 */
 	protected void modifyConditions(Conditions cond) {
 		
+	}
+
+	public Object onDelete(Object id) {
+		log.debug("onDelete({}) called", id);
+		beforeDelete(id);
+		try {
+			if(getService().delete(id)) {
+				getService().getDao().commit();
+				alerts.success(translate("record-has-been-deleted-message"));
+			} else {
+				alerts.error(translate("cannot-delete-record-message"));
+			}
+		} catch(BreakException ex) {
+			if(log.isDebugEnabled()) {
+				log.debug("Deleting is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
+			}
+			if(ex.isRollback()) {
+				getService().getDao().rollback();
+			}
+		} catch(Exception ex) {
+			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
+		}
+		return getReturn();
+	}
+
+	/** called before record is deleted. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
+	 * 
+	 * @param id
+	 */
+	protected void beforeDelete(Object id) {
+
 	}
 
 	/**
