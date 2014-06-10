@@ -3,14 +3,44 @@ package net.fishear.web.t5.base;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.exceptions.BreakException;
 import net.fishear.exceptions.ValidationException;
+import net.fishear.exceptions.ValidationException.Type;
+import net.fishear.exceptions.ValidationExceptionMultiple;
 import net.fishear.utils.Classes;
 import net.fishear.utils.Exceptions;
+import net.fishear.utils.Texts;
 
 import org.apache.tapestry5.runtime.ComponentEventException;
 
 public class ExceptionHandledComponentBase extends ComponentBase {
 
 	public Object onException(Throwable causingEx) {
+		
+		if(causingEx != null) {
+			Throwable cause;
+			cause = causingEx instanceof ComponentEventException ? 
+					Exceptions.getRootCause(((ComponentEventException)causingEx).getCause()) :
+					Exceptions.getRootCause(causingEx)
+			;
+			if(cause instanceof ValidationExceptionMultiple) {
+				ValidationExceptionMultiple viex = (ValidationExceptionMultiple)cause;
+				log.debug("ValidationExceptionMultiple is proccessed");
+				if(viex.getCause() != null || Texts.tos(viex.getMessage()).length() > 0 || viex.getRootException() != null) {
+					onExceptionInternal(viex);
+				}
+				
+				for(ValidationException ex : viex.getExceptions()) {
+					if(ex != null) {
+						onExceptionInternal(ex);
+					}
+				}
+			} else {
+				onExceptionInternal(causingEx);
+			}
+		}
+		return getReturn();
+	}
+
+	private void onExceptionInternal(Throwable causingEx) {
 		Throwable cause;
 		if(causingEx instanceof ComponentEventException) {
 			cause = Exceptions.getRootCause(((ComponentEventException)causingEx).getCause());
@@ -18,11 +48,18 @@ public class ExceptionHandledComponentBase extends ComponentBase {
 			cause = Exceptions.getRootCause(causingEx);
 		}
 		String message;
+		Type type = ValidationException.Type.ERROR;
 		
 		// BreakException indicates that processing was stopped but it is not error
-		if(!(cause instanceof BreakException)) {
+		if(cause instanceof BreakException) {
+			log.trace("BreakException thrown from component - IGNORED", cause);
+		} else {
+			log.trace("Exception thrown from  component that is proccesed ty 'ExceptionHandledComponentBase'", cause);
 			if(cause instanceof ValidationException) {
 				ValidationException vex = (ValidationException) cause;
+				if(vex.getType() != null) {
+					type = vex.getType();
+				}
 				String msg = vex.getMessage();
 				if(msg != null) {
 					if(msg.regionMatches(0,	"localized:", 0, 10)) {
@@ -53,8 +90,20 @@ cont1:
 					message = message + " :: " + cause.toString();
 				}
 			}
-			alerts.error(message);
+			switch(type) {
+			case WARN:
+				alerts.warn(message);
+				break;
+			case INFO:
+				alerts.info(message);
+				break;
+			case OK:
+				alerts.success(message);
+				break;
+			default:
+				alerts.error(message);
+				break;
+			}
 		}
-		return getReturn();
 	}
 }
