@@ -13,6 +13,15 @@ import org.apache.tapestry5.runtime.ComponentEventException;
 
 public class ExceptionHandledComponentBase extends ComponentBase {
 
+	/**
+	 * handles exception that occurs in component or nested components.
+	 * Cascade exceptions are "stripped" to root cause, that is displayed as message.
+	 * {@link BreakException} is silently ignored (inly logged at "trace" level).
+	 * In case {@link ValidationException}, its message is translated and showed with parameters (id {@link ValidationException#getType()} is set, in corresponding type of message. 
+	 * 
+	 * @param causingEx the main exception. 
+	 * @return calls {@link #getReturn()} to obtain return value
+	 */
 	public Object onException(Throwable causingEx) {
 		
 		if(causingEx != null) {
