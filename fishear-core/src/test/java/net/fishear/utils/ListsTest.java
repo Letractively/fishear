@@ -11,7 +11,7 @@ import static org.testng.Assert.*;
 
 public class ListsTest {
 
-	static class ListKey {
+	public static class ListKey {
 
 		public ListKey(int id) {
 			setId((long)id);
@@ -52,7 +52,7 @@ public class ListsTest {
 		
 	}
 	
-	static class ListIt {
+	public static class ListIt {
 
 		private String key;
 		
@@ -338,6 +338,60 @@ public class ListsTest {
 		assertEquals(map.get(null).size(), 1);
 		assertEquals(map.get(lk1).size(), 4);
 		assertEquals(map.get(lk2).size(), 3);
+	}
+	
+	@Test
+	public void sublistPropertyTest1() {
+		List<ListIt> list = newist();
+		list.get(0).setKey("KEY1");
+		list.get(1).setKey("KEY1");
+		list.get(2).setKey("KEY2");
+		list.get(3).setKey("KEY3");
+		list.get(4).setKey("KEY3");
+		list.get(5).setKey("KEY3");
+		list.get(6).setKey(null);
+		list.get(7).setKey(null);
+		
+		assertEquals(Lists.sublist(list, "key", "KEY1").size(), 2);
+		assertEquals(Lists.sublist(list, "key", "KEY1", "KEY2").size(), 3);
+		assertEquals(Lists.sublist(list, "key", "KEY1", "KEY2", null).size(), 5);
+		
+		assertEquals(Lists.sublist(true, list, "key", "KEY1", "KEY2", null).size(), 3);
+		assertEquals(Lists.sublist(true, list, "key", "KEY1", "KEY2", null, "KEY3").size(), 0);
+	}
+	
+	@Test
+	public void sublistPropertyTest2() {
+		List<ListIt> list = newist();
+		
+		ListKey lk1 = new ListKey(1);
+		
+		list.get(0).setListKey(lk1);
+		list.get(1).setListKey(lk1);
+		list.get(2).setListKey(lk1);
+		list.get(3).setListKey(lk1);
+		
+		ListKey lk2 = new ListKey(2);
+		list.get(4).setListKey(lk2);
+		list.get(5).setListKey(lk2);
+
+		ListKey lk3 = new ListKey(3);
+		list.get(6).setListKey(lk3);
+		
+		ListKey lk4 = new ListKey(3);
+		list.get(7).setListKey(lk4);
+
+		assertEquals(Lists.sublist(list, "listKey", lk1).size(), 4);
+		assertEquals(Lists.sublist(list, "listKey", lk3).size(), 1);
+		assertEquals(Lists.sublist(list, "listKey", lk4).size(), 1);
+
+		assertEquals(Lists.sublist(list, "listKey.id", 2L).size(), 2);
+		assertEquals(Lists.sublist(list, "listKey.id", 3L, 4L).size(), 2);
+		assertEquals(Lists.sublist(list, "listKey.id", 2L, 3L).size(), 4);
+		
+		list.add(new ListIt());
+		assertEquals(Lists.sublist(list, "listKey.id", 2L, 3L).size(), 4);
+		
 	}
 	
 }
