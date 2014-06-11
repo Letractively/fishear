@@ -42,7 +42,6 @@ public class Lists {
 	public static <T> List<T>sublist(final boolean negate, List<T> list, final String propertyName, Object... allowedValues) {
 	
 		final List<?> values = Arrays.asList(allowedValues);
-System.err.println("\nVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV " + values);		
 		ListFilter<T> filter = new ListFilter<T>() {
 
 			@Override
