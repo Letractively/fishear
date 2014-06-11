@@ -23,6 +23,42 @@ public class Lists {
 		}
 		return retlist;
 	}
+	
+	
+	public static <T> List<T>sublist(List<T> list, String propertyName, Object... allowedValues) {
+		return sublist(false, list, propertyName, allowedValues);
+	}
+
+	/**
+	 * filters list to only elements, that contaions property with given set of values.
+	 * 
+	 * 
+	 * @param list the list
+	 * @param propertyName name of property (may be nested, dot separated) that value is tested
+	 * @param negate if true => the condition is negated. That means returns list with item that's 'propertyName' DOES NOT contain any of values in 'allowedValues'.
+	 * @param allowedValues list of values that value of 'propertyName' must fit. 
+	 * @return sublist
+	 */
+	public static <T> List<T>sublist(final boolean negate, List<T> list, final String propertyName, Object... allowedValues) {
+	
+		final List<?> values = Arrays.asList(allowedValues);
+System.err.println("\nVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV " + values);		
+		ListFilter<T> filter = new ListFilter<T>() {
+
+			@Override
+			public boolean addToResult(T o) {
+				Object theVal = EntityUtils.getRawValue(propertyName, o, null);
+				if(values.contains(theVal)) {
+					return !negate;
+				} else {
+					return negate;
+				}
+			}
+		};
+
+		return sublist(list, filter);
+	}
+	
 
 	public static <T> List<T>sublist(List<T> list, int from, int to) {
 		if(from < 0) {
