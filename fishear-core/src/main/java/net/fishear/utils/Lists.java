@@ -59,6 +59,25 @@ public class Lists {
 	}
 	
 
+	/**
+	 * creates sublist of given list from beginning index to the end.
+	 * 
+	 * @param list
+	 * @param from
+	 * @return
+	 */
+	public static <T> List<T>sublist(List<T> list, int from) {
+		return sublist(list, 0, Integer.MAX_VALUE);
+	}
+
+	/**
+	 * creates sublist of given list between indexes.
+	 * 
+	 * @param list the source list
+	 * @param from index of first element. If < 0, 0 is treated. 
+	 * @param to index of element AFTER last element that is added to the sublist. For example 1 means only first element is passed to target. If the value is greats then list size, the end of list is treated. 
+	 * @return the sublist.
+	 */
 	public static <T> List<T>sublist(List<T> list, int from, int to) {
 		if(from < 0) {
 			from = 0;
