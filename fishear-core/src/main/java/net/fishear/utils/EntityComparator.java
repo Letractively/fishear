@@ -12,7 +12,9 @@ import java.util.Comparator;
  */
 public class EntityComparator<T> implements Comparator<T> {
 	
-	final Method[] ma;
+	private final Method[] ma;
+	
+	private boolean invert;
 	
 	EntityComparator(Method[] ma) {
 		this.ma = ma;
@@ -37,9 +39,13 @@ public class EntityComparator<T> implements Comparator<T> {
 		return va;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public int compare(Object o1, Object o2) {
+		return invert ? -compareInternal(o1, o2) : compareInternal(o1, o2);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private int compareInternal(Object o1, Object o2) {
 
 		Object[] va1 = val(o1);
 		Object[] va2 = val(o2);
@@ -62,5 +68,21 @@ public class EntityComparator<T> implements Comparator<T> {
 		} else {
 			return ((Comparable)v1).compareTo(v2);
 		}
+	}
+
+	/**
+	 * @return the invert
+	 */
+	public boolean isInvert() {
+		return invert;
+	}
+
+	/**
+	 * @param invert the invert to set
+	 * @return this instance
+	 */
+	public EntityComparator<T> setInvert(boolean invert) {
+		this.invert = invert;
+		return this;
 	}
 }
