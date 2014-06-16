@@ -42,6 +42,7 @@
 <!-- 		<module>fishear-t5-sample</module> -->
 		<module>fishear-t5-context</module>
 		<module>fishear-data-versions</module>
+		<module>fishear-t5-jquery</module>
 	</modules>
 	<properties>
 		<java-version>1.6</java-version>
