@@ -1,0 +1,26 @@
+<t:container 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter"
+>
+<t:if test="ajaxEvent">
+	<t:component t:id="ajaxDialog"
+		t:dialog="${clientId}"
+		t:zone="dlgBaseZone"
+	><t:delegate to="label" /></t:component>
+	<t:jquery.dialog
+		t:clientId="${clientId}" 
+		t:params="params"
+	>
+	<t:zone t:id="dlgBaseZone"><t:body /></t:zone>
+	</t:jquery.dialog>	
+<p:else>
+	<t:component t:id="nonAjax"
+		t:dialog="${clientId}"
+	><t:delegate to="label" /></t:component>
+	<t:jquery.dialog
+		t:clientId="${clientId}" 
+		t:params="params"
+	><t:body /></t:jquery.dialog>	
+</p:else>
+</t:if>
+</t:container>
