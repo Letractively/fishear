@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.fishear</groupId>
+		<artifactId>fishear-all</artifactId>
+		<version>1.0.3-SNAPSHOT</version>
+	</parent>
+	<artifactId>fishear-t5-jquery</artifactId>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.got5</groupId>
+			<artifactId>tapestry5-jquery</artifactId>
+			<version>${tapestry-jquery-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tapestry</groupId>
+			<artifactId>tapestry-core</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.fishear</groupId>
+			<artifactId>fishear-core</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.fishear</groupId>
+			<artifactId>fishear-t5</artifactId>
+			<version>1.0.3-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<tapestry-jquery-version>3.3.3</tapestry-jquery-version>
+	</properties>
+
+</project>

@@ -1,4 +1,4 @@
-package net.fishear.web.t5.components;
+package net.fishear.web.t5.jquery.components;
 
 import javax.inject.Inject;
 
