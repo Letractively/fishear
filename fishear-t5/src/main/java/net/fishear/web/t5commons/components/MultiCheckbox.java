@@ -1,4 +1,4 @@
-package net.fishear.web.t5.components;
+package net.fishear.web.t5commons.components;
 
 import java.util.ArrayList;
 import java.util.List;
