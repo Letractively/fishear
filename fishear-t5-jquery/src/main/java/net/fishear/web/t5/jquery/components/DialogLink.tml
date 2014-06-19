@@ -1,0 +1,6 @@
+<t:container 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter"
+>
+<t:jquery.dialogajaxlink t:id="openDialog" t:zone="dlgBaseZone" t:dialog="prop:dialogId" t:context="prop:context" ><t:body /></t:jquery.dialogajaxlink>
+</t:container>

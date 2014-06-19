@@ -17,6 +17,13 @@ public class DialogTest extends ComponentBase {
 	@Property
 	int loopVar;
 	
+	@Property
+	String loopVar2;
+	
+	@Property
+	@Persist
+	String dialog2Value;
+	
 	/**
 	 * @return the act1Num
 	 */
@@ -45,14 +52,16 @@ public class DialogTest extends ComponentBase {
 		this.act2Num = act2Num;
 	}
 	
-	@OnEvent(value="Mujevent")
-	public void onMujevent() {
-		System.err.println("(1)XXXXXXXXXXXXXXXXXXXXXXXXXx " + act1Num++);
+	@OnEvent("ajaxDialogEvent_1")
+	public void ajax1(int context) {
+		act1Num = context;
 	}
 	
-	@OnEvent(value="mujevent2")
-	public void ajax2() {
-		System.err.println("(2)XXXXXXXXXXXXXXXXXXXXXXXXXx " + act2Num++);
+	@OnEvent("ajaxDialogEvent_2")
+	public void ajax2(String code) {
+		act2Num++;
+		System.err.println("ajaxDialogEvent_2 called - act2Num=" + act2Num + ",  new code = '" + code + "'");
+		dialog2Value = code;
 	}
 	
 }
