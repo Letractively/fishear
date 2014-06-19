@@ -45,6 +45,20 @@ public class Dialog extends ComponentBase {
 	DialogLink dialog;
 
 
+	/**
+	 * @return the context
+	 */
+	public Object[] getContext() {
+		return context;
+	}
+
+	/**
+	 * @param context the context to set
+	 */
+	public void setContext(Object[] context) {
+		this.context = context;
+	}
+	
 	@Cached
 	public String getClientId() {
 		if(Texts.tos(clientId).length() == 0) {
@@ -62,10 +76,14 @@ public class Dialog extends ComponentBase {
 	}
 
 	public Object onActionFromAjaxDialog() {
+		return raiseDialogEvent(context);
+	}
+
+	public Object raiseDialogEvent(Object[] context) {
 		if(Texts.tos(ajaxEvent).length() > 0) {
 			crsc.getContainerResources().triggerEvent(ajaxEvent, context, null);
 		}
 		return ((Zone)crsc.getEmbeddedComponent("dlgBaseZone")).getBody();
 	}
-	
+
 }

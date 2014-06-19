@@ -7,6 +7,10 @@
 <body>
 <t:alerts />
 
+<t:fe.Dialog t:id="novis" params="{title:'${message:1st-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}">
+	NoDialogTest
+</t:fe.Dialog>
+
 <t:fe.Dialog label="First Dialog" params="{title:'${message:1st-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}">
 	This is the FIRST dialog body
 </t:fe.Dialog>
@@ -23,24 +27,31 @@
 <br />
 <br />
 
-<t:fe.Dialog id="ajaxDlg1" label="Ajax Dialog 1" params="{title:'${message:1st-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}" event="mujevent">
+<t:fe.Dialog t:id="ajaxDialog1" label="Ajax Dialog 1" params="{title:'${message:1st-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}" event="ajaxDialogEvent_1" t:context="0">
 	This is the First Ajax dialog body - action number ${act1Num}
 </t:fe.Dialog>
-
 <br />
-<br />
-
-<t:fe.Dialog label="Ajax Dialog 2" params="{title:'${message:2nd-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}" event="mujevent2">
-	This is the Second Ajax dialog body - action number ${act2Num} <br />
-	This is the Second Ajax dialog body - action number ${act2Num}
-</t:fe.Dialog>
-
-<br />
-<br />
-
+Additional Open: 
 <t:Loop source="[1,2,3,4]" value="loopVar">
-<div><t:fe.dialoglink t:dialog="ajaxDlg1"> XXX ${loopVar} </t:fe.dialoglink> </div>
+	<t:fe.dialoglink t:dialog="ajaxDialog1" t:context="loopVar">Value_${loopVar}</t:fe.dialoglink>, &#160;
 </t:Loop>
+
+<br />
+<br />
+
+<t:fe.Dialog t:id="ajaxDialog2" label="Ajax Dialog 2" params="{title:'${message:2nd-test-dialog-title}', draggable:true,modal:true,width:900,minHeight=550}" t:event="ajaxDialogEvent_2" t:context="'X'">
+	This is the Second Ajax dialog body - action number ${act2Num} <br />
+	This is the Second Ajax dialog body - action number ${act2Num} <br />
+	Extra value is: ${dialog2Value}
+</t:fe.Dialog>
+<br />
+Additional Open: <t:Loop source="['A','B','C','D']" value="loopVar2">
+	<t:fe.dialoglink t:dialog="ajaxDialog2" t:context="loopVar2">Value '${loopVar2}'</t:fe.dialoglink>, &#160;
+</t:Loop>
+
+<br />
+
+
 
 </body>
 </html>

@@ -3,10 +3,12 @@
 	xmlns:p="tapestry:parameter"
 >
 <t:if test="ajaxEvent">
+	<t:if test="label">
 	<t:component t:id="ajaxDialog"
 		t:dialog="${clientId}"
 		t:zone="dlgBaseZone"
 	><t:delegate to="label" /></t:component>
+	</t:if>
 	<t:jquery.dialog
 		t:clientId="${clientId}" 
 		t:params="params"
@@ -14,9 +16,11 @@
 	<t:zone t:id="dlgBaseZone"><t:body /></t:zone>
 	</t:jquery.dialog>	
 <p:else>
+	<t:if test="label">
 	<t:component t:id="nonAjax"
 		t:dialog="${clientId}"
 	><t:delegate to="label" /></t:component>
+	</t:if>
 	<t:jquery.dialog
 		t:clientId="${clientId}" 
 		t:params="params"
