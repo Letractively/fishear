@@ -464,6 +464,7 @@ public class
 		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
 			throw new IllegalArgumentException("java native classes cannot be compared");
 		}
+System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " :: " + System.identityHashCode(e2));
 		do {
 			Field[] fields = clazz.getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
@@ -504,8 +505,10 @@ public class
 					}
 					v1 = m.invoke(e1);
 					v2 = m.invoke(e2);
+System.err.println("  " + fldn + " => " + v1);
+System.err.println("  " + fldn + " => " + v2);
 					if(v1 == v2) {
-						log.trace("Values for field {} are the same, ignore", fldn);
+						log.trace("Field {} ignored: values are the same:{}", fldn, v1);
 						continue;
 					} else if (v1 == null || v2 == null || (e1 instanceof IdI<?> ? equalsId((IdI<?>)e1, (IdI<?>)e2) : !v1.equals(v2))) {
 						if(log.isTraceEnabled()) {

@@ -6,6 +6,7 @@ import net.fishear.data.audit.entities.Audit;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.services.AuditServiceI;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.data.generic.services.AuditServiceI.Action;
 
 public interface 
 	AuditService 
@@ -27,7 +28,7 @@ extends
 	 * 			  the service that manipulates the entity. May be null
 	 * @return null if no difference exists between entities, otherwise antity.
 	 */
-	Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService);
+	Audit createAuditEntity(Action action, EntityI<?> e1, ServiceI<?> targetService);
 
 	/**
 	 * @return enity list service
@@ -53,4 +54,12 @@ extends
 	 * @return latest change, or null if does not exist
 	 */
 	Audit getLatestChange(EntityI<?> entity);
+
+	/**
+	 * finds last value for given eudit (= entity type + object Id)
+	 * 
+	 * @param audit #DUMMY_AUDIT
+	 * @return 
+	 */
+	Audit getLastValueForEntity(Audit audit);
 }

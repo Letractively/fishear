@@ -2,6 +2,7 @@ package net.fishear.data.generic.entities;
 
 
 import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
@@ -11,6 +12,7 @@ import net.fishear.utils.Classes;
 import net.fishear.utils.EntityUtils;
 import net.fishear.utils.Globals;
 import net.fishear.utils.ListFilter;
+import net.fishear.utils.EntityUtils.Property;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.slf4j.Logger;
@@ -240,6 +242,11 @@ implements
 		} catch (CloneNotSupportedException ex) {
 			throw new IllegalStateException(ex);
 		}
+	}
+	
+	@Transient
+	public List<Property> listChanges() {
+		return EntityUtils.listDifferencies(this, initialState);
 	}
 	
 	/**

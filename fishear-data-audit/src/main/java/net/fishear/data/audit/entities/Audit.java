@@ -23,6 +23,11 @@ import net.fishear.data.generic.services.AuditServiceI.Action;
 @Table(name=AuditConstants.AUDIT_HEADERS_TABLE_NAME)
 public class Audit extends AbstractEntity {
 
+	public static final Audit DUMMY_AUDIT= new Audit();
+	static {
+		DUMMY_AUDIT.setAction(Action.VIRTUAL);
+	}
+	 
 	private Action action;
 
 	private List<AuditChange> changes;
