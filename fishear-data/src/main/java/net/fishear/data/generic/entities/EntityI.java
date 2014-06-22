@@ -1,9 +1,12 @@
 package net.fishear.data.generic.entities;
 
+import java.util.List;
+
 import javax.persistence.Transient;
 
 import net.fishear.Interfaces.IdI;
 import net.fishear.utils.Coercer;
+import net.fishear.utils.EntityUtils.Property;
 
 /**
  * Interface for internal data object. Each entity have to implement this
@@ -54,4 +57,12 @@ extends
      */
     @Transient
     void beforeDelete();
+    
+	/**
+	 * checks changes against initial state (it must be stored after entity is loaded).
+	 * 
+	 * @return list of changes. May return null = changes are unknown (or method is not implemented). In case no change, returns empty list.
+	 */
+	List<Property> listChanges();
+
 }

@@ -35,6 +35,9 @@ public class AuditDetail extends ComponentBase {
 
 	@Property
 	DspProp row;
+	
+	@Property
+	private boolean onlyChanged = false;
 
 	@Cached(watch="row")
 	public String getLinkEntityId() {
@@ -55,16 +58,22 @@ public class AuditDetail extends ComponentBase {
 	public List<DspProp> getDisplayProeprties() {
 
 		List<DspProp> list = new ArrayList<AuditDetail.DspProp>();
-		Map<String, String> pp = getPropertyValues();
+		Map<String, String> propValuse = getPropertyValues();
 
 		for(net.fishear.utils.EntityUtils.Property p : getAllProperties()) {
+			
+			String newVal = propValuse.containsKey(p.getName()) ? propValuse.get(p.getName()) : AuditChangeService.NA;
+			String oldVal = auditService.getAuditChangeService().getPreviousValue(audit, p.getName());
+			String curVal = getCurretnValue(p.getName());
+			
 			DspProp dp = new DspProp();
-			list.add(dp);
 			dp.setPropertyName(p.getName());
-			dp.setNewValue(pp.containsKey(p.getName()) ? pp.get(p.getName()) : AuditChangeService.NA);
-			dp.setCurrentValue(getCurretnValue(p.getName()));
-			dp.setOldValue(auditService.getAuditChangeService().getPreviousValue(audit, p.getName()));
+			dp.setNewValue(newVal);
+			dp.setCurrentValue(curVal);
+			dp.setOldValue(oldVal);
 			dp.property = p;
+			
+			list.add(dp);
 		}
 
 		return list;

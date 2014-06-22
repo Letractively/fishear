@@ -210,11 +210,11 @@ implements
 				AuditServiceI aus;
 				if((aus = adons.getAuditService()) != null) {
 					if(action == Action.DELETE) {
-						aus.auditEntity(action, entity, null, this);
+						aus.auditEntity(action, entity, this);
 					} else if(action == Action.INSERT) {
-						aus.auditEntity(action, null, entity, this);
+						aus.auditEntity(action, entity, this);
 					} else {
-						aus.auditEntity(action, entity, (EntityI<?>) ((InitialStateI)entity).getInitialState(), this);
+						aus.auditEntity(action, entity, this);
 					}
 				}
 			} else {

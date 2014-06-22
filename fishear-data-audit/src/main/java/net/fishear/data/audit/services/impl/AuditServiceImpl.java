@@ -36,14 +36,14 @@ implements
 
 	private AuditChangeService auditChangeService;
 
-	public Audit createAuditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
+	public Audit createAuditEntity(Action action, EntityI<?> e1, ServiceI<?> targetService) {
 
 		log.debug("Auditing: action {}", action);
 		
-		if(e1 == null && e2 == null) {
-			log.warn("Borh entities are null, potential application error");
-			return null;
-		}
+//		if(e1 == null && e2 == null) {
+//			log.warn("Borh entities are null, potential application error");
+//			return null;
+//		}
 		
 		List<Property> diflist;
 		boolean forceSave = false;
@@ -53,22 +53,23 @@ implements
 			forceSave = true;
 			break;
 		case VIRTUAL:
-			diflist = EntityUtils.fillDifferencies(e1 == null ? e2 : e1, true);
+			diflist = EntityUtils.fillDifferencies(e1, true);
 			break;
 		case INSERT:
-			diflist = EntityUtils.fillDifferencies(e2, true);
+			diflist = EntityUtils.fillDifferencies(e1, true);
 			break;
 		case UPDATE:
-			if(e2 == null) {
-				log.warn("UPDATE is performed but main entity ('e2') is null. Skipping.");
-				return null;
-			}
-			if(e1 == null) {
-				log.warn("UPDATE is performed but previous state ('e1') is null. Full log is performed.");
-				diflist = EntityUtils.listDifferencies(e2, true);
-			} else {
-				diflist = EntityUtils.listDifferencies(e1, e2);
-			}
+			diflist = e1.listChanges();
+//			if(e2 == null) {
+//				log.warn("UPDATE is performed but main entity ('e2') is null. Skipping.");
+//				return null;
+//			}
+//			if(e1 == null) {
+//				log.warn("UPDATE is performed but previous state ('e1') is null. Full log is performed.");
+//				diflist = EntityUtils.listDifferencies(e2, true);
+//			} else {
+//				diflist = EntityUtils.listDifferencies(e1, e2);
+//			}
 			break;
 		default:
 			throw new IllegalArgumentException("'action' argument has unsupported value: " + action);
@@ -76,14 +77,14 @@ implements
 
 		if(forceSave || diflist.size() > 0) {
 			log.trace("Entities differencies found: {}", diflist.size());
-
 			Audit audit = newEntityInstance();
-			audit.setChanges(toChanges(diflist, audit, (e2 == null ? e1 : e2) instanceof StandardEntityI));
+			List<AuditChange> changes = toChanges(diflist, audit, e1 instanceof StandardEntityI);
+			audit.setChanges(changes);
 
 			if(forceSave || audit.getChanges().size() > 0) {
 
-				audit.setAuditedEntity(auditedEntityService.getOrCreate((e1 == null ? e2 : e1).getClass()));
-				audit.setObjectId(e2 == null ? e1.getIdString() : e2.getIdString());
+				audit.setAuditedEntity(auditedEntityService.getOrCreate((e1).getClass()));
+				audit.setObjectId(e1.getIdString());
 				audit.setChangeNumber(getNextChangeNumber(audit));
 	
 				CurrentStateI state = getCurrentState();
@@ -110,28 +111,29 @@ implements
 		return ll == null ? 1L : ll + 1L;
 	}
 
-	public void auditEntity(Action action, EntityI<?> e1, EntityI<?> e2, ServiceI<?> targetService) {
+	@Override
+	public void auditEntity(Action action, EntityI<?> e1, ServiceI<?> targetService) {
 
 		if(action == Action.VIRTUAL) {
 			throw new IllegalArgumentException("Action.VIRTUAL is internal only and cannot be passed from outside");
 		}
-		EntityI<?> ex = e2 == null ? e1 : e2;
+		EntityI<?> entity = e1;
 		if(action != Action.INSERT) {
-			if(countChanges(ex) == 0) {
-				log.debug("Entity {} has no change registered. Creating virtual insert.", ex);
-				Audit virtAudit = createAuditEntity(Action.VIRTUAL, e1, e2, targetService);
+			if(countChanges(entity) == 0) {
+				log.debug("Entity {} has no change registered. Creating virtual insert.", entity);
+				Audit virtAudit = createAuditEntity(Action.VIRTUAL, e1, targetService);
 				if(virtAudit != null) {
 					save(virtAudit);
 				} else {
-					log.warn("Virtual insert for entity {} with ID {} cannot be created (bo changes).", ex, ex.getIdString());
+					log.warn("Virtual insert for entity {} with ID {} cannot be created (no changes).", entity, entity.getIdString());
 				}
 			}
 		}
-		Audit audit = createAuditEntity(action, e1, e2, targetService);
+		Audit audit = createAuditEntity(action, e1, targetService);
 		if(audit != null) {
 			save(audit);
 		} else {
-			log.debug("No changes found forf entity {}. Saving skipped.", ex);
+			log.debug("No changes found forf entity {}. Saving skipped.", entity);
 		}
 	}
 
@@ -230,5 +232,27 @@ implements
 				"objectId", entity.getIdString()
 		);
 		return super.queryCount(qc);
+	}
+
+	@Override
+	public Audit getLastValueForEntity(Audit audit) {
+		QueryConstraints qc = QueryFactory.create();
+		qc.results().add("changeNumber", Functions.MAX);
+		qc.add(Restrictions.equal("auditedEntity", audit.getAuditedEntity()));
+		qc.add(Restrictions.equal("objectId", audit.getObjectId()));
+		Long rn = (Long) query(qc).get(0);
+
+		QueryConstraints qc2 = QueryFactory.create();
+		qc2.add(Restrictions.equal("changeNumber", rn));
+		qc2.add(Restrictions.equal("objectId", audit.getObjectId()));
+		qc2.add(Restrictions.equal("auditedEntity", audit.getAuditedEntity()));
+
+		Audit row = read(qc2);
+
+		if(row == null) {
+			return Audit.DUMMY_AUDIT;
+		} else {
+			return row;
+		}
 	}
 }

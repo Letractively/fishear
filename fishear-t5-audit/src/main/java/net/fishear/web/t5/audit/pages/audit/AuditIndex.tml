@@ -38,7 +38,7 @@
 		<tr><td colspan="99">
 		<hr />
 		<h5 class="selectedEntityHeader" style="display: inline; ">${getEntityShortName(AudiedEntity)}</h5> 
-		&#160; <t:checkbox t:id="simpleList" onclick="form.changeFrom.value='SELONLY';form.submit()"/><t:label for="simpleList">Only object list</t:label>
+		&#160; <t:checkbox t:id="lastValueOnly" onclick="form.changeFrom.value='SELONLY';form.submit()"/><t:label for="lastValueOnly">Show Only Last Changed Entity Value</t:label>
 		<t:if t:test="selectedObjectId">
 			&#160; <t:eventlink t:event="clrObjId" title="Displays all objects (with all IDs)">Display All Object</t:eventlink> 
 		</t:if>

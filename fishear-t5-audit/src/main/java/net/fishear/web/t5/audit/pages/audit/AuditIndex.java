@@ -57,7 +57,7 @@ public class AuditIndex extends ComponentBase {
 	
 	@Property
 	@Persist
-	boolean simpleList;
+	boolean lastValueOnly;
 	
 	@Property
 	@Persist
@@ -83,33 +83,13 @@ public class AuditIndex extends ComponentBase {
 //	@Persist(PersistenceConstants.FLASH)
 	String changeFrom;
 
-	private static final Audit DUMMY_AUDIT;
-	static {
-		DUMMY_AUDIT = new Audit();
-		DUMMY_AUDIT.setAction(Action.VIRTUAL);
-	}
-	
 	@Cached(watch="row")
 	public Audit getLastForRow() {
-		Audit row = this.row; 
-		if(simpleList) {
-			QueryConstraints qc = QueryFactory.create();
-			qc.results().add("changeNumber", Functions.MAX);
-			qc.add(Restrictions.equal("objectId", row.getObjectId()));
-			Long rn = (Long) auditService.query(qc).get(0);
-	
-			QueryConstraints qc2 = QueryFactory.create();
-			qc2.add(Restrictions.equal("changeNumber", rn));
-			qc2.add(Restrictions.equal("objectId", row.getObjectId()));
-			
-			row = auditService.read(qc2);
-			if(row == null) {
-				return DUMMY_AUDIT;
-			} else {
-				return row;
-			}
+		Audit audit = this.row; 
+		if(lastValueOnly) {
+			return auditService.getLastValueForEntity(audit);
 		} else {
-			return row;
+			return audit;
 		}
 	}
 	
@@ -172,31 +152,33 @@ public class AuditIndex extends ComponentBase {
 		if(entityHash == null) {
 			qc.add(Restrictions.FALSE);
 		} else {
-			qc.add(Restrictions.equal("auditedEntity", getAudiedEntity()));
-			if(selectedProperty != null) {
-				if(searchpropertyValue != null) {
-					qc.where().conditions().add(Restrictions.exists(AuditChange.class, "ac", Restrictions.and(
-						Restrictions.equalProperty("this.id", "ac.audit.id"),
-						Restrictions.equal("propertyName", selectedProperty),
-						Restrictions.like("newValue", searchpropertyValue)
-				)));
-				} else {
-					qc.where().conditions().add(Restrictions.exists(AuditChange.class, "ac", Restrictions.and(
-						Restrictions.equalProperty("this.id", "ac.audit.id"),
-						null,
-						Restrictions.equal("propertyName", selectedProperty)
+			if(getAudiedEntity() != null) {
+				qc.add(Restrictions.equal("auditedEntity.id", getAudiedEntity().getId()));
+				if(selectedProperty != null) {
+					if(searchpropertyValue != null) {
+						qc.where().conditions().add(Restrictions.exists(AuditChange.class, "ac", Restrictions.and(
+							Restrictions.equalProperty("this.id", "ac.audit.id"),
+							Restrictions.equal("propertyName", selectedProperty),
+							Restrictions.like("newValue", searchpropertyValue)
 					)));
+					} else {
+						qc.where().conditions().add(Restrictions.exists(AuditChange.class, "ac", Restrictions.and(
+							Restrictions.equalProperty("this.id", "ac.audit.id"),
+							null,
+							Restrictions.equal("propertyName", selectedProperty)
+						)));
+					}
 				}
-			}
-			if(selectedAction != null) {
-				qc.add(Restrictions.equal("action", selectedAction));
-			}
-			if(selectedObjectId != null) {
-				qc.add(Restrictions.equal("objectId", selectedObjectId));
-			}
-			qc.add(Restrictions.interval("actionDate", changedFrom, changedTo));
-			if(simpleList) {
-				qc.add(Restrictions.equal("changeNumber", 1L));
+				if(selectedAction != null) {
+					qc.add(Restrictions.equal("action", selectedAction));
+				}
+				if(selectedObjectId != null) {
+					qc.add(Restrictions.equal("objectId", selectedObjectId));
+				}
+				qc.add(Restrictions.interval("actionDate", changedFrom, changedTo));
+				if(lastValueOnly) {
+					qc.add(Restrictions.equal("changeNumber", 1L));
+				}
 			}
 		}
 		
@@ -227,7 +209,7 @@ public class AuditIndex extends ComponentBase {
 		this.selectedObjectId = objectId;
 		if(objectId != null) {
 			selectedAction = null;
-			simpleList = false;
+			lastValueOnly = false;
 		}
 	}
 	
@@ -261,7 +243,7 @@ public class AuditIndex extends ComponentBase {
 		
 		changedTo = null;
 
-		simpleList = true;
+		lastValueOnly = true;
 		
 		detail = null;
 
@@ -271,15 +253,15 @@ public class AuditIndex extends ComponentBase {
 	public void onSuccessFromSearch() {
 
 		if(selectedAction != null && "ACTION".equals(changeFrom)) {
-			simpleList = false;
+			lastValueOnly = false;
 		}
 		if(entityHash != null && "ENTITY".equals(changeFrom)) {
-			simpleList = true;
+			lastValueOnly = true;
 			selectedProperty = null;
 			selectedObjectId = null;
 		}
 		if(selectedProperty != null && searchpropertyValue != null && !"SELONLY".equals(changeFrom)) {
-			simpleList = false;
+			lastValueOnly = false;
 			selectedAction = null;
 		}
 		changeFrom = null;
@@ -301,7 +283,7 @@ public class AuditIndex extends ComponentBase {
 	
 	void onClrObjId() {
 		selectedObjectId = null;
-		simpleList = true;
+		lastValueOnly = true;
 	}
 	
 	private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm");
