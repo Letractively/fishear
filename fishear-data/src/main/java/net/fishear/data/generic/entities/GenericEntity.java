@@ -213,6 +213,11 @@ implements
     	// the default - empty - implementation
     }
 
+	/**
+	 * searches for type of ID that thic instance implements.
+	 * 
+	 * @return class represents type of ID
+	 */
 	@SuppressWarnings("unchecked")
 	private Class<T> findType() {
 		Class<?> clazz = this.getClass();
