@@ -505,12 +505,12 @@ System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " 
 					}
 					v1 = m.invoke(e1);
 					v2 = m.invoke(e2);
-System.err.println("  " + fldn + " => " + v1);
-System.err.println("  " + fldn + " => " + v2);
-					if(v1 == v2) {
+//System.err.println("  " + fldn + " => " + v1);
+//System.err.println("  " + fldn + " => " + v2);
+					if(equalsObject(v1, v2)) {
 						log.trace("Field {} ignored: values are the same:{}", fldn, v1);
 						continue;
-					} else if (v1 == null || v2 == null || (e1 instanceof IdI<?> ? equalsId((IdI<?>)e1, (IdI<?>)e2) : !v1.equals(v2))) {
+					} else {
 						if(log.isTraceEnabled()) {
 							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
 						}
@@ -525,6 +525,27 @@ System.err.println("  " + fldn + " => " + v2);
 		return list;
 	}
 	
+	/**
+	 * tries to compare two object the best way. Entities are compared by them IDs, primitices by cvalues and the rest by the "equals" method.
+	 * 
+	 * @param v1 first value
+	 * @param v2 second value
+	 * @return value are equals (or IDs are the same in case entity)
+	 */
+	private static boolean equalsObject(Object v1, Object v2) {
+		// TODO Auto-generated method stub
+		if(v1 == v2) {
+			return true;
+		}
+		if(v1 == null || v2 == null) {
+			return false;
+		}
+		if (v1 instanceof IdI<?> && v2 instanceof IdI<?>) {
+			return equalsId((IdI<?>)v1, (IdI<?>)v2);
+		}
+		return v1.equals(v2);
+	}
+
 	/** provides list of all values form entity as list of differencies.
 	 * @param e rhe entity
 	 * @param isTarget if true, values are filled to target value of list item. Default is source value.
