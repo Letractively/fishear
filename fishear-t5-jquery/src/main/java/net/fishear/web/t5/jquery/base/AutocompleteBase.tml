@@ -1,0 +1,7 @@
+<t:container 
+	xmlns:t="http://tapestry.apache.org/schema/tapestry_5_1_0.xsd" 
+	xmlns:p="tapestry:parameter"
+>
+<t:textfield t:id="selectedId" size="1" style="display:none" />
+<t:textfield t:id="typedText" t:mixins="fe/Autocomplete" targetId="selectedId${clientIdSuffix}"/>
+</t:container>
