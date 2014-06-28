@@ -21,6 +21,14 @@ import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
 import org.apache.tapestry5.dom.Element;
 
+/**
+ * Base class for selects, that provide direct select into target entity of given type.
+ * That means the {@link #value} if the entity itself - not an ID or code. Entity type passed as class parameter.
+ * 
+ * @author raterwork
+ *
+ * @param <T>
+ */
 @SupportsInformalParameters
 public abstract class SelectBase<T extends EntityI<?>> {
 
