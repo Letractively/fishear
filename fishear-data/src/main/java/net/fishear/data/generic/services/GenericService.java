@@ -27,6 +27,7 @@ import net.fishear.data.generic.query.exceptions.TooManyRecordsException;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.services.AuditServiceI.Action;
 import net.fishear.exceptions.AppException;
+import net.fishear.utils.Classes;
 import net.fishear.utils.Defender;
 import net.fishear.utils.EntityUtils;
 import net.fishear.utils.EntityUtils.FillFlags;
@@ -49,8 +50,19 @@ implements
 	ServiceI<K> 
 {
 
+	private Object DUMMY_ENTITY;
+	
 	private static final Class<Annotation> auditable = getAuditable();
 
+	
+	@SuppressWarnings("unchecked")
+	private K dummyEntity() {
+		if(DUMMY_ENTITY == null) {
+			DUMMY_ENTITY = newEntityInstance();
+		}
+		return (K) DUMMY_ENTITY;
+	}
+	
 	@SuppressWarnings("unchecked")
 	private static Class<Annotation> getAuditable() {
 		String auditableClass = "net.fishear.data.audit.annotations.Auditable";
@@ -111,8 +123,23 @@ implements
 	}
 
     private K read_(Object id) {
-        return (K)getDao().read(id);
+    	if(checkId(id)) {
+    		return (K)getDao().read(id);
+    	} else {
+    		return null;
+    	}
     }
+
+	private boolean checkId(Object id) {
+    	if(id == null) {
+    		log.warn("Entity ID is null");
+    		return false;
+    	}
+    	if(!id.getClass().equals(dummyEntity().getIdType())) {
+    		throw new IllegalStateException(String.format("ID is wrong type. Expected type: %s, passed type: %s", Classes.getShortClassName(dummyEntity().getIdType()), id.getClass()));
+    	}
+    	return true;
+	}
 
 	@Override
     public void delete(K entity) {
@@ -129,13 +156,15 @@ implements
 	@Override
     public boolean delete(Object id) {
 		log.trace("Deleting entity by ID={}", id);
-		GenericDaoI<K> dao = getDao();
-		K k = dao.read(id);
-		if(k != null) {
-			delete(k);
-	        return true;
-		} else {
-			log.debug("Deleting entity by ID: object with ID='{}' not found", id);
+		if(checkId(id)) {
+			GenericDaoI<K> dao = getDao();
+			K k = dao.read(id);
+			if(k != null) {
+				delete(k);
+		        return true;
+			} else {
+				log.debug("Deleting entity by ID: object with ID='{}' not found", id);
+			}
 		}
 		return false;
     }
