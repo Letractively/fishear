@@ -3,17 +3,18 @@ package net.fishear.web.t5.components;
 import java.lang.reflect.ParameterizedType;
 
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.EntitySourceI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.query.restrictions.Restrictions;
 import net.fishear.data.generic.query.utils.SearchUtils;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Classes;
 import net.fishear.utils.Globals;
 import net.fishear.web.t5.base.ComponentBase;
-import net.fishear.web.t5.base.GenericGridDetailComponent;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -111,8 +112,8 @@ implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public ServiceI<T> getService() {
-		if(this.searchable != null && this.searchable instanceof GenericGridDetailComponent<?>) {
-			return (ServiceI<T>) ((GenericGridDetailComponent<?>)this.searchable).getService();
+		if(this.searchable != null && this.searchable instanceof ServiceSourceI<?>) {
+			return (ServiceI<T>) ((ServiceSourceI<?>)this.searchable).getService();
 		} else {
 			throw new IllegalStateException(String.format("The component that implements '%s' must be placed inside '%s' or must extend method 'getService()' to return propert service.", Classes.getShortClassName(AbstractSearch.class), Classes.getShortClassName(this)));
 		}
@@ -149,11 +150,15 @@ implements
 
 	private void resetEntity() {
 		if(clearEntity) {
-			log.trace("Flag 'reserEntity' is set = reseting {} entity to null ", Classes.getShortClassName(GenericGridDetailComponent.class));
-			if(this.searchable != null && this.searchable instanceof GenericGridDetailComponent<?>) {
-				((GenericGridDetailComponent<?>)this.searchable).setEntity(null);
+			if(this.searchable == null) {
+				log.debug("Flag 'resetEntity' is set bur searchable is null");
 			} else {
-				log.debug("Flag 'reserEntity' is set but the component is not inside {}", Classes.getShortClassName(GenericGridDetailComponent.class));
+				if(this.searchable instanceof EntitySourceI<?>) {
+					log.trace("Flag 'resetEntity' is set => reseting entity in '{}' to null ", Classes.getShortClassName(this.searchable.getClass()));
+					((EntitySourceI<?>)this.searchable).setEntity(null);
+				} else {
+					log.debug("Flag 'reserEntity' is set but the component '{}' is not instance of {}", Classes.getShortClassName(this.searchable.getClass()), Classes.getShortClassName(EntitySourceI.class));
+				}
 			}
 		} else {
 

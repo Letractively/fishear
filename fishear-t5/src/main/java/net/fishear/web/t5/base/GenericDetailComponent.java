@@ -2,8 +2,11 @@ package net.fishear.web.t5.base;
 
 import java.lang.reflect.ParameterizedType;
 
+import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.EntitySourceI;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 
@@ -16,6 +19,10 @@ public abstract class
 	GenericDetailComponent<T extends EntityI<?>> 
 extends 
 	ExceptionHandledComponentBase
+implements
+	EntityTypeI,
+	ServiceSourceI<T>,
+	EntitySourceI<T>
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());
