@@ -243,8 +243,9 @@ implements
 	@Transient
 	public void saveInitialState() {
 		try {
-			initialState = (EntityI<?>) this.clone();
-		} catch (CloneNotSupportedException ex) {
+//			initialState = (EntityI<?>) this.clone();
+			initialState = (EntityI<?>) EntityUtils.softClone(this);
+		} catch (Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 	}
