@@ -2,10 +2,13 @@ package net.fishear.web.t5.base;
 
 import java.lang.reflect.ParameterizedType;
 
+import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
+import net.fishear.data.generic.entities.EntitySourceI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 import net.fishear.exceptions.ValidationException;
@@ -26,7 +29,11 @@ public abstract class
 extends 
 	ExceptionHandledComponentBase
 implements 
-	SearchableI<T>
+	SearchableI<T>,
+	EntityTypeI,
+	EntitySourceI<T>,
+	ServiceSourceI<T>
+	
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());

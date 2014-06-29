@@ -1,9 +1,10 @@
 package net.fishear.web.t5.internal;
 
+import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.web.t5.base.GenericGridDetailComponent;
 
-public interface SearchableI<T extends EntityI<?>>
+public interface SearchableI<T extends EntityI<?>> extends EntityTypeI
 {
 
 	void setSearchComponent(SearchFormI<T> searchComponent);

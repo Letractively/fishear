@@ -2,10 +2,12 @@ package net.fishear.web.t5.base;
 
 import java.lang.reflect.ParameterizedType;
 
+import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.conditions.Conditions;
 import net.fishear.data.generic.services.ServiceI;
+import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 import net.fishear.utils.Classes;
@@ -13,6 +15,7 @@ import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
+import org.apache.tapestry5.annotations.Cached;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +24,9 @@ public abstract class
 extends 
 	ExceptionHandledComponentBase
 implements
-	SearchableI<T>
+	SearchableI<T>,
+	EntityTypeI,
+	ServiceSourceI<T>
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());
@@ -35,7 +40,17 @@ implements
 	/**
 	 * @return the service that manages entities for this 
 	 */
+	
 	public abstract ServiceI<T> getService();
+	
+	@Cached
+	private ServiceI<T> service() {
+		ServiceI<T> svc = getService();
+		if(svc == null) {
+			throw new IllegalStateException("Service required by the {} class is null.");
+		}
+		return svc;
+	}
 
 	/**
 	 * method suit for modifying conditions. 
@@ -50,8 +65,8 @@ implements
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
-			if(getService().delete(id)) {
-				getService().getDao().commit();
+			if(service().delete(id)) {
+				service().getDao().commit();
 				alerts.success(translate("record-has-been-deleted-message"));
 			} else {
 				alerts.error(translate("cannot-delete-record-message"));
@@ -61,7 +76,7 @@ implements
 				log.debug("Deleting is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
 			}
 			if(ex.isRollback()) {
-				getService().getDao().rollback();
+				service().getDao().rollback();
 			}
 		} catch(Exception ex) {
 			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
@@ -82,7 +97,7 @@ implements
 	 * @return data source
 	 */
 	public PagingDataSource getDataSource() {
-		PagingDataSource pds = new PagingDataSource(getService());
+		PagingDataSource pds = new PagingDataSource(service());
 		if(searchComponent != null) {
 			Conditions cond = searchComponent.getSearchConstraints();
 			Conditions cond2 = cond == null ? new Conditions() : cond;

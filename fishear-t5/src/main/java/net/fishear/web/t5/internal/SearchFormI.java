@@ -1,14 +1,17 @@
 package net.fishear.web.t5.internal;
 
+import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.query.conditions.Conditions;
+import net.fishear.data.generic.services.ServiceSourceI;
 
 public interface 
 	SearchFormI<T extends EntityI<?>>
 extends
-	ServiceSourceI<T>
+	ServiceSourceI<T>,
+	EntityTypeI
 {
 
 	/** returns condition to satisfy data filled out to search form, or null if no search is required.
