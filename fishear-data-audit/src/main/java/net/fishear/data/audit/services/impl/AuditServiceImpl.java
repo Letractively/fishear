@@ -247,12 +247,14 @@ implements
 		qc2.add(Restrictions.equal("objectId", audit.getObjectId()));
 		qc2.add(Restrictions.equal("auditedEntity", audit.getAuditedEntity()));
 
-		Audit row = read(qc2);
-
-		if(row == null) {
-			return Audit.DUMMY_AUDIT;
+		List<Audit> list = list(qc2);
+		if(list.size() > 0) {
+			if(list.size() > 1) {
+				log.warn(String.format("Two or more audits with the same entity, ObjectId and change number. Entity: %s, ObjectId: %s, Change#: ", audit.getAuditedEntity(), audit.getObjectId(), audit.getChangeNumber()));
+			}
+			return list.get(0);
 		} else {
-			return row;
+			return Audit.DUMMY_AUDIT;
 		}
 	}
 }
