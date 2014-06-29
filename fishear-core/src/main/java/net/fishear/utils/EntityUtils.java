@@ -1,18 +1,29 @@
 package net.fishear.utils;
 
 import java.beans.PropertyDescriptor;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.BeanUtilsBean2;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.persistence.Id;
@@ -464,7 +475,7 @@ public class
 		if(cln.startsWith("java.") || cln.startsWith("javax.")) {
 			throw new IllegalArgumentException("java native classes cannot be compared");
 		}
-System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " :: " + System.identityHashCode(e2));
+//System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " :: " + System.identityHashCode(e2));
 		do {
 			Field[] fields = clazz.getDeclaredFields();
 			for (int i = 0; i < fields.length; i++) {
@@ -505,12 +516,13 @@ System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " 
 					}
 					v1 = m.invoke(e1);
 					v2 = m.invoke(e2);
-//System.err.println("  " + fldn + " => " + v1);
-//System.err.println("  " + fldn + " => " + v2);
+//System.err.println("  " + fldn + ": " + v1 + " <=> " + v2);
 					if(equalsObject(v1, v2)) {
+//System.err.println("    => " + "EQUALS");
 						log.trace("Field {} ignored: values are the same:{}", fldn, v1);
 						continue;
 					} else {
+//System.err.println("    => " + "DIFFERENCE");
 						if(log.isTraceEnabled()) {
 							log.trace(String.format("Added difference for field %s, v1={}, v2={}", fldn), v1, v2);
 						}
@@ -525,6 +537,89 @@ System.err.println("\nListing differencies: " + System.identityHashCode(e1) + " 
 		return list;
 	}
 	
+	/**
+	 * creates clone of the entity in "very shelf" manner. In case nested entities (instances of {@link IdI}), only empty instances with ID set are created. 
+	 * the Known types (date, numbers, strings) are clonned. The rest id passed as is (with warning message).
+	 * 
+	 * @param entity
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T softClone(T entity) {
+		if(entity == null) {
+			return null;
+		}
+		try {
+			return (T) cloneInternal(entity);
+		} catch (Exception ex) {
+			throw new IllegalStateException(ex);
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static Object cloneInternal(Object entity) throws Exception {
+
+		Class<?> clazz = entity.getClass();
+		
+		Object nent = clazz.newInstance();
+		
+		Method[] methods = clazz.getMethods();
+
+		for (int i = 0; i < methods.length; i++) {
+			Method met = methods[i];
+			String metn = met.getName();
+			log.trace("Method {}", metn);
+			if(!metn.startsWith("get")) {
+				continue;
+			}
+			if(Modifier.isStatic(met.getModifiers())) {
+				log.trace("Static getter {}. Skipping.", metn);
+				continue;
+			}
+			if(isTransient(met)) {
+				log.trace("transient getter {}. Skipping.", metn);
+				continue;
+			}
+
+			try {
+				Method setter = clazz.getMethod("set".concat(metn.substring(3)), met.getReturnType());
+				
+				Object val = met.invoke(entity);
+				Object nval;
+				
+				if(val == null) {
+					nval = null;
+				} else if(val.getClass().isPrimitive()) {
+					nval = val;
+				} else if(val instanceof IdI<?>) {
+					((IdI)(nval = val.getClass().newInstance())).setId(((IdI)val).getId());
+				} else if(val instanceof String) {
+					nval = new String((String)val);
+				} else if(val instanceof Number || val instanceof Enum || val instanceof Date) {
+					nval = clone(val);
+				} else {
+					if(log.isWarnEnabled()) {
+						log.warn(String.format("Unclonned value for property '%s': %s of type '%s'", metn, val, val.getClass().getName()));
+					}
+					nval = val;
+				}
+				setter.invoke(nent, nval);
+			} catch (NoSuchMethodException e) {
+				log.trace("No setter exists for getter {}. Skipping.", metn);
+				continue;
+			}
+		}
+		return nent;
+	}
+	
+	private static Object clone(Object val) throws Exception {
+		ByteArrayOutputStream bos;
+		ObjectOutputStream oos = new ObjectOutputStream(bos = new ByteArrayOutputStream());
+		oos.writeObject(val);
+		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+		return ois.readObject();
+	}
+
 	/**
 	 * tries to compare two object the best way. Entities are compared by them IDs, primitices by cvalues and the rest by the "equals" method.
 	 * 
