@@ -8,7 +8,7 @@ package net.fishear.exceptions;
  */
 public class 
 	AppException 
-extends 
+extends
 	GeneralException
 {
 

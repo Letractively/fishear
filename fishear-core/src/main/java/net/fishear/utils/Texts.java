@@ -299,4 +299,17 @@ public class Texts {
 		return s.substring(from, to);
 	}
 	
+	/**
+	 * Gets attribute value from the 'entity', converts it to string using 'toString' method and returns.
+	 * In case attribute value is empty string or in case any error, returns 'dftValue'.
+	 * 
+	 * @param bean object instance which the 'propertyName' property is taken from
+	 * @param propertyName name of required property from 'entity'
+	 * @param dftValue value returned if property value cannot be obtained or f it is empty.
+	 * @return the value
+	 */
+	public static String tos(Object entity, String propertyName, String dftValue) {
+		return tos(EntityUtils.getValue(propertyName, entity, dftValue), dftValue);
+	}
+	
 }
