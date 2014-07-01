@@ -56,6 +56,12 @@ extends
 		this.exceptions = exceptions;
 	}
 
+	/**
+	 * Adds one or more exceptions to the list.
+	 * 
+	 * @param exList exceptions
+	 * @return the instance
+	 */
 	public ValidationExceptionMultiple add(ValidationException... exList) {
 		if(exList != null && exList.length > 0) {
 			for(ValidationException ex : exList) {
@@ -69,4 +75,40 @@ extends
 		}
 		return this;
 	}
+
+	/**
+	 * creates new instance ov {@link ValidationException} that is described by the code and arguments and adds one exception to the list.
+	 * 
+	 * @param code exception message code
+	 * @param args optional arguments
+	 * @return the instance 
+	 */
+	public ValidationExceptionMultiple add(String code, Object... args) {
+		
+		add(new ValidationException(code, args));
+		return this;
+	}
+	
+	/**
+	 * if exception list is not empty, throws this instance. 
+	 * If the list IS EMPTY, does nothing.
+	 */
+	public void throwNotEmpty() {
+		if(getExceptions().size() > 0) {
+			throw this;
+		}
+	}
+
+	/**
+	 * if exception list is not empty, returns this instance. 
+	 * If the list IS EMPTY, returns null.
+	 */
+	public ValidationExceptionMultiple returnNotEmpty() {
+		if(getExceptions().size() > 0) {
+			return this;
+		} else {
+			return null;
+		}
+	}
+	
 }
