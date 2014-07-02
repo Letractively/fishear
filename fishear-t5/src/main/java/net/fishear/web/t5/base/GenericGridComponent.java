@@ -47,7 +47,7 @@ implements
 	private ServiceI<T> service() {
 		ServiceI<T> svc = getService();
 		if(svc == null) {
-			throw new IllegalStateException("Service required by the {} class is null.");
+			throw new IllegalStateException(String.format("method 'getService' returned null. This method must return service for entity type '%s'.", getEntityType().getName()));
 		}
 		return svc;
 	}

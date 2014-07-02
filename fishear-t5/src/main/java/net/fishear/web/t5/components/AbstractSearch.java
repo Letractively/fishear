@@ -120,9 +120,18 @@ implements
 	}
 	
 	@Cached
+	private ServiceI<T> service() {
+		ServiceI<T> svc = getService();
+		if(svc == null) {
+			throw new IllegalStateException(String.format("method 'getService' returned null. This method must return service for entity type '%s'.", getEntityType().getName()));
+		}
+		return svc;
+	}
+	
+	@Cached
 	public T getEntity() {
 		if(entity == null) {
-			entity = getService().newEntityInstance();
+			entity = service().newEntityInstance();
 			newEntityInstance(entity, EntityType.ENTITY);
 		}
 		return entity;
@@ -131,7 +140,7 @@ implements
 	@Cached
 	public T getEntity2() {
 		if(entity2 == null) {
-			entity2 = getService().newEntityInstance();
+			entity2 = service().newEntityInstance();
 			newEntityInstance(entity2, EntityType.ENTITY2);
 		}
 		return entity2;
