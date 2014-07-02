@@ -51,6 +51,15 @@ implements
 	 * @return the service that manages entities for this 
 	 */
 	public abstract ServiceI<T> getService();
+	
+	@Cached
+	private ServiceI<T> service() {
+		ServiceI<T> svc = getService();
+		if(svc == null) {
+			throw new IllegalStateException(String.format("method 'getService' returned null. This method must return service for entity type '%s'.", getEntityType().getName()));
+		}
+		return svc;
+	}
 
 	/**
 	 * called in case form is submitted.
@@ -107,7 +116,7 @@ implements
 		try {
 			if(entity == null) {
 				log.trace("getEntity(): Entity variable is null => creating new entity instance");
-				T e = getService().newEntityInstance();
+				T e = service().newEntityInstance();
 				log.trace("Calling 'newEntityInstance' for entity {}", e);
 				newEntityInstance(e);
 				try {
@@ -118,10 +127,10 @@ implements
 				}
 			} else if(entity.getId() != null) {
 				log.trace("getEntity(): Reading entity for ID '{}'", entity.getIdString());
-				entity = getService().syncRead(entity);
+				entity = service().syncRead(entity);
 				if(entity == null) {
 					log.warn("Entity with id {} not found", entity.getId());
-					entity = getService().newEntityInstance();
+					entity = service().newEntityInstance();
 					newEntityInstance(entity);
 				}
 			}
@@ -131,7 +140,7 @@ implements
 			log.error("Exception during entity gettting", ex);
 			if(entity == null) {
 				log.warn("entity is null after exception, creating new entity instance");
-				entity = getService().newEntityInstance();
+				entity = service().newEntityInstance();
 			}
 		}
 		return entity;
@@ -145,7 +154,7 @@ implements
 	 * @return data source
 	 */
 	public PagingDataSource getDataSource() {
-		PagingDataSource pds = new PagingDataSource(getService());
+		PagingDataSource pds = new PagingDataSource(service());
 		if(searchComponent != null) {
 			Conditions cond = searchComponent.getSearchConstraints();
 			Conditions cond2 = cond == null ? new Conditions() : cond;
@@ -176,7 +185,7 @@ implements
 	public Object onSuccess() {
 		log.debug("onSuccess() called");
 		try {
-			ServiceI<T> service = getService();
+			ServiceI<T> service = service();
 			T entity = getEntity();
 			
 			log.debug("onSuccess procedure for entity {} and service {}", entity, service);
@@ -201,7 +210,7 @@ implements
 				log.debug("Saving is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
 			}
 			if(ex.isRollback()) {
-				getService().getDao().rollback();
+				service().getDao().rollback();
 			}
 		}
 		return getReturn();
@@ -231,8 +240,8 @@ implements
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
-			if(getService().delete(id)) {
-				getService().getDao().commit();
+			if(service().delete(id)) {
+				service().getDao().commit();
 				alerts.success(translate("record-has-been-deleted-message"));
 			} else {
 				alerts.error(translate("cannot-delete-record-message"));
@@ -242,7 +251,7 @@ implements
 				log.debug("Deleting is interrupted by {}, rollback: {}", ex.toString(), ex.isRollback());
 			}
 			if(ex.isRollback()) {
-				getService().getDao().rollback();
+				service().getDao().rollback();
 			}
 		} catch(Exception ex) {
 			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
@@ -257,7 +266,7 @@ implements
 		log.debug("refreshEntity() called");
 		T e = getEntity();
 		if(!e.isNew()) {
-			entity = getService().getDao().refresh(getEntity());
+			entity = service().getDao().refresh(getEntity());
 		}
 	}
 
@@ -304,7 +313,7 @@ implements
 		if(entityId == null) {
 			entity = null;
 		} else {
-			entity = getService().read(entityId);
+			entity = service().read(entityId);
 		}
 		afterLoad();
 	}

@@ -16,6 +16,7 @@ import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.EntityUtils;
 import net.fishear.utils.Globals;
 
+import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.grid.ColumnSort;
 import org.apache.tapestry5.grid.GridDataSource;
 import org.apache.tapestry5.grid.SortConstraint;
@@ -39,6 +40,9 @@ implements
 	private final Class<? extends EntityI<?>> rowType;
 
 	public PagingDataSource(ServiceI<? extends EntityI<?>> listService) {
+		if(listService == null) {
+			throw new IllegalStateException(String.format("The service (argument 'listService') is null."));
+		}
 		this.rowType = listService.getEntityType();
 		setQueryConstraint(null);
 		setListService(listService);
