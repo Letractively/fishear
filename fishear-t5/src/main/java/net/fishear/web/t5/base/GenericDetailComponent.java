@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import net.fishear.Interfaces.EntityTypeI;
 import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.entities.EntitySourceI;
+import net.fishear.data.generic.services.ServiceHolder;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
@@ -35,7 +36,16 @@ implements
 	/**
 	 * @return the service that manages entities for this 
 	 */
-	public abstract ServiceI<T> getService();
+	@Override
+	public ServiceI<T> getService() {
+		@SuppressWarnings("unchecked")
+		ServiceI<T> svc = (ServiceI<T>) ServiceHolder.getInstance().findServiceForEntity(getEntityType());
+		if(svc == null) {
+System.err.println(ServiceHolder.getInstance().listRegisteredServices());
+			log.error("Method 'getService()' is not overriden, but service for entity {} seems to be unregisteres. Override the 'getService()' method to provide correct service.", getEntityType().getName());
+		}
+		return svc;
+	}
 
 	@Cached
 	private ServiceI<T> service() {
