@@ -53,7 +53,12 @@ implements
 	private Object DUMMY_ENTITY;
 	
 	private static final Class<Annotation> auditable = getAuditable();
+	
+    private final GenericDaoI<K> thisDao;
 
+    protected final Logger log = LoggerFactory.getLogger(getClass());
+
+	private List<String> eagerProps;
 	
 	@SuppressWarnings("unchecked")
 	private K dummyEntity() {
@@ -78,27 +83,29 @@ implements
 		}
 	}
 	
-    private final GenericDaoI<K> thisDao;
-
-    protected final Logger log = LoggerFactory.getLogger(getClass());
-
-	private List<String> eagerProps;
-
     public GenericService(GenericDaoI<K> genericDao) {
         this.thisDao = genericDao;
+        register();
         log.debug("Service instance created with DAO '{}'", this.thisDao);
     }
 
     public GenericService() {
         this.thisDao = DaoSourceManager.createDao(findType(), getClass());
+        register();
         log.debug("Service instance created with DAO '{}'", this.thisDao);
     }
 
     @SuppressWarnings("unchecked")
 	public GenericService(Class<? extends EntityI<?>> entityType) {
         this.thisDao = (GenericDaoI<K>) DaoSourceManager.createDao(entityType, getClass());
+        register();
         log.debug("Service instance created for entity type '{}', DAO '{}'", entityType, this.thisDao);
     }
+
+    
+	private void register() {
+		ServiceHolder.getInstance().registerService(this);
+	}
 
 	@Override
     public K read(Object id) {
