@@ -11,7 +11,14 @@ import net.fishear.utils.Texts;
 
 import org.apache.tapestry5.runtime.ComponentEventException;
 
-public class ExceptionHandledComponentBase extends ComponentBase {
+/**
+ * component base that handles all exceptions and transforms them to messagec. 
+ * Subclasses of this class should neve throw exception, only show message with exception text. Exceptions except {@link ValidationException} are also logged as errors.
+ * 
+ * @author ffyxrr
+ *
+ */
+public class ComponentBaseHandled extends ComponentBase {
 
 	/**
 	 * handles exception that occurs in component or nested components.
@@ -63,7 +70,7 @@ public class ExceptionHandledComponentBase extends ComponentBase {
 		if(cause instanceof BreakException) {
 			log.trace("BreakException thrown from component - IGNORED", cause);
 		} else {
-			log.trace("Exception thrown from  component that is proccesed ty 'ExceptionHandledComponentBase'", cause);
+			log.trace("Exception thrown from  component that is proccesed ty 'ComponentBaseHandled'", cause);
 			if(cause instanceof ValidationException) {
 				ValidationException vex = (ValidationException) cause;
 				if(vex.getType() != null) {

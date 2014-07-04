@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public abstract class
 	GenericGridComponent<T extends EntityI<?>> 
 extends 
-	ExceptionHandledComponentBase
+	ComponentBaseHandled
 implements
 	SearchableI<T>,
 	EntityTypeI,

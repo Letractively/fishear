@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public abstract class
 	GenericDetailComponent<T extends EntityI<?>> 
 extends 
-	ExceptionHandledComponentBase
+	ComponentBaseHandled
 implements
 	EntityTypeI,
 	ServiceSourceI<T>,
