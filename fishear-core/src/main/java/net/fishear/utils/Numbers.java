@@ -6,8 +6,8 @@ import net.fishear.exceptions.ValidationException;
 
 import org.apache.commons.lang.StringUtils;
 
-
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -84,14 +84,27 @@ public class Numbers {
 	 * If the 'n' is null or it's double value is NaN, returns 'dft'.
 	 * Never throws exception.
 	 */
-	public static BigDecimal tobd(Number n, BigDecimal dft) {
-		if(n != null) {
-			if(n instanceof BigDecimal) {
-				return (BigDecimal) n;
+	public static BigDecimal tobd(Number num, BigDecimal dft) {
+goDft:
+		if(num != null) {
+			if(num instanceof BigDecimal) {
+				return (BigDecimal) num;
 			}
-			double d = n.doubleValue();
-			if(!Double.isNaN(d)) {
-				return new BigDecimal(d);
+			if(num instanceof BigInteger) {
+				return new BigDecimal((BigInteger)num);
+			}
+			Class<? extends Number> numCl = num.getClass();
+			
+			if(numCl == Float.class || numCl == Float.TYPE || numCl == Double.class || numCl == Double.TYPE) {
+				Double d = num.doubleValue();
+				if(Double.isNaN(d)) {
+					break goDft;
+				} else {
+					return BigDecimal.valueOf(num.doubleValue());
+				}
+			}
+			if(numCl.isPrimitive() || numCl == Integer.class || numCl == Long.class || numCl == Short.class || numCl == Byte.class) {
+				return BigDecimal.valueOf(num.longValue());
 			}
 		}
 		return dft;
