@@ -42,18 +42,12 @@ public abstract class EnumSelectBase<T> {
 	public Map<T, String> getData() {
 		try {
 			Map<T, String> map = new TreeMap<T, String>();
+
 			T[] vals = getValues();
-			Class<? extends Object> clazz = vals[0].getClass();
-			
-			String fldn = Texts.tos(getFieldname(), null);
-			if(fldn == null) {
-				for(T val : vals) {
-					map.put(val, val.toString());
-				}
-			} else {
-				Field desc = clazz.getDeclaredField("desc");
-				for(T val : vals) {
-					map.put(val, (String) desc.get(val));
+			for(T val : vals) {
+				String text = getVisibleText(val);
+				if(text != null) {
+					map.put(val, text);
 				}
 			}
 			return map;
@@ -62,7 +56,25 @@ public abstract class EnumSelectBase<T> {
 		}
 	}
 
-	
+	/**
+	 * Designed to provide visible tect for goven item. 
+	 * By default, either value of "desc" field or field which name returns {@link #getFieldname()} method is returned, or (if field name is null) result of "toString".
+	 * May be overriden to change default behavior. If returns null, the item is skipped.
+	 * 
+	 * @param val e
+	 * @return visible text, or null = item is ignored (not added to the list).
+	 * @throws Exception
+	 */
+	protected String getVisibleText(T val) throws Exception {
+		String fldn = Texts.tos(getFieldname(), null);
+		if(fldn == null) {
+			return val.toString();
+		} else {
+			Field desc = val.getClass().getField("desc");
+			return (String) desc.get(val);
+		}
+	}
+
 	/**
 	 * @return name of the field that is used as visible text.
 	 * If returns null, "toString()" method is used.

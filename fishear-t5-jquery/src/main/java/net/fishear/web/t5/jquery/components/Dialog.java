@@ -79,11 +79,15 @@ public class Dialog extends ComponentBase {
 		return raiseDialogEvent(context);
 	}
 
+	public Zone getDialogZone() {
+		return (Zone)crsc.getEmbeddedComponent("dlgBaseZone");
+	}
+	
 	public Object raiseDialogEvent(Object[] context) {
 		if(Texts.tos(ajaxEvent).length() > 0) {
 			crsc.getContainerResources().triggerEvent(ajaxEvent, context, null);
 		}
-		return ((Zone)crsc.getEmbeddedComponent("dlgBaseZone")).getBody();
+		return getDialogZone().getBody();
 	}
 
 }
