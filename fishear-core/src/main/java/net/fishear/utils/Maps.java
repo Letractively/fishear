@@ -11,9 +11,9 @@ public class Maps {
 	 * @param parameters array with key-value pairs
 	 * @return map
 	 */
-	public static Map<String, Object> toMap(Object... parameters) {
+	public static <T> Map<String, T> toMap(Object... parameters) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, T> map = new HashMap<String, T>();
 
 		if(parameters != null) {
 
@@ -26,7 +26,8 @@ public class Maps {
 					throw new IllegalArgumentException(String.format("Each even parameter must be not null string value, but parameter at index %s ('%s)' is not.", i, parameters[i]));
 				}
 				String key = parameters[i].toString();
-				Object val = parameters[i + 1];
+				@SuppressWarnings("unchecked")
+				T val = (T) parameters[i + 1];
 				map.put(key, val);
 			}
 		}

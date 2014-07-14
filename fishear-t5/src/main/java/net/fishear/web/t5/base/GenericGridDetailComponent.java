@@ -225,7 +225,8 @@ implements
 	protected Object onDetail(Object id) {
 		log.debug("onDetail({}) called", id);
 		readEntity(id);
-		return getReturn();
+//		return getReturn();
+		return true;
 	}
 
 	/**
@@ -256,7 +257,8 @@ implements
 		} catch(Exception ex) {
 			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
 		}
-		return getReturn();
+//		return getReturn();
+		return true;
 	}
 
 	/**

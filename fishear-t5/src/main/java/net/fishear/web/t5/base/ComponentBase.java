@@ -43,9 +43,9 @@ public class ComponentBase {
 			an = cl.getAnnotation(type);
 		} while(an == null && (cl = cl.getSuperclass()) != Object.class);
 
-		if(an == null) {
-			throw new IllegalStateException(String.format("Class is expected to be annotated by '%s' annotation, but it is not", ForZone.class.getName()));
-		}
+//		if(an == null) {
+//			throw new IllegalStateException(String.format("Class is expected to be annotated by '%s' annotation, but it is not", ForZone.class.getName()));
+//		}
 		return an;
 	}
 	
@@ -54,22 +54,36 @@ public class ComponentBase {
 	 * The child class must be annotated by this annotation. 
 	 */
 	@Cached
-	public Zone getForZone() {
-		String an = getAn(ForZone.class).value();
+	protected Zone getForZone() {
+		try {
+			Component dcl = crsc.getEmbeddedComponent("detailDialog");
+			return (Zone) dcl.getClass().getMethod("getDialogZone").invoke(this);
+		} catch(Exception ex) {
+			return getOldForZone();
+		}
+	}
+	
+	private Zone getOldForZone() {
+		ForZone anot = getAn(ForZone.class);
+		if(anot == null) {
+			return null;
+		}
+		String an = anot.value();
 		Component zz = crsc.getEmbeddedComponent(an);
 		if(zz == null) {
-			throw new IllegalStateException(String.format("Component '%s' must contain embedded zone '%s'", getClass().getName(), an));
+			return null;
+//			throw new IllegalStateException(String.format("Component '%s' must contain embedded zone '%s'", getClass().getName(), an));
 		}
 		if(!(zz instanceof Zone)) {
 			throw new IllegalStateException(String.format("Embedded block '%s' is expected to be Zone, but it is '%s'", an, zz.getClass().getSuperclass().getName()));
 		}
 		return (Zone)zz;
 	}
-	
-	public String getForZoneId() {
-		Zone zz = getForZone();
-		return zz == null ? null : zz.getClientId();
-	}
+
+//	public String getForZoneId() {
+//		Zone zz = getForZone();
+//		return zz == null ? null : zz.getClientId();
+//	}
 	
 	
 	/**
