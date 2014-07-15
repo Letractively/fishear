@@ -16,11 +16,31 @@ import org.apache.tapestry5.services.javascript.JavaScriptSupport;
 import org.got5.tapestry5.jquery.components.DialogAjaxLink;
 import org.got5.tapestry5.jquery.components.DialogLink;
 
+/**
+ * jQuery dialog that directly contains its content. 
+ * Optionally it may render link to open the dialog - either using Ajaxc, or directly from the page.
+ * 
+ * parameter "event" decides about Ajax. If set, given event is sent to the server and its response (Zone content is expected) is shown. 
+ * Otherwise (if "event" parameter is not specified), dialog content is shown directly (without Ajax event).
+ * 
+ * In case Ajax (= "event" is specified), "context" argument is sent to the server.
+ * 
+ * Dialog may be also opened using {@link net.fishear.web.t5.jquery.components.DialogLink} with different context.
+ * 
+ * @author raterwork
+ *
+ */
 public class Dialog extends ComponentBase {
 
+	/**
+	 * if specified, it is shown as "open" link.
+	 */
 	@Parameter(defaultPrefix=BindingConstants.LITERAL)
 	Block label;
 	
+	/**
+	 * JQuery Dialog parameters - JSon object.
+	 */
 	@Parameter(value="")
 	@Property
 	String params;
@@ -28,11 +48,17 @@ public class Dialog extends ComponentBase {
 	@Inject
 	JavaScriptSupport jsup;
 	
+	/**
+	 * event context used in case Ajax. 
+	 */
 	@Parameter
 	Object[] context;
 	
+	/**
+	 * Event that is invoked on the server (context is passed). 
+	 * Its return (Zone content is expected) is shown in the dialog zone.
+	 */
 	@Parameter(name="event", defaultPrefix=BindingConstants.LITERAL)
-	@Property
 	String ajaxEvent;
 
 	@Parameter
@@ -76,18 +102,32 @@ public class Dialog extends ComponentBase {
 	}
 
 	public Object onActionFromAjaxDialog() {
-		return raiseDialogEvent(context);
+		return raiseDialogEvent(context, ajaxEvent);
 	}
 
 	public Zone getDialogZone() {
 		return (Zone)crsc.getEmbeddedComponent("dlgBaseZone");
 	}
 	
-	public Object raiseDialogEvent(Object[] context) {
+	public Object raiseDialogEvent(Object[] context, String ajaxEvent) {
 		if(Texts.tos(ajaxEvent).length() > 0) {
 			crsc.getContainerResources().triggerEvent(ajaxEvent, context, null);
 		}
 		return getDialogZone().getBody();
+	}
+
+	/**
+	 * @return the ajaxEvent
+	 */
+	public String getAjaxEvent() {
+		return ajaxEvent;
+	}
+
+	/**
+	 * @param ajaxEvent the ajaxEvent to set
+	 */
+	public void setAjaxEvent(String ajaxEvent) {
+		this.ajaxEvent = ajaxEvent;
 	}
 
 }

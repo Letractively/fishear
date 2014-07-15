@@ -8,15 +8,33 @@ import org.apache.tapestry5.runtime.Component;
 
 import net.fishear.web.t5.base.ComponentBase;
 
+/**
+ * Control that can "open" {@link Dialog}.
+ * 
+ * Alternative context may be passed to the server handler, then is specified at oridinal dialog.
+ * The event (that is invoked on the server) is specified at the dialog. 
+ * 
+ * It ia also possible to specify alternative event. 
+ * In such case different event handler is called for dialog's own button and different for this link.
+ * 
+ * @author ffyxrr
+ *
+ */
 public class DialogLink extends ComponentBase {
 
 	@Parameter(required=true, allowNull=false, defaultPrefix=BindingConstants.LITERAL)
 	String dialog;
 	
+	/**
+	 * context that is passed to server event handler.
+	 */
 	@Parameter
 	@Property
 	Object[] context;
-		
+
+	@Parameter(name="event")
+	String ajaxEvent;
+	
 	
 	/**
 	 * searches for dialog in component hierarchy.
@@ -50,7 +68,12 @@ public class DialogLink extends ComponentBase {
 	}
 
 	public Object onActionFromOpenDialog(Object[] context) {
-		return getDialog().raiseDialogEvent(context);
+		Dialog dlg = getDialog();
+		if(ajaxEvent != null) {
+			return dlg.raiseDialogEvent(context, ajaxEvent);
+		} else {
+			return dlg.raiseDialogEvent(context, dlg.getAjaxEvent());
+		}
 	}
 	
 }
