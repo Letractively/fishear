@@ -86,7 +86,7 @@ public interface
      * Never returns null - returns empty list in case no record if found.
      * It behaves similarly as {@link #query(QueryConstraints)}, but it is type safe. 
      * It cannot be used for general purpose queries too (only entity lists) and never returns null.
-     * {@link QueryConstraints#projection()} in 'constraints' must  not be set in case this call (otherwise exception is thrown).
+     * {@link QueryConstraints#projections()} in 'constraints' must  not be set in case this call (otherwise exception is thrown).
      * If audit module is available and entity is annotates as Auditable, initial state of each entity in list is saved for auditing purpose.
      * 
      * @param constraints constraint to restrict and modify the result. If it is null, the "full result" constraints are used (see {@link QueryFactory#fullResult()}).

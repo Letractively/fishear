@@ -1,12 +1,12 @@
 package net.fishear.data.generic.query.results;
 
-public class SqlProjectionItem extends ProjectionItem {
+public class SqlProjection extends Projection {
 
 	private String sql;
 	
 	private String[] aliases;
 	
-	public SqlProjectionItem() {
+	public SqlProjection() {
 		super(Type.SQL);
 	}
 	

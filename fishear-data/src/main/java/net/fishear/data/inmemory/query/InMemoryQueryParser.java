@@ -30,7 +30,7 @@ extends
      */
     public void parse( QueryConstraints qc, InMemoryCriteria criteria) {
 
-//    	Projection projection = prepareProjection(qc);
+//    	Projections projection = prepareProjection(qc);
 //    	if(projection != null) {
 //            criteria.setProjection(projection);
 //    		criteria.setResultTransformer( CriteriaSpecification.PROJECTION );
@@ -42,12 +42,12 @@ extends
         resultsParser.parse( qc.getResults(), criteria );
     }
 
-//	private Projection prepareProjection(QueryConstraints qc) {
-//		net.fishear.data.generic.query.results.Projection be2p = qc.getProjection();
-//		List<ProjectionItem> list;
+//	private Projections prepareProjection(QueryConstraints qc) {
+//		net.fishear.data.generic.query.results.Projections be2p = qc.getProjection();
+//		List<Projection> list;
 //		if(be2p != null && (list = be2p.getProjections()) != null) {
 //			ProjectionList pList = Projections.projectionList();
-//			for (ProjectionItem p : list) {
+//			for (Projection p : list) {
 //				switch(p.getType()) {
 //				case DISTINCT:
 //					pList.add(Projections.distinct(Projections.property(p.getPropertyName())));
