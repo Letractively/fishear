@@ -181,7 +181,7 @@ implements
 		return null;
 	}
 
-	public void setProjection(Projections projections) {
+	public void setProjections(Projections projections) {
 		this.projections = projections;
 	}
 
@@ -189,7 +189,7 @@ implements
 	 * Returns the projections instance (if any exists). 
 	 * Returns null if no projections is required.
 	 */
-	public Projections getProjection() {
+	public Projections getProjections() {
 		return projections;
 	}
 

@@ -71,7 +71,7 @@ extends
     }
 
 	private org.hibernate.criterion.Projection prepareProjection(QueryConstraints qc) {
-		net.fishear.data.generic.query.results.Projections be2p = qc.getProjection();
+		net.fishear.data.generic.query.results.Projections be2p = qc.getProjections();
 		if(be2p != null && be2p.getProjections() != null && be2p.getProjections().size() > 0) {
 			ProjectionList pList = org.hibernate.criterion.Projections.projectionList();
 			for (Projection p : be2p.getProjections()) {
