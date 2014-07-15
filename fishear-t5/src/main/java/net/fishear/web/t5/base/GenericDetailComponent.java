@@ -10,6 +10,7 @@ import net.fishear.data.generic.services.ServiceI;
 import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
+import net.fishear.exceptions.ValidationException;
 
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
@@ -92,6 +93,15 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 
 	}
 
+	/** called before record is deleted. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
+	 * 
+	 * @param id
+	 */
+	protected void afterDelete(T entity) {
+
+	}
+
 	/**
 	 * @return an entity instance; depending on persistent state it may erturn new instance or existing one.
 	 * Never returns null.
@@ -135,7 +145,17 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 		this.entity = entity;
 	}
 
-	//	@CommitAfter
+	/**
+	 * Default form handler designed to quick form handling. 
+	 * 
+	 * Gets here after form submission and all validations are OK. 
+	 * Calls {@link #beforeSave(EntityI)}, then saves record and calls {@link #afterSave(EntityI)}. 
+	 * Each of there calls may throw {@link ValidationException} that results to message, {@link BreakException} that silently stops the process, 
+	 * or any other exception that results to "internal error" message (the page is rendered normally only with error message).
+	 * If succeeded, performs commit and message is displayed to &lt;alerts /&gt; component. On any exception (including {@link BreakException} or {@link ValidationException}) performs rollback and corresponding error message is dislayed.
+	 * 
+	 * @return value of {@link #getFormReturn()} method.
+	 */
 	public Object onSuccess() {
 		log.debug("onSuccess() called");
 		try {
@@ -167,7 +187,7 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 				service().getDao().rollback();
 			}
 		}
-		return getReturn();
+		return getFormReturn();
 	}
 
 	public Object onAddNew() {
@@ -190,11 +210,28 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 		// does nothing - suit for successors 
 	}
 
-	public Object onDelete(Object id) {
+	/**
+	 * Deletes record from persistent storage. 
+	 * 
+	 * Calls {@link #beforeDelete(Object)}, then deletes record and calls {@link #afterDelete(EntityI)}. Both may throw {@link BreakException} to silently stop the process and perform rollback.
+	 * 
+	 * Shows corresponding alert message about result: success, ID does not exists, failure.
+	 * In case success, performs commit on all session (incl. previous commands). In case failure, performs rollback of all session. 
+	 * 
+	 * @param id Object ID to be deleted.
+	 * @return true if succeeded, false otherwise.
+	 */
+	protected Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
+			T entity = getService().read(id);
+			if(entity == null) {
+				alerts.error(translate("record-does-not-exist-message"));
+				return false;
+			}
 			if(service().delete(id)) {
+				afterDelete(entity);
 				service().getDao().commit();
 				alerts.success(translate("record-has-been-deleted-message"));
 			} else {

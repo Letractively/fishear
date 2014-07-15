@@ -56,14 +56,15 @@ public class ComponentBase {
 	@Cached
 	protected Zone getForZone() {
 		try {
-			Component dcl = crsc.getEmbeddedComponent("detailDialog");
-			return (Zone) dcl.getClass().getMethod("getDialogZone").invoke(this);
+			org.apache.tapestry5.runtime.Component dlg = crsc.getEmbeddedComponent("detailDialog");
+			return (Zone) dlg.getClass().getMethod("getDialogZone").invoke(dlg);
 		} catch(Exception ex) {
 			return getOldForZone();
 		}
 	}
 	
 	private Zone getOldForZone() {
+		log.warn("Deprecated 'ForZone' annotation is used. replace this annotation with standard approach (either 'fe.dialog', or direct zone ID reference.");
 		ForZone anot = getAn(ForZone.class);
 		if(anot == null) {
 			return null;
@@ -80,10 +81,16 @@ public class ComponentBase {
 		return (Zone)zz;
 	}
 
-//	public String getForZoneId() {
-//		Zone zz = getForZone();
-//		return zz == null ? null : zz.getClientId();
-//	}
+	/**
+	 * @return zone ID or null.
+	 * @deprecated Standard ^ zone reference should be used instead
+	 */
+	@Deprecated
+	public String getForZoneId() {
+		log.warn("Deprecated 'ForZoneId' attribute reference is used. Replace it with '^'.");
+		Zone zz = getForZone();
+		return zz == null ? null : zz.getClientId();
+	}
 	
 	
 	/**
@@ -100,6 +107,17 @@ public class ComponentBase {
 		return request.isXHR() ? getForZone() : getPageToRender();
 	}
 
+	/**
+	 * calls for return value during form submission. Default implementation calls {@link #getReturn()}, but may be overriden to return different value..
+	 * 
+	 * @return form handler return value.
+	 */
+	protected Object getFormReturn() {
+		return getReturn();
+	}
+	
+	
+	
 	public String translate(String key, Object... args) {
 		
 		

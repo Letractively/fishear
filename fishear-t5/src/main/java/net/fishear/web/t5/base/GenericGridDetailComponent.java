@@ -13,14 +13,12 @@ import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 import net.fishear.exceptions.ValidationException;
 import net.fishear.utils.Classes;
-import net.fishear.utils.Exceptions;
 import net.fishear.web.t5.data.PagingDataSource;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Persist;
-import org.apache.tapestry5.runtime.ComponentEventException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +95,17 @@ implements
 
 	}
 	
+	/** called before record is deleted. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
+	 * 
+	 * @param id
+	 */
+	protected void afterDelete(T entity) {
+
+	}
+	
+	
+	
 	/**
 	 * method suit for modifying conditions. 
 	 * 
@@ -107,8 +116,8 @@ implements
 	}
 
 
-	/**
-	 * @return an entity instance; depending on persistent state it may erturn new instance or existing one.
+	/*
+	 * @return an entity instance; depending on persistent state it may return new instance or existing one.
 	 * Never returns null.
 	 */
 	@Cached
@@ -151,6 +160,10 @@ implements
 	}
 
 	/**
+	 * Prepares {@link PagingDataSource} based on service.
+	 * Uses {@link #searchComponent} (is it is set) to construct query constraints. 
+	 * Also calls {@link #modifyConditions(Conditions)} and {@link #modifyConstraints(QueryConstraints)} (in this order) to allow to override and modify default behaviout.
+	 * 
 	 * @return data source
 	 */
 	public PagingDataSource getDataSource() {
@@ -181,7 +194,17 @@ implements
 
 	}
 
-	//	@CommitAfter
+	/**
+	 * Default form handler designed to quick form handling. 
+	 * 
+	 * Gets here after form submission and all validations are OK. 
+	 * Calls {@link #beforeSave(EntityI)}, then saves record and calls {@link #afterSave(EntityI)}. 
+	 * Each of there calls may throw {@link ValidationException} that results to message, {@link BreakException} that silently stops the process, 
+	 * or any other exception that results to "internal error" message (the page is rendered normally only with error message).
+	 * If succeeded, performs commit and message is displayed to &lt;alerts /&gt; component. On any exception (including {@link BreakException} or {@link ValidationException}) performs rollback and corresponding error message is dislayed.
+	 * 
+	 * @return value of {@link #getFormReturn()} method.
+	 */
 	public Object onSuccess() {
 		log.debug("onSuccess() called");
 		try {
@@ -213,7 +236,7 @@ implements
 				service().getDao().rollback();
 			}
 		}
-		return getReturn();
+		return getFormReturn();
 	}
 
 	public Object onAddNew() {
@@ -222,26 +245,54 @@ implements
 		return getReturn();
 	}
 
+	/**
+	 * Processes detail by loading entity by given ID.
+	 * 
+	 * If entity ID does not exist, prepares new entity instance (no error message is shown).
+	 * Calls {@link #readEntity(Object)} to read entity instance.
+	 * 
+	 * Returns true to prevent event bubbling. If event bubbling is required, override this method and return your own value.
+	 * 
+	 * @param id required entity ID
+	 * @return true to prevent event bubbling.
+	 */
 	protected Object onDetail(Object id) {
 		log.debug("onDetail({}) called", id);
 		readEntity(id);
-//		return getReturn();
 		return true;
 	}
 
 	/**
-	 * called after entity is read from database.
+	 * called after entity is read from database (even if it is not really loaded due nonexisting ID, but new entity instance is created).
+	 * 
 	 * The entity variable may be null during this call. Call of {@link #getEntity()} method guarantee not null return instead.
 	 */
 	protected void afterLoad() {
 		// does nothing - suit for successors 
 	}
 
+	/**
+	 * Deletes record from persistent storage. 
+	 * 
+	 * Calls {@link #beforeDelete(Object)}, then deletes record and calls {@link #afterDelete(EntityI)}. Both may throw {@link BreakException} to silently stop the process and perform rollback.
+	 * 
+	 * Shows corresponding alert message about result: success, ID does not exists, failure.
+	 * In case success, performs commit on all session (incl. previous commands). In case failure, performs rollback of all session. 
+	 * 
+	 * @param id Object ID to be deleted.
+	 * @return true if succeeded, false otherwise.
+	 */
 	protected Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
+			T entity = getService().read(id);
+			if(entity == null) {
+				alerts.error(translate("record-does-not-exist-message"));
+				return false;
+			}
 			if(service().delete(id)) {
+				afterDelete(entity);
 				service().getDao().commit();
 				alerts.success(translate("record-has-been-deleted-message"));
 			} else {
@@ -257,7 +308,6 @@ implements
 		} catch(Exception ex) {
 			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
 		}
-//		return getReturn();
 		return true;
 	}
 
@@ -308,8 +358,9 @@ implements
 	/**
 	 * reads entity with given ID.
 	 * If entityId is null or entity with the ID does not exist, new entity instance is created.
+	 * {@link #afterLoad()} method is called in both cases (entity is loaded, or new entity instance has been created). 
 	 * 
-	 * @param entityId
+	 * @param entityId ID of required entity
 	 */
 	public void readEntity(Object entityId) {
 		if(entityId == null) {
@@ -342,53 +393,5 @@ implements
 			clazz = clazz.getSuperclass();
 		}
 		throw new AppException("Subclass does not parametrize generic superclass.");
-	}
-
-	public Object onException(Throwable causingEx) {
-		Throwable cause;
-		if(causingEx instanceof ComponentEventException) {
-			cause = Exceptions.getRootCause(((ComponentEventException)causingEx).getCause());
-		} else {
-			cause = Exceptions.getRootCause(causingEx);
-		}
-		String message;
-		
-		// BreakException indicates that processing was stopped but it is not error
-		if(!(cause instanceof BreakException)) {
-			if(cause instanceof ValidationException) {
-				ValidationException vex = (ValidationException) cause;
-				String msg = vex.getMessage();
-				if(msg != null) {
-					if(msg.regionMatches(0,	"localized:", 0, 10)) {
-						message = msg.substring(10);
-					} else {
-						message = translate(msg, vex.getParams() == null ? new Object[0] : vex.getParams());
-					}
-				} else {
-					String causeMsg = "(unknown)";
-cont1:
-					try {
-						StackTraceElement[] stt = cause.getStackTrace();
-						for(StackTraceElement st : stt) {
-							Class<?> cl = getClass().getClassLoader().loadClass(st.getClassName());
-							if(EntityI.class.isAssignableFrom(cl)) {
-								causeMsg = Classes.getShortClassName(cl);
-								break cont1;
-							}
-						}
-						causeMsg = Classes.getShortClassName(getClass().getClassLoader().loadClass(stt[1].getClassName()));
-					} catch(Exception ex) {}
-					message = translate("validation-failed-at", causeMsg);
-				}
-			} else {
-				message = translate("application-error-occurred", cause.toString());
-				log.error("Applicatioon error occurred", causingEx);
-				if(message.startsWith("[[missing key:")) {
-					message = message + " :: " + cause.toString();
-				}
-			}
-			alerts.error(message);
-		}
-		return getReturn();
 	}
 }
