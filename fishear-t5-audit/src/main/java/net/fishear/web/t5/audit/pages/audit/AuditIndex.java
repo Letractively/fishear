@@ -138,7 +138,7 @@ public class AuditIndex extends ComponentBase {
 		} else {
 			QueryConstraints qc = QueryFactory.create();
 			qc.addJoin("audit", Restrictions.equal("auditedEntity", getAudiedEntity()));
-			qc.projection().distinct("propertyName");
+			qc.projections().distinct("propertyName");
 			return auditService.getAuditChangeService().query(qc);
 		}
 	}
@@ -275,7 +275,7 @@ public class AuditIndex extends ComponentBase {
 		qc.add(Restrictions.like("objectId", fragment));
 		qc.add(Restrictions.equal("auditedEntity", auditService.getAuditedEntityService().read(Integer.parseInt(entityHash))));
 		
-		qc.projection().distinct("objectId");
+		qc.projections().distinct("objectId");
 
 		List<String> list = auditService.query(qc);
 		return list;

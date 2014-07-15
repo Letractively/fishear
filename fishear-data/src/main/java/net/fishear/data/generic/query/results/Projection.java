@@ -1,16 +1,11 @@
 package net.fishear.data.generic.query.results;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.fishear.data.generic.query.results.ProjectionItem.Type;
-
 /**
- * projection of SQL result to Java object(s).
+ * One projection item.
  * 
- * Similar to Hibernate's projections.
+ * class may be instantiate from package only.
  * 
- * @author ffyxrr
+ * @author terber
  *
  */
 public class 
@@ -19,117 +14,77 @@ implements
 	Cloneable
 {
 
-	private List<ProjectionItem> projections;
-
-	public void setProjections(List<ProjectionItem> projections) {
-		this.projections = projections;
+	public enum Type {
+		DISTINCT,
+		PROPERTY,
+		SQL,
+		GROUP,
+		MAX,
+		MIN,
+		SUM,
+		COUNT,
+		COUNTDISTINCT,
+		AVG,
+		ROWCOUNT
 	}
 
-	public List<ProjectionItem> getProjections() {
-		return projections;
-	}
-
-	/**
-	 * adds the property projection type to the result.
-	 * @param propertyName
-	 * @return
-	 */
-	public Projection property(String propertyName) {
-		return add(propertyName, Type.PROPERTY);
-	}
-
-	public Projection distinct(String propertyName) {
-		return add(propertyName, Type.DISTINCT);
-	}
-
-	public Projection count(String propertyName) {
-		return add(propertyName, Type.COUNT);
-	}
-
-	public Projection countDistinct(String propertyName) {
-		return add(propertyName, Type.COUNTDISTINCT);
-	}
-
-	public Projection max(String propertyName) {
-		return add(propertyName, Type.MAX);
-	}
-
-	public Projection min(String propertyName) {
-		return add(propertyName, Type.MIN);
-	}
-
-	public Projection sum(String propertyName) {
-		return add(propertyName, Type.SUM);
-	}
-
-	public Projection avg(String propertyName) {
-		return add(propertyName, Type.AVG);
-	}
-
-	public Projection rowCount() {
-		return add(null, Type.ROWCOUNT);
-	}
-
-	/**
-	 * adds the property projection type to the result.
-	 * @param propertyName
-	 * @return
-	 */
-	public Projection group(String propertyName) {
-		return add(propertyName, Type.GROUP);
-	}
+	private String propertyName;
 	
-	public Projection add(ProjectionItem item) {
-		check(item.getType());
-		if(projections == null) {
-			projections = new ArrayList<ProjectionItem>();
+	private final Type type;
+	
+	private String alias;
+
+	protected Projection(Type type) {
+		this.type = type;
+	}
+
+	public static Projection distinct(String propertyName) {
+		Projection pIt = new Projection(Type.DISTINCT);
+		pIt.setPropertyName(propertyName);
+		return pIt;
+	}
+
+	public static Projection create(String propertyName, Type type) {
+		if(type == Type.SQL) {
+			throw new IllegalArgumentException(String.format("Projections type %s cannot be created by this call. ", type));
 		}
-		projections.add(item);
+		Projection pIt = new Projection(type);
+		pIt.setPropertyName(propertyName);
+		return pIt;
+	}
+
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
+	}
+
+	public String getPropertyName() {
+		return propertyName;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public Projection as(String alias) {
+		setAlias(alias);
 		return this;
 	}
 
-	public Projection add(String propertyName, Type type) {
-		return add(ProjectionItem.create(propertyName, type));
-	}
-	
-	protected void check(Type forType) {
-		if(projections != null) {
-			boolean isGrp = forType == Type.GROUP;
-			boolean isProperty = forType == Type.PROPERTY;
-			for(ProjectionItem pi : projections) {
-				switch(pi.getType()) {
-				case GROUP:
-					if(isProperty) {
-						throw new IllegalArgumentException(String.format("Cannot add projection %s when the %s has been added already", forType, pi.getType()));
-					}
-					isGrp = true;
-					break;
-				case PROPERTY:
-					if(isGrp) {
-						throw new IllegalArgumentException(String.format("Cannot add projection %s when the %s has been added already", forType, pi.getType()));
-					}
-					isProperty = true;
-					break;
-				default:
-					break;
-//					throw new IllegalArgumentException(String.format("Unsupported projection type: '%s'. Only those types are allowed: %s ", pi.getType(), Arrays.asList(ProjectionItem.Type.GROUP, ProjectionItem.Type.PROPERTY)));
-				}
-			}
-		}
-	}
-	
-	public int size() {
-		return projections == null ? 0 : projections.size();
+	public String toString() {
+		return type + " " + propertyName;
 	}
 
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		
-		List<ProjectionItem> prjs = projections;
-		for (ProjectionItem p : prjs) {
-			if(sb.length() > 0) { sb.append(", "); }
-			sb.append(p.toString());
-		}
-		return sb.toString();
+	/**
+	 * @return the alias
+	 */
+	public String getAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias the alias to set
+	 */
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 }

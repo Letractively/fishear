@@ -9,7 +9,7 @@ import net.fishear.data.generic.query.conditions.Where;
 import net.fishear.data.generic.query.order.OrderBy;
 import net.fishear.data.generic.query.order.SortDirection;
 import net.fishear.data.generic.query.restrictions.Restrictions;
-import net.fishear.data.generic.query.results.Projection;
+import net.fishear.data.generic.query.results.Projections;
 import net.fishear.data.generic.query.results.Results;
 import net.fishear.exceptions.AppException;
 import net.fishear.utils.Texts;
@@ -28,7 +28,7 @@ implements
 
 	private OrderBy orderBy;
 	private Where where;
-	private Projection projection;
+	private Projections projections;
 	private Results results;
 	
 	private List<String> eagerLoad;
@@ -65,7 +65,7 @@ implements
 		if (!eq(eagerLoad, that.eagerLoad)) {
 			return false;
 		}
-		if (!eq(projection, that.projection)) {
+		if (!eq(projections, that.projections)) {
 			return false;
 		}
 		if (!eq(alias, that.alias)) {
@@ -181,27 +181,27 @@ implements
 		return null;
 	}
 
-	public void setProjection(Projection projection) {
-		this.projection = projection;
+	public void setProjection(Projections projections) {
+		this.projections = projections;
 	}
 
 	/**
-	 * Returns the projection instance (if any exists). 
-	 * Returns null if no projection is required.
+	 * Returns the projections instance (if any exists). 
+	 * Returns null if no projections is required.
 	 */
-	public Projection getProjection() {
-		return projection;
+	public Projections getProjection() {
+		return projections;
 	}
 
 	/**
-	 * Always returns the projection instance. 
+	 * Always returns the projections instance. 
 	 * If the one does not exists, creates it.
 	 */
-	public Projection projection() {
-		if (projection == null) {
-			projection = new Projection();
+	public Projections projections() {
+		if (projections == null) {
+			projections = new Projections();
 		}
-		return projection;
+		return projections;
 	}
 
 	public String toString() {
@@ -219,9 +219,9 @@ implements
 			sb.append("\n");
 			sb.append(" RESULTS: [").append(results.toString()).append("]");
 		}
-		if (projection != null && projection.size() > 0) {
+		if (projections != null && projections.size() > 0) {
 			sb.append("\n");
-			sb.append(" PROJECTION: [").append(projection.toString()).append("]");
+			sb.append(" PROJECTION: [").append(projections.toString()).append("]");
 		}
 		return sb.toString();
 	}
