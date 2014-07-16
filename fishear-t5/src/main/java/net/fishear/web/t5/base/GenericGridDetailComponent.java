@@ -14,6 +14,7 @@ import net.fishear.exceptions.BreakException;
 import net.fishear.exceptions.ValidationException;
 import net.fishear.utils.Classes;
 import net.fishear.web.t5.data.PagingDataSource;
+import net.fishear.web.t5.internal.GridSourceI;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -30,8 +31,8 @@ implements
 	SearchableI<T>,
 	EntityTypeI,
 	EntitySourceI<T>,
-	ServiceSourceI<T>
-	
+	ServiceSourceI<T>,
+	GridSourceI<T>
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());
@@ -95,17 +96,16 @@ implements
 
 	}
 	
-	/** called before record is deleted. 
+	/** called after record is deleted. 
 	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
 	 * 
+	 * @param entity the original entity, which is deleted from persistent storage in time of this call.
 	 * @param id
 	 */
 	protected void afterDelete(T entity) {
 
 	}
-	
-	
-	
+
 	/**
 	 * method suit for modifying conditions. 
 	 * 

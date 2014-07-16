@@ -10,7 +10,6 @@ import net.fishear.data.generic.entities.EntityI;
 import net.fishear.data.generic.query.QueryConstraints;
 import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.services.ServiceI;
-import net.fishear.data.generic.services.ServiceSourceI;
 import net.fishear.utils.Numbers;
 
 import org.apache.tapestry5.BindingConstants;

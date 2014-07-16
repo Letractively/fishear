@@ -12,6 +12,7 @@ import net.fishear.exceptions.AppException;
 import net.fishear.exceptions.BreakException;
 import net.fishear.utils.Classes;
 import net.fishear.web.t5.data.PagingDataSource;
+import net.fishear.web.t5.internal.GridSourceI;
 import net.fishear.web.t5.internal.SearchFormI;
 import net.fishear.web.t5.internal.SearchableI;
 
@@ -26,7 +27,8 @@ extends
 implements
 	SearchableI<T>,
 	EntityTypeI,
-	ServiceSourceI<T>
+	ServiceSourceI<T>,
+	GridSourceI<T>
 {
 
 	Logger log = LoggerFactory.getLogger(getClass());
@@ -61,11 +63,28 @@ implements
 		
 	}
 
-	public Object onDelete(Object id) {
+	/**
+	 * Deletes record from persistent storage. 
+	 * 
+	 * Calls {@link #beforeDelete(Object)}, then deletes record and calls {@link #afterDelete(EntityI)}. Both may throw {@link BreakException} to silently stop the process and perform rollback.
+	 * 
+	 * Shows corresponding alert message about result: success, ID does not exists, failure.
+	 * In case success, performs commit on all session (incl. previous commands). In case failure, performs rollback of all session. 
+	 * 
+	 * @param id Object ID to be deleted.
+	 * @return true if succeeded, false otherwise.
+	 */
+	protected Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
+			T entity = getService().read(id);
+			if(entity == null) {
+				alerts.error(translate("record-does-not-exist-message"));
+				return false;
+			}
 			if(service().delete(id)) {
+				afterDelete(entity);
 				service().getDao().commit();
 				alerts.success(translate("record-has-been-deleted-message"));
 			} else {
@@ -90,6 +109,16 @@ implements
 	 * @param id
 	 */
 	protected void beforeDelete(Object id) {
+
+	}
+
+	/** called after record is deleted. 
+	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
+	 * 
+	 * @param entity the original entity, which is deleted from persistent storage in time of this call.
+	 * @param id
+	 */
+	protected void afterDelete(T entity) {
 
 	}
 
