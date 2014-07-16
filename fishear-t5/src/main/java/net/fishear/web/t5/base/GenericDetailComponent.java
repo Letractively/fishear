@@ -93,9 +93,10 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 
 	}
 
-	/** called before record is deleted. 
+	/** called after record is deleted. 
 	 * May throw {@link BreakException}, that causes update process breaking. If exception's 'rollback' flag is set, database rollback is performed; otherwise database commit status stay unchanged.
 	 * 
+	 * @param entity the original entity, which is deleted from persistent storage in time of this call.
 	 * @param id
 	 */
 	protected void afterDelete(T entity) {

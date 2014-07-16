@@ -7,6 +7,7 @@ import net.fishear.web.t5.base.ComponentBase;
 
 import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.Block;
+import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.annotations.Cached;
 import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Parameter;
@@ -41,7 +42,7 @@ public class Dialog extends ComponentBase {
 	/**
 	 * JQuery Dialog parameters - JSon object.
 	 */
-	@Parameter(value="")
+	@Parameter(value="{width:750,draggable:true}", defaultPrefix=BindingConstants.LITERAL)
 	@Property
 	String params;
 	
@@ -101,14 +102,28 @@ public class Dialog extends ComponentBase {
 		return label;
 	}
 
+	/**
+	 * event handler for action link (if {@link #label} is defined).
+	 * Only calls {@link #raiseDialogEvent(Object[], String)} with {@link #context} and "event" (see {@link #ajaxEvent} )
+	 * 
+	 * 
+	 * @return dialog zone returned by {@link #raiseDialogEvent(Object[], String)}
+	 */
 	public Object onActionFromAjaxDialog() {
-		return raiseDialogEvent(context, ajaxEvent);
+		return raiseDialogEvent(getContext(), getAjaxEvent());
 	}
 
 	public Zone getDialogZone() {
 		return (Zone)crsc.getEmbeddedComponent("dlgBaseZone");
 	}
 	
+	/**
+	 * If event is defined ({@link #ajaxEvent}, calls event handler from target component (where the dialog is used).
+	 * 
+	 * @param context the context passed to event (see {@link ComponentResources#triggerContextEvent(String, org.apache.tapestry5.EventContext, org.apache.tapestry5.ComponentEventCallback)}
+	 * @param ajaxEvent event name
+	 * @return dialog zone
+	 */
 	public Object raiseDialogEvent(Object[] context, String ajaxEvent) {
 		if(Texts.tos(ajaxEvent).length() > 0) {
 			crsc.getContainerResources().triggerEvent(ajaxEvent, context, null);
