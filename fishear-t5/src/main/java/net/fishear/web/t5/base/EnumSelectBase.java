@@ -70,7 +70,7 @@ public abstract class EnumSelectBase<T> {
 		if(fldn == null) {
 			return val.toString();
 		} else {
-			Field desc = val.getClass().getField("desc");
+			Field desc = val.getClass().getField(fldn);
 			return (String) desc.get(val);
 		}
 	}
