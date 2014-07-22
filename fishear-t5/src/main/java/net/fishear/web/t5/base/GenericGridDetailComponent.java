@@ -259,7 +259,7 @@ implements
 	protected Object onDetail(Object id) {
 		log.debug("onDetail({}) called", id);
 		readEntity(id);
-		return true;
+		return getFormReturn();
 	}
 
 	/**
