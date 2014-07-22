@@ -110,10 +110,10 @@ public class ComponentBase {
 	/**
 	 * calls for return value during form submission. Default implementation calls {@link #getReturn()}, but may be overriden to return different value..
 	 * 
-	 * @return form handler return value.
+	 * @return form handler return value. By default, returns true.
 	 */
 	protected Object getFormReturn() {
-		return getReturn();
+		return true;
 	}
 	
 	
