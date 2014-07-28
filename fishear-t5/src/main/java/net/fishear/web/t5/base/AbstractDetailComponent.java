@@ -24,7 +24,7 @@ implements
 		return super.getEntity();
 	}
 
-	protected Object onDelete(Long id) {
+	public Object onDelete(Long id) {
 		return super.onDelete(id);
 	}
 
@@ -37,7 +37,7 @@ implements
 		}
 	}
 
-	protected Object onDetail(Long id) {
+	public Object onDetail(Long id) {
 		return super.onDetail(id);
 	}
 

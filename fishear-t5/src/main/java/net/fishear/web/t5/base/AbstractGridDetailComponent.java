@@ -35,11 +35,11 @@ implements
 		return super.getEntity();
 	}
 
-	protected Object onDelete(Long id) {
+	public Object onDelete(Long id) {
 		return super.onDelete(id);
 	}
 
-	protected Object onDelete(Object id) {
+	public Object onDelete(Object id) {
 		try {
 			return onDelete(Numbers.tol(id, null));
 		} catch(Exception ex) {
@@ -48,11 +48,11 @@ implements
 		}
 	}
 
-	protected Object onDetail(Long id) {
+	public Object onDetail(Long id) {
 		return super.onDetail(id);
 	}
 
-	protected Object onDetail(Object id) {
+	public Object onDetail(Object id) {
 		try {
 			// preserve "internall" call of onDetail(Long) due possibility of overriding
 			return onDetail(Numbers.tol(id, null));

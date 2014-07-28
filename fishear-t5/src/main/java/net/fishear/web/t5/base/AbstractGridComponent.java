@@ -28,7 +28,7 @@ implements
 		this.row = row;
 	}
 
-	protected Object onDelete(Long id) {
+	public Object onDelete(Long id) {
 		return super.onDelete(id);
 	}
 
