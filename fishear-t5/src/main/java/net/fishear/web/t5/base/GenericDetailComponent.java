@@ -222,7 +222,7 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 	 * @param id Object ID to be deleted.
 	 * @return true if succeeded, false otherwise.
 	 */
-	protected Object onDelete(Object id) {
+	public Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
 		beforeDelete(id);
 		try {
