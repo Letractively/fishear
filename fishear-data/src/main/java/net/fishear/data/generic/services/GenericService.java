@@ -178,6 +178,9 @@ implements
 
 	@Override
     public void deleteAll(Collection<K> list) {
+		if(list == null) {
+			return;
+		}
     	for (K k : list) {
 			delete(k);
 		}
