@@ -300,4 +300,38 @@ public class Lists {
 		}
 		return nlist;
 	}
+	
+	/**
+	 * converts each item in list to a Long number. 
+	 * Values that cannot be converted are removed from target list.
+	 * 
+	 * @param list the list
+	 * @return list of Long that does not contain nulls.
+	 */
+	public List<Long> tol(List<Object> list) {
+		return tol(list, null);
+	}
+
+	/**
+	 * converts each item in list to a Long number. 
+	 * In case item cannot be converted, sets 'dft'as a value.
+	 * 
+	 * @param list list to be converted
+	 * @param dft value that is set as item value in case item cannot be converted to long. If 'dft' is null, items that cannot be converted are skipped (removed from returned list).
+	 * @return list of Long values that does not contain nulls.
+	 */
+	public List<Long> tol(List<Object> list, Long dft) {
+		
+		List<Long> retl = new ArrayList<Long>();
+		
+		for(Object o : list) {
+			Long val = Numbers.tol(o, dft);
+			if(val != null) {
+				retl.add(val);
+			}
+		}
+		return retl;
+		
+	}
+	
 }
