@@ -308,7 +308,7 @@ public class Lists {
 	 * @param list the list
 	 * @return list of Long that does not contain nulls.
 	 */
-	public List<Long> tol(List<Object> list) {
+	public static List<Long> tol(List<Object> list) {
 		return tol(list, null);
 	}
 
@@ -320,7 +320,7 @@ public class Lists {
 	 * @param dft value that is set as item value in case item cannot be converted to long. If 'dft' is null, items that cannot be converted are skipped (removed from returned list).
 	 * @return list of Long values that does not contain nulls.
 	 */
-	public List<Long> tol(List<Object> list, Long dft) {
+	public static List<Long> tol(List<Object> list, Long dft) {
 		
 		List<Long> retl = new ArrayList<Long>();
 		
