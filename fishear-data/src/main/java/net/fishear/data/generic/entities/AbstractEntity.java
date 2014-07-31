@@ -8,6 +8,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.TableGenerator;
 
 import net.fishear.data.generic.entities.EntityConstants;
+import net.fishear.utils.Numbers;
 
 /**
  * This is a superclass for all "standard" entity classes (with ID of Long type). 
@@ -34,7 +35,8 @@ extends
     )
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = EntityConstants.IDGEN_NAME)
 	public Long getId() {
-		return super.getId();
+		// due some Java version incompatibilities, on some systems happened class cast exception. This construction should to fix it. 
+		return Numbers.tol((Object)super.getId(), null);
 	}
 
 //	@Override

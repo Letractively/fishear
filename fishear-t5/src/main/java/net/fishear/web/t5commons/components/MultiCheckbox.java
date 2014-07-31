@@ -13,21 +13,21 @@ import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
 
 @SupportsInformalParameters
-public class MultiCheckbox {
+public class MultiCheckbox<T> {
 
 	@Inject
 	ComponentResources crsc;
 	
 	@Parameter(required=true, allowNull=true)
-	List<?> list;
+	List<T> list;
 	
 	@Parameter(name="key", allowNull=true, required=true)
-	Object id;
+	T id;
 
 	@SetupRender
 	void setup(MarkupWriter wr) {
 		if(list == null) {
-			list = new ArrayList<Object>();
+			list = new ArrayList<T>();
 		}
 		wr.element("span");
 		crsc.renderInformalParameters(wr);
@@ -38,11 +38,11 @@ public class MultiCheckbox {
 		wr.end();
 	}
 
-	public void setId(Object id) {
+	public void setId(T id) {
 		this.id = id;
 	}
 	
-	public Object getId() {
+	public T getId() {
 		return id;
 	}
 	
@@ -50,11 +50,10 @@ public class MultiCheckbox {
 		return list.contains(id);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setState(boolean fl) {
 		if(fl) {
 			if(!list.contains(id)) {
-				((List<Object>)list).add(id);
+				list.add(id);
 			}
 		} else {
 			if(list.contains(id)) {
