@@ -36,7 +36,12 @@ extends
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = EntityConstants.IDGEN_NAME)
 	public Long getId() {
 		// due some Java version incompatibilities, on some systems happened class cast exception. This construction should to fix it. 
-		return Numbers.tol((Object)super.getId(), null);
+		Object num = super.getId();
+		if(num instanceof Long) {
+			return (Long)num;
+		} else {
+			return Numbers.tol(num, null);
+		}
 	}
 
 //	@Override
