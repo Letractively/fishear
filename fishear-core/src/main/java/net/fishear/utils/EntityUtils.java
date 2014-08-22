@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -543,14 +544,14 @@ public class
 			return null;
 		}
 		try {
-			return (T) cloneInternal(entity);
+			return (T) cloneInternal(entity, false);
 		} catch (Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	static Object cloneInternal(Object entity) throws Exception {
+	static Object cloneInternal(Object entity, boolean cloneCollections) throws Exception {
 
 		Class<?> clazz = entity.getClass();
 		
@@ -575,7 +576,14 @@ public class
 			}
 
 			try {
-				Method setter = clazz.getMethod("set".concat(metn.substring(3)), met.getReturnType());
+				
+				Class<?> retType = met.getReturnType();
+				
+				if(Collection.class.isAssignableFrom(retType) && !cloneCollections) {
+					continue;
+				}
+				
+				Method setter = clazz.getMethod("set".concat(metn.substring(3)), retType);
 				
 				Object val = met.invoke(entity);
 				Object nval;
