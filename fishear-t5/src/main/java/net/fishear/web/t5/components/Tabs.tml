@@ -11,7 +11,7 @@
 			<t:eventlink event="select" context="tab.name">${tabTitle}</t:eventlink>
 			</p:else>
 		</t:if>
-	</span>&#160;
+	</span>
 </t:loop>
 </div>
 
