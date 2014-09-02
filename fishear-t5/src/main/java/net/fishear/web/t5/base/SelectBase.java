@@ -12,13 +12,14 @@ import net.fishear.data.generic.query.QueryFactory;
 import net.fishear.data.generic.services.ServiceI;
 import net.fishear.utils.Numbers;
 
-import org.apache.tapestry5.BindingConstants;
 import org.apache.tapestry5.ComponentResources;
 import org.apache.tapestry5.MarkupWriter;
+import org.apache.tapestry5.annotations.Component;
 import org.apache.tapestry5.annotations.Parameter;
 import org.apache.tapestry5.annotations.Property;
 import org.apache.tapestry5.annotations.SetupRender;
 import org.apache.tapestry5.annotations.SupportsInformalParameters;
+import org.apache.tapestry5.corelib.components.Select;
 import org.apache.tapestry5.dom.Element;
 
 /**
@@ -39,10 +40,6 @@ public abstract class SelectBase<T extends EntityI<?>> {
 	@Inject
 	ComponentResources crsc;
 
-	@Parameter(defaultPrefix=BindingConstants.LITERAL) 
-	@Property
-	String zone;
-	
 	@Parameter(name="value")
 	T value;
 
@@ -53,12 +50,12 @@ public abstract class SelectBase<T extends EntityI<?>> {
 	
 	protected abstract ServiceI<T> getService();
 
+	@Component(publishParameters="blankOption, blankLabel, zone")
+	protected Select select;
 
 	@SetupRender
-	void setupRender() {
-		if(zone != null) {
-			isSubmit = true;
-		}
+	protected void setupRender() {
+		
 	}
 
 	/**
