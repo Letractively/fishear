@@ -74,6 +74,12 @@ public class
 		OVERWRITE_BY_NULLS,
 		
 		/**
+		 * If set, collections are not copied.
+		 * By default, collections are copied from source to dest which may result to "lazy loading error"vin hibernate.
+		 */
+		IGNORE_COLLECTIONS,
+
+		/**
 		 * IF SET, DOES NOT PROVIDE check that target is assignable from the source.
 		 */
 		DO_NOT_CHECK_CLASSES
@@ -1103,6 +1109,7 @@ public class
 		boolean fillAll = false;
 		boolean fillSourceNulls = false;
 		boolean doCheck = true;
+		boolean ignoreCollections = false;
 		for(FillFlags fl : flags) {
 			if(fl == FillFlags.FILL_ALL) {
 				fillAll = true;
@@ -1112,6 +1119,8 @@ public class
 				fillSourceNulls = true;
 			} else if (fl == FillFlags.DO_NOT_CHECK_CLASSES) {
 				doCheck = false;
+			} else if (fl == FillFlags.IGNORE_COLLECTIONS) {
+				ignoreCollections = true;
 			}
 		}
 		Class<?> sClazz = srcE.getClass();
@@ -1145,6 +1154,10 @@ public class
 									!isTransient(setter) &&
 									Modifier.isPublic(mSrc.getModifiers()) && Modifier.isPublic(setter.getModifiers())
 							) {
+								if(Collection.class.isAssignableFrom(mSrc.getReturnType()) && ignoreCollections) {
+									continue;
+								}
+
 								Object valSrc = mSrc.invoke(srcE);
 								Method mDst = dClazz.getMethod(getterName);
 								if(valSrc != null) {

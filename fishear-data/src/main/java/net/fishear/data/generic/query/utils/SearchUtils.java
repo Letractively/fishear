@@ -3,6 +3,7 @@ package net.fishear.data.generic.query.utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Vector;
 
@@ -326,7 +327,10 @@ public class SearchUtils
 						} else {
 							Object o = m.invoke(entity1, EntityUtils.EOA);
 							if(o != null) {
-								log.warn("Field '{}' is unsupported type {}; ignored", fldName, retvalType.getName());
+								// collections are silently ignored
+								if(!Collection.class.isAssignableFrom(retvalType)) {
+									log.warn("Field '{}' is unsupported type {}; ignored", fldName, retvalType.getName());
+								}
 							} else {
 								log.debug("Field '{}' is unsupported type {}, but its value is null; ignored", fldName, retvalType.getName());
 							}

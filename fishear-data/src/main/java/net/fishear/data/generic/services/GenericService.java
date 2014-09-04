@@ -422,7 +422,7 @@ implements
     		return entity;
     	}
 		loadEager(entity, getEagerProps(null));
-    	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS, FillFlags.DO_NOT_CHECK_CLASSES);
+    	EntityUtils.fillDestination(entity, nent, FillFlags.OVERWRITE_BY_NULLS, FillFlags.DO_NOT_CHECK_CLASSES, FillFlags.IGNORE_COLLECTIONS);
     	return modifyEntity(nent);
     }
 
