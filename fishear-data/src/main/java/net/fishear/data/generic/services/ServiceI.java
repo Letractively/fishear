@@ -188,7 +188,8 @@ public interface
 
 	/** Synchronize entity in persistent storage with given entity.
 	 * If the 'entity' exists in the persistent storage, reads it and synchronize read one with 'entity'. 
-	 * Otherwise ('entity' is null, no ID, does not exist...), returns original entity or new instance. 
+	 * Otherwise ('entity' is null, no ID, does not exist...), returns original entity or new instance.
+	 * Collections may be ignored during synchronization (e.g. are NOT syncronized in default implementation).  
 	 * @param entity the "source" entity
 	 * @return entity instance (never returns null)
 	 */
