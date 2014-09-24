@@ -92,7 +92,7 @@ implements
 	 * 
 	 * @param id
 	 */
-	protected void beforeDelete(Object id) {
+	protected void beforeDelete(T entity) {
 
 	}
 	
@@ -282,15 +282,17 @@ implements
 	 * @param id Object ID to be deleted.
 	 * @return true if succeeded, false otherwise.
 	 */
-	protected Object onDelete(Object id) {
+	public Object onDelete(Object id) {
 		log.debug("onDelete({}) called", id);
-		beforeDelete(id);
 		try {
 			T entity = getService().read(id);
 			if(entity == null) {
 				alerts.error(translate("record-does-not-exist-message"));
 				return false;
 			}
+
+			beforeDelete(entity);
+
 			if(service().delete(id)) {
 				afterDelete(entity);
 				service().getDao().commit();
