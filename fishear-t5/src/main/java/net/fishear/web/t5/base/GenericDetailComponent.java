@@ -245,8 +245,9 @@ System.err.println(ServiceHolder.getInstance().listRegisteredServices());
 			if(ex.isRollback()) {
 				service().getDao().rollback();
 			}
-		} catch(Exception ex) {
-			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
+//		} catch(Exception ex) {
+//			log.error("Cannot delete record", ex);
+//			alerts.error(translate("error-while-deleting-record-message", ex.toString()));
 		}
 		return getReturn();
 	}
